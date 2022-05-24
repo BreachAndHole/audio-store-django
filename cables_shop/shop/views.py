@@ -1,9 +1,10 @@
 from django.shortcuts import render
-
+from .models import *
 
 def index(request):
     context = {
         'title': 'Главная страница',
+        'cable_types': CableType.objects.all(),
     }
     return render(request, 'shop/index.html', context)
 
