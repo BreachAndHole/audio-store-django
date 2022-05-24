@@ -6,6 +6,9 @@ def index(request):
         'title': 'Главная страница',
         'cable_types': CableType.objects.all(),
     }
+
+    print(CableType.objects.get(pk=1).photo.url)
+
     return render(request, 'shop/index.html', context)
 
 
