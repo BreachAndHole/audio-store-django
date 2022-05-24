@@ -1,0 +1,58 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col d-flex">
+                <div class="dropdown me-3">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton1"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Cable type
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="#">All</a></li>
+                        <li><a class="dropdown-item" href="#">Межблочный</a></li>
+                        <li><a class="dropdown-item" href="#">Акустический</a></li>
+                        <li><a class="dropdown-item" href="#">Инструментальный</a></li>
+                        <li><a class="dropdown-item" href="#">Силовой</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown mr-3">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton1"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Another filter
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="#">All</a></li>
+                        <li><a class="dropdown-item" href="#">Option 1</a></li>
+                        <li><a class="dropdown-item" href="#">Option 2</a></li>
+                        <li><a class="dropdown-item" href="#">Option 3</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row g-3 pt-3">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card bg-white border-white">
+                    <img src="https://picsum.photos/1280/720" alt="Title photo preview" class="card-img-top">
+                    <div class="card-body">
+                        <h3 class="card-title">Cable Title</h3>
+                        <div class="my-2">50 sm</div>
+                        <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque totam vero
+                            libero commodi quis eveniet, quas dolor ipsam dicta veniam quibusdam modi quisquam tempore
+                            distinctio iste nihil ullam ab doloribus.</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <a href="/" class="btn btn-outline-dark">Inspect</a>
+                            </div>
+                            <p class="text-dark"> 1200 р</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

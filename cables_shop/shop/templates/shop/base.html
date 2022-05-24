@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+
+<body class="bg-dark d-flex flex-column min-vh-100">
+<header class="p-3 bg-dark text-white">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a href="{% url 'home' %}" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+                <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap">
+                    <use xlink:href="#bootstrap"></use>
+                </svg>
+            </a>
+
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li><a href="{% url 'home' %}" class="nav-link px-2 text-white btn-lg">Главная</a></li>
+                <li><a href="{% url 'all_cables' %}" class="nav-link px-2 text-white">Продукция</a></li>
+                <li><a href="#" class="nav-link px-2 text-white">Constructor</a></li>
+                <li><a href="#" class="nav-link px-2 text-white">About</a></li>
+            </ul>
+            <div class="text-end">
+                <button type="button" class="btn text-white me-2">Cart</button>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container">
+    {% block content %}
+    {% endblock content %}
+</div>
+
+
+<div class="container bg-dark mt-auto">
+    <footer class="my-2">
+        <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+            <li class="nav-item"><a href="{% url 'home' %}" class="nav-link px-2 text-white">Home</a></li>
+            <li class="nav-item"><a href="{% url 'all_cables' %}" class="nav-link px-2 text-white">Products</a></li>
+            <li class="nav-item"><a href="#" class="nav-link px-2 text-white">Constructor</a></li>
+            <li class="nav-item"><a href="#" class="nav-link px-2 text-white">About</a></li>
+        </ul>
+        <p class="text-center text-white">© 2022 Company, Inc</p>
+    </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
+        integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js"
+        integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
