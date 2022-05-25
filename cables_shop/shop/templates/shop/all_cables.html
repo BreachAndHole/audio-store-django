@@ -36,16 +36,14 @@
     <div class="row g-3 pt-3">
         {% for cable in cables %}
         <div class="col-12 col-md-6 col-lg-4">
-            <div class="card bg-dark border-white">
+            <div class="card bg-dark text-white border-white h-100">
                 <img src="https://picsum.photos/1280/720" alt="Photo for {{ cable.name }}" class="card-img-top">
-                <div class="card-body text-white">
+                <div class="card-body d-flex flex-column text-white">
                     <h3 class="card-title">{{ cable.name }}</h3>
                     <div class="my-2">Длина: {% widthratio cable.length_m 1 100 %} см.</div>
                     <p class="card-text">{{ cable.description }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group text-white">
-                            <a href="{{ cable.get_absolute_url }}" class="btn btn-outline-light">Подробнее</a>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <a href="{{ cable.get_absolute_url }}" class="btn btn-outline-light">Подробнее</a>
                         <p>{{ cable.price|add:0 }} ₽</p>
                     </div>
                 </div>
