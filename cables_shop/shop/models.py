@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class CableType(models.Model):
@@ -33,3 +34,6 @@ class Cable(models.Model):
 
     def __str__(self):
         return f'#{self.pk} {self.name}'
+
+    def get_absolute_url(self):
+        return reverse('cable', kwargs={'cable_slug': self.slug})
