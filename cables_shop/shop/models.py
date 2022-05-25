@@ -15,3 +15,21 @@ class CableType(models.Model):
 
     def __str__(self):
         return f'#{self.pk} {self.name}'
+
+
+class Cable(models.Model):
+    name = models.CharField('Название', max_length=50)
+    slug = models.SlugField('URL')
+    length_m = models.DecimalField('Длина, м.', max_digits=5, decimal_places=2)
+    price = models.DecimalField('Цена', max_digits=8, decimal_places=2)
+    units_in_stock = models.PositiveSmallIntegerField('Количество в наличии')
+    description = models.TextField('Описание', blank=True, null=True)
+    type = models.ForeignKey(CableType, on_delete=models.PROTECT)
+
+    class Meta:
+        verbose_name = 'Кабель'
+        verbose_name_plural = 'Кабели'
+        ordering = ('type', 'price')
+
+    def __str__(self):
+        return f'#{self.pk} {self.name}'
