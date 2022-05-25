@@ -1,58 +1,57 @@
 {% extends 'shop/base.html' %}
 
 {% block content %}
-
-    <div class="container">
+<div class="container">
+    <form action="{% url 'all_cables' %}" method="post">
+        {% csrf_token %}
         <div class="row">
             <div class="col d-flex">
                 <div class="dropdown me-3">
                     <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton1"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Cable type
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Тип кабеля
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="#">All</a></li>
-                        <li><a class="dropdown-item" href="#">Межблочный</a></li>
-                        <li><a class="dropdown-item" href="#">Акустический</a></li>
-                        <li><a class="dropdown-item" href="#">Инструментальный</a></li>
-                        <li><a class="dropdown-item" href="#">Силовой</a></li>
+                        {% for type in cable_types %}
+                        <li class="mx-3">
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="checkbox" name="{{ type.name }}"
+                                           value="{{ type.pk }}">
+                                    {{ type.name }}
+                                </label>
+                            </div>
+                        </li>
+                        {% endfor %}
                     </ul>
                 </div>
-                <div class="dropdown mr-3">
-                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton1"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Another filter
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="#">All</a></li>
-                        <li><a class="dropdown-item" href="#">Option 1</a></li>
-                        <li><a class="dropdown-item" href="#">Option 2</a></li>
-                        <li><a class="dropdown-item" href="#">Option 3</a></li>
-                    </ul>
-                </div>
+                <button class="btn bg-dark text-white" type="submit">Применить фильтры</button>
             </div>
         </div>
-    </div>
-    <div class="container">
-        <div class="row g-3 pt-3">
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card bg-white border-white">
-                    <img src="https://picsum.photos/1280/720" alt="Title photo preview" class="card-img-top">
-                    <div class="card-body">
-                        <h3 class="card-title">Cable Title</h3>
-                        <div class="my-2">50 sm</div>
-                        <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque totam vero
-                            libero commodi quis eveniet, quas dolor ipsam dicta veniam quibusdam modi quisquam tempore
-                            distinctio iste nihil ullam ab doloribus.</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <a href="/" class="btn btn-outline-dark">Inspect</a>
-                            </div>
-                            <p class="text-dark"> 1200 р</p>
+    </form>
+</div>
+
+
+<div class="container">
+    <div class="row g-3 pt-3">
+        {% for cable in cables %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card bg-dark border-white">
+                <img src="https://picsum.photos/1280/720" alt="Photo for {{ cable.name }}" class="card-img-top">
+                <div class="card-body text-white">
+                    <h3 class="card-title">{{ cable.name }}</h3>
+                    <div class="my-2">Длина: {% widthratio cable.length_m 1 100 %} см.</div>
+                    <p class="card-text">{{ cable.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group text-white">
+                            <a href="#" class="btn btn-outline-light">Подробнее</a>
                         </div>
+                        <p>{{ cable.price|add:0 }} ₽</p>
                     </div>
                 </div>
             </div>
         </div>
+        {% endfor %}
     </div>
+</div>
 {% endblock content %}
