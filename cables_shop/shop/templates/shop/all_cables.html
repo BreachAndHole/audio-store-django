@@ -44,7 +44,7 @@
                     <p class="card-text">{{ cable.description }}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group text-white">
-                            <a href="#" class="btn btn-outline-light">Подробнее</a>
+                            <a href="{{ cable.get_absolute_url }}" class="btn btn-outline-light">Подробнее</a>
                         </div>
                         <p>{{ cable.price|add:0 }} ₽</p>
                     </div>
