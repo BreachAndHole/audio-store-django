@@ -16,5 +16,12 @@ class CableAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 
+class CablePhotoAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'cable', 'is_title', 'photo')
+    list_display_links = ('pk',)
+    list_filter = ('cable', 'is_title')
+
+
 admin.site.register(CableType, CableTypeAdmin)
 admin.site.register(Cable, CableAdmin)
+admin.site.register(CablePhoto, CablePhotoAdmin)
