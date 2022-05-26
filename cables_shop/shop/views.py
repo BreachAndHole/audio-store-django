@@ -32,8 +32,20 @@ class CablePage(detail.DetailView):
     }
 
 
+# This needs to be refactored
 def cart(request):
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, is_made=False)
+        all_items = order.ordereditem_set.all()
+    else:
+        # Kostyl'
+        order = {'get_cart_total_price': 0, 'get_cart_total_amount': 0}
+        all_items = []
+
     context = {
         'title': f'Корзина',
+        'all_items': all_items,
+        'order': order,
     }
     return render(request, 'shop/cart.html', context)
