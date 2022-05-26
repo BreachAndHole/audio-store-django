@@ -28,7 +28,7 @@ class CablePage(detail.DetailView):
     slug_url_kwarg = 'cable_slug'
     template_name = 'shop/cable.html'
     extra_context = {
-        'title': f'Страница товара - {model.name}',
+        'title': f'Страница товара',
     }
 
 

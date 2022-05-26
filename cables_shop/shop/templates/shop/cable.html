@@ -36,9 +36,9 @@
                 <h5 class="text-white mt-3">Цена: {{ cable.price }}₽</h5>
                 <h6 class="text-white mt-3">Длина: {{ cable.length_sm }} sm</h6>
                 {% if cable.units_in_stock %}
-                <div class="btn btn-outline-light btn-sm stext-white mt-3">В наличии</div>
+                    <div><a href="#" class="btn btn-sm btn-outline-light mt-3">В корзину</a></div>
                 {% else %}
-                <div class="btn btn-outline-light btn-sm disabled mt-3">Закончились</div>
+                    <div><a href="#" class="btn btn-sm btn-outline-light mt-3 disabled">Нет в наличии</a></div>
                 {% endif %}
             </div>
             <div class="text-white mt-3">{{ cable.description }}</div>
