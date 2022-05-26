@@ -63,11 +63,7 @@
         {% for type in cable_types %}
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card bg-dark text-white border-white h-100">
-                {% if type.photo %}
-                <img src="{{ type.photo.url }}" alt="Title photo preview" class="card-img-top">
-                {% else %}
-                <img src="https://picsum.photos/1280/720" alt="Title photo preview" class="card-img-top">
-                {% endif %}
+                <img src="{{ type.photo.url }}" alt="Photo for {{ type.name_plural }}" class="card-img-top">
                 <div class="card-body d-flex flex-column">
                     <h3 class="card-title">{{ type.name_plural }}</h3>
                     <p class="card-text">{{ type.description }}</p>

@@ -7,7 +7,7 @@ class CableType(models.Model):
     name_plural = models.CharField('название (мн.ч)', max_length=50)
     slug = models.SlugField('URL')
     description = models.TextField('описание', blank=True, null=True)
-    photo = models.ImageField('фото', upload_to='photos/cable_types/', blank=True, null=True)
+    photo = models.ImageField('фото', upload_to='photos/cable_types/')
 
     class Meta:
         verbose_name = 'тип кабеля'
