@@ -1,78 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Home page</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-
-</head>
-
-<body class="bg-dark d-flex flex-column min-vh-100">
+{% extends 'shop/base.html' %}
+{% block content %}
     <div class="container">
         <div class="row">
             <div class="col-lg-12 p-5">
-                <div class="table-responsive">
+                <div class="table-responsive ">
                     <table class="table">
                         <thead>
                             <tr class="border-bottom">
                                 <th scope="col" class="border-0 text-white">
-                                    <div class="p-2 px-3 text-uppercase">Product</div>
+                                    <div class="p-2 px-3 text-uppercase">Наименование</div>
                                 </th>
                                 <th scope="col" class="border-0 text-white">
-                                    <div class="py-2 text-uppercase">Price</div>
+                                    <div class="py-2 text-uppercase">Цена</div>
                                 </th>
                                 <th scope="col" class="border-0 text-white">
-                                    <div class="py-2 text-uppercase">Quantity</div>
+                                    <div class="py-2 text-uppercase">Количество</div>
                                 </th>
                                 <th scope="col" class="border-0 text-white">
-                                    <div class="py-2 text-uppercase">Remove</div>
+                                    <div class="py-2 text-uppercase">Удалить</div>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="border-bottom">
-                                <th scope="row" class="border-0">
+                                <td scope="row" class="border-0">
                                     <div class="p-2">
                                         <img src="https://bootstrapious.com/i/snippets/sn-cart/product-1.jpg" alt=""
-                                            width="70" class="img-fluid rounded shadow-sm">
+                                            width="70" class="img-fluid rounded">
                                         <div class="mx-3 d-inline-block align-middle">
-                                            <a href="#" class="h5 text-white d-inline-block align-middle">
-                                                Timex Unisex Originals
+                                            <a href="#" class="h5 text-white d-inline-block text-decoration-none">
+                                                Product name
                                             </a>
-                                            <span class="text-white d-block">Category: Watches</span>
                                         </div>
                                     </div>
-                                </th>
-                                <td class="border-0 align-middle text-white"><strong>$79.00</strong></td>
-                                <td class="border-0 align-middle text-white"><strong>3</strong></td>
-                                <td class="border-0 align-middle">
-                                    <a href="#" class="text-dark">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
                                 </td>
+                                <td class="border-0 align-middle text-white">Price</td>
+                                <td class="border-0 align-middle text-white">Qty</td>
+                                <td class="border-0 align-middle text-white">X</td>
                             </tr>
-                            <tr class="border-bottom">
-                                <th scope="row" class="border-0">
-                                    <div class="p-2">
-                                        <img src="https://bootstrapious.com/i/snippets/sn-cart/product-1.jpg" alt=""
-                                            width="70" class="img-fluid rounded shadow-sm">
-                                        <div class="mx-3 d-inline-block align-middle">
-                                            <a href="#" class="h5 text-white d-inline-block align-middle">
-                                                Timex Unisex Originals
-                                            </a>
-                                            <span class="text-white d-block">Category: Watches</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <td class="border-0 align-middle text-white"><strong>$79.00</strong></td>
-                                <td class="border-0 align-middle text-white"><strong>3</strong></td>
-                                <td class="border-0 align-middle">
-                                    <a href="#" class="text-dark">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                </td>
+                            <tr>
+                                <td scope="row" class="border-0"></td>
+                                <td class="border-0 align-middle text-white">6 500 Р</td>
+                                <td class="border-0 align-middle text-white"></td>
+                                <td class="border-0 align-middle text-white"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -80,13 +50,4 @@
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
-        integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js"
-        integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy"
-        crossorigin="anonymous"></script>
-</body>
-
-</html>
+{% endblock content %}

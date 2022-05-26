@@ -27,3 +27,10 @@ def cable_page(request, cable_slug):
         'cable': cable,
     }
     return render(request, 'shop/cable.html', context)
+
+
+def cart(request):
+    context = {
+        'title': f'Корзина',
+    }
+    return render(request, 'shop/cart.html', context)

@@ -2,7 +2,7 @@
 {% load shop_tags %}
 
 {% block content %}
-<div class="container px-4 py-5 text-white" id="hanging-icons">
+<div class="container py-5 text-white" id="hanging-icons">
     <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
         <div class="col d-flex align-items-start">
             <div class="icon-square bg-light text-white d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
@@ -58,7 +58,7 @@
     </div>
 </div>
 
-<div class="container">
+<div class="container mb-3">
     <div class="row g-3 pt-3 border-top">
         {% for type in cable_types %}
         <div class="col-12 col-md-6 col-lg-4">
@@ -68,7 +68,6 @@
                     <h3 class="card-title">{{ type.name_plural }}</h3>
                     <p class="card-text">{{ type.description }}</p>
                     <div class="mt-auto"><a href="#" class="btn btn-outline-light">Подробнее</a></div>
-
                 </div>
             </div>
         </div>

@@ -9,33 +9,25 @@
 </head>
 
 <body class="bg-dark d-flex flex-column min-vh-100 text-white">
-<header class="p-3 bg-dark text-white">
+<header class="py-3 bg-dark text-white">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a href="{% url 'home_page' %}" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap">
-                    <use xlink:href="#bootstrap"></use>
-                </svg>
-            </a>
-
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 <li><a href="{% url 'home_page' %}" class="nav-link text-white">Главная</a></li>
                 <li><a href="{% url 'all_cables_page' %}" class="nav-link text-white">Товары</a></li>
-                <li><a href="#" class="nav-link text-white">Constructor</a></li>
-                <li><a href="#" class="nav-link text-white">About</a></li>
+                <li><a href="#" class="nav-link text-white">(Constructor)</a></li>
+                <li><a href="#" class="nav-link text-white">(About)</a></li>
                 <li><a href="/admin" class="nav-link text-white">Админка</a></li>
             </ul>
             <div class="text-end">
-                <a href="#" class="btn btn-bg-dark text-white">Cart</a>
+                <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
             </div>
         </div>
     </div>
 </header>
-<div class="container">
-    {% block content %}
-    {% endblock content %}
-</div>
 
+{% block content %}
+{% endblock content %}
 
 <div class="container bg-dark mt-auto">
     <footer class="my-2">
