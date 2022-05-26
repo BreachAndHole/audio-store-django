@@ -47,6 +47,14 @@ class Cable(models.Model):
     def get_absolute_url(self):
         return reverse('cable_page', kwargs={'cable_slug': self.slug})
 
+    def get_title_photo_url(self):
+        try:
+            title_photo_url = self.cablephoto_set.get(is_title=True).photo.url
+        except ValueError:
+            title_photo_url = ''
+        print(f'{title_photo_url = }')
+        return title_photo_url
+
 
 class CablePhoto(models.Model):
     photo = models.ImageField('фото', upload_to='photos/cable_photos/%Y/%m')
@@ -91,6 +99,16 @@ class Order(models.Model):
     def __str__(self):
         return str(self.pk)
 
+    @property
+    def get_cart_total_price(self):
+        all_items_ordered = self.ordereditem_set.all()
+        return sum([item.get_item_total_price for item in all_items_ordered])
+
+    @property
+    def get_cart_total_amount(self):
+        all_items_ordered = self.ordereditem_set.all()
+        return sum([item.amount for item in all_items_ordered])
+
 
 class OrderedItem(models.Model):
     item = models.ForeignKey(Cable, on_delete=models.SET_NULL, null=True, blank=True)
@@ -99,7 +117,11 @@ class OrderedItem(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.item
+        return self.item.name
+
+    @property
+    def get_item_total_price(self):
+        return self.item.price * self.amount
 
 
 class ShippingAddress(models.Model):
