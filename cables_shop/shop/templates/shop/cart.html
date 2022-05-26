@@ -22,22 +22,24 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="border-bottom">
-                                <td scope="row" class="border-0">
-                                    <div class="p-2  align-middle">
-                                        <img src="https://bootstrapious.com/i/snippets/sn-cart/product-1.jpg" alt=""
-                                            width="70" class="img-fluid rounded">
-                                        <div class="mx-3 d-inline-block">
-                                            <a href="#" class="h5 text-white d-inline-block text-decoration-none">
-                                                Product name
-                                            </a>
+                            {% for item in all_items %}
+                                <tr class="border-bottom">
+                                    <td scope="row" class="border-0">
+                                        <div class="p-2  align-middle">
+                                            <img src="{{ item.item.get_title_photo_url }}" alt="{{ item.item.name }} photo"
+                                                width="70" class="img-fluid rounded">
+                                            <div class="mx-3 d-inline-block">
+                                                <a href="#" class="h5 text-white d-inline-block text-decoration-none">
+                                                    {{ item.item.name }}
+                                                </a>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="border-0 align-middle text-white">1500</td>
-                                <td class="border-0 align-middle text-white">3</td>
-                                <td class="border-0 align-middle text-white">X</td>
-                            </tr>
+                                    </td>
+                                    <td class="border-0 align-middle text-white">{{ item.item.price }}</td>
+                                    <td class="border-0 align-middle text-white">{{ item.amount }}</td>
+                                    <td class="border-0 align-middle text-white">X</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -45,8 +47,8 @@
         </div>
         <div class="row">
             <div class="col mx-3">
-                <p class="h5">Items: 3</p>
-                <p class="h5">Total: 4 500</p>
+                <p class="h5">Items: {{ order.get_cart_total_amount }}</p>
+                <p class="h5">Total: {{ order.get_cart_total_price }}</p>
 
             </div>
 
