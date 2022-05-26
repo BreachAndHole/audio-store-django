@@ -36,7 +36,7 @@ class Cable(models.Model):
         return f'#{self.pk} {self.name}'
 
     def get_absolute_url(self):
-        return reverse('cable', kwargs={'cable_slug': self.slug})
+        return reverse('cable_page', kwargs={'cable_slug': self.slug})
 
 
 class CablePhoto(models.Model):
