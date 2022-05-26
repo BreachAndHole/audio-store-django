@@ -1,5 +1,5 @@
 {% extends 'shop/base.html' %}
-
+{% load shop_tags %}
 {% block content %}
 <div class="container">
     <form action="{% url 'all_cables' %}" method="post">
@@ -37,7 +37,9 @@
         {% for cable in cables %}
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card bg-dark text-white border-white h-100">
-                <img src="https://picsum.photos/1280/720" alt="Photo for {{ cable.name }}" class="card-img-top">
+                {% for photo in cable.cablephoto_set.all|slice:':1' %}
+                    <img src="{{ photo.photo.url }}" alt="Photo for {{ cable.name }}" class="card-img-top">
+                {% endfor %}
                 <div class="card-body d-flex flex-column text-white">
                     <h3 class="card-title">{{ cable.name }}</h3>
                     <div class="my-2">Длина: {% widthratio cable.length_m 1 100 %} см.</div>
