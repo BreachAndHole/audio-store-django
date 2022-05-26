@@ -1,32 +1,35 @@
 from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.views.generic import list, detail
 from .models import *
 
 
-def index(request):
-    context = {
+class IndexPage(list.ListView):
+    model = CableType
+    context_object_name = 'cable_types'
+    template_name = 'shop/index.html'
+    extra_context = {
         'title': 'Главная страница',
-        'cable_types': CableType.objects.all(),
     }
-    return render(request, 'shop/index.html', context)
 
 
-def all_cables(request):
-    context = {
+class AllCablesPage(list.ListView):
+    model = Cable
+    context_object_name = 'cables'
+    template_name = 'shop/all_cables.html'
+    extra_context = {
         'title': 'Товары',
         'cable_types': CableType.objects.all(),
-        'cables': Cable.objects.all(),
     }
-    return render(request, 'shop/all_cables.html', context)
 
 
-def cable_page(request, cable_slug):
-    cable = get_object_or_404(Cable, slug=cable_slug)
-    context = {
-        'title': f'Страница товара - {cable.name}',
-        'cable': cable,
+class CablePage(detail.DetailView):
+    model = Cable
+    context_object_name = 'cable'
+    slug_url_kwarg = 'cable_slug'
+    template_name = 'shop/cable.html'
+    extra_context = {
+        'title': f'Страница товара - {model.name}',
     }
-    return render(request, 'shop/cable.html', context)
 
 
 def cart(request):
