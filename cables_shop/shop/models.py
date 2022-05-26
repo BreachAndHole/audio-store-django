@@ -7,7 +7,7 @@ class CableType(models.Model):
     name_plural = models.CharField('название (мн.ч)', max_length=50)
     slug = models.SlugField('URL')
     description = models.TextField('описание', blank=True, null=True)
-    photo = models.ImageField('фото', upload_to='photos/cable_types/')
+    photo = models.ImageField('фото', upload_to='photos/cable_types/', null=True)
 
     class Meta:
         verbose_name = 'тип кабеля'
@@ -21,8 +21,8 @@ class CableType(models.Model):
 class Cable(models.Model):
     name = models.CharField('название', max_length=50)
     slug = models.SlugField('URL')
-    length_m = models.DecimalField('длина, м.', max_digits=5, decimal_places=2)
-    price = models.DecimalField('цена', max_digits=8, decimal_places=2)
+    length_sm = models.PositiveSmallIntegerField('длина, см.', default=0)
+    price = models.PositiveIntegerField('цена, руб.', default=0)
     units_in_stock = models.PositiveSmallIntegerField('количество в наличии')
     description = models.TextField('описание', blank=True, null=True)
     type = models.ForeignKey(CableType, on_delete=models.PROTECT)

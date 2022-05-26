@@ -9,7 +9,7 @@ class CableTypeAdmin(admin.ModelAdmin):
 
 
 class CableAdmin(admin.ModelAdmin):
-    list_display = ('name', 'length_m', 'price', 'units_in_stock')
+    list_display = ('name', 'length_sm', 'price', 'units_in_stock')
     list_display_links = ('name',)
     list_editable = ('price', 'units_in_stock')
     list_filter = ('type',)
