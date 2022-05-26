@@ -18,7 +18,7 @@ class CableAdmin(admin.ModelAdmin):
 
 class CablePhotoAdmin(admin.ModelAdmin):
     list_display = ('pk', 'cable', 'is_title', 'photo')
-    list_display_links = ('pk',)
+    list_display_links = ('cable',)
     list_filter = ('cable', 'is_title')
 
 

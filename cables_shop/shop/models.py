@@ -15,7 +15,7 @@ class CableType(models.Model):
         ordering = ('pk',)
 
     def __str__(self):
-        return f'#{self.pk} {self.name}'
+        return self.name
 
 
 class Cable(models.Model):
@@ -50,4 +50,4 @@ class CablePhoto(models.Model):
         ordering = ('pk', '-is_title')
 
     def __str__(self):
-        return f'Фото#{self.pk}, {"title " if self.is_title else ""}{self.cable.name}'
+        return f'Фото#{self.pk}, {"title " if self.is_title else ""}{self.cable.name[:5]}...'
