@@ -47,7 +47,7 @@
                             <a href="{{ cable.get_absolute_url }}" class="btn btn-outline-light">Подробнее</a>
                             {% if cable.units_in_stock %}
                                 <button class="btn-update-cart btn btn-sm btn-outline-light ms-2"
-                                        data-item-id="{{ cable.pk }}" data-action="add_to_cart">В корзину
+                                        data-item-id="{{ cable.id }}" data-action="add_to_cart">В корзину
                                 </button>
                             {% endif %}
 
