@@ -76,9 +76,21 @@ def checkout(request):
 
 def update_item(request):
     data = json.loads(request.body)
-    print(data)
-    # item_id = data["itemId"]
+    item_id = data["itemId"]
     action = data["action"]
-    # print(f'{item_id = }')
-    print(f'{action = }')
+
+    customer = request.user.customer
+    item = Cable.objects.get(pk=item_id)
+    order, created = Order.objects.get_or_create(customer=customer, is_made=False)
+    ordered_item, created = OrderedItem.objects.get_or_create(order=order, item=item)
+
+    if action == 'add_to_cart':
+        ordered_item.amount += 1
+    elif action == 'remove_from__cart':
+        ordered_item.amount -= 1
+
+    ordered_item.save()
+    if ordered_item.amount < 0:
+        ordered_item.delete()
+
     return JsonResponse('Item was added', safe=False)
