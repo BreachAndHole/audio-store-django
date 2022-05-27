@@ -15,7 +15,6 @@ for (var i = 0; i < updateBtns.length; i++) {
 }
 
 function updateUserOrder(itemId, action) {
-    console.log(`Sending data: (itemId = ${itemId}), (action = ${action})`)
     var url = '/update_item/'
 
     fetch(url, {
@@ -25,8 +24,8 @@ function updateUserOrder(itemId, action) {
             'X-CSRFToken': csrftoken
         },
         body: JSON.stringify({
-            'action': action,
             'itemId': itemId,
+            'action': action,
         })
     })
 
@@ -35,7 +34,6 @@ function updateUserOrder(itemId, action) {
         })
 
         .then((data) => {
-            // location.reload()
-            document.getElementById('cart_total').innerText = data['cart_items_total']
+            location.reload()
         })
 }

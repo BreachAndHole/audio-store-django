@@ -6,7 +6,7 @@ from django.views.generic import list, detail, TemplateView
 from .models import *
 
 
-class IndexPage(list.ListView):
+class IndexPageView(list.ListView):
     model = CableType
     context_object_name = 'cable_types'
     template_name = 'shop/index.html'
@@ -17,7 +17,7 @@ class IndexPage(list.ListView):
         return context
 
 
-class AllCablesPage(list.ListView):
+class AllCablesPageView(list.ListView):
     model = Cable
     context_object_name = 'cables'
     template_name = 'shop/all_cables.html'
@@ -33,7 +33,7 @@ class AllCablesPage(list.ListView):
         return context
 
 
-class CablePage(detail.DetailView):
+class CablePageView(detail.DetailView):
     model = Cable
     context_object_name = 'cable'
     slug_url_kwarg = 'cable_slug'
@@ -70,7 +70,7 @@ def cart(request):
     return render(request, 'shop/cart.html', context)
 
 
-class CheckoutPage(TemplateView):
+class CheckoutPageView(TemplateView):
     template_name = 'shop/checkout.html'
     extra_context = {
         'title': f'Оформление заказа',
@@ -90,7 +90,7 @@ def update_item(request):
 
     if action == 'add_to_cart':
         ordered_item.amount += 1
-    elif action == 'remove_from__cart':
+    elif action == 'remove_from_cart':
         ordered_item.amount -= 1
 
     ordered_item.save()

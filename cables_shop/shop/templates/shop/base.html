@@ -42,7 +42,7 @@
             <div class="text-end">
                 {% with total=cart_items_total %}
                     {% if total %}
-                        <button class="btn btn-sm btn-outline-light" id="cart_total">{{ total }}</button>
+                        <button class="badge bg-white text-dark rounded-pill border-0 mx-2" id="cart_total">{{ total }}</button>
                     {% endif %}
                 {% endwith %}
                 <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
