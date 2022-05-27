@@ -7,9 +7,11 @@ class IndexPage(list.ListView):
     model = CableType
     context_object_name = 'cable_types'
     template_name = 'shop/index.html'
-    extra_context = {
-        'title': 'Главная страница',
-    }
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Главная страница'
+        return context
 
 
 class AllCablesPage(list.ListView):
@@ -21,6 +23,12 @@ class AllCablesPage(list.ListView):
         'cable_types': CableType.objects.all(),
     }
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Товары'
+        context['cable_types'] = CableType.objects.all()
+        return context
+
 
 class CablePage(detail.DetailView):
     model = Cable
@@ -30,6 +38,11 @@ class CablePage(detail.DetailView):
     extra_context = {
         'title': f'Страница товара',
     }
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Страница товара - {context.get("cable").name}'
+        return context
 
 
 # This needs to be refactored
