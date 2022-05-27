@@ -49,3 +49,10 @@ def cart(request):
         'order': order,
     }
     return render(request, 'shop/cart.html', context)
+
+
+def checkout(request):
+    context = {
+        'title': f'Оформление заказа',
+    }
+    return render(request, 'shop/checkout.html', context)
