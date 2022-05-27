@@ -37,7 +37,13 @@
                                 </div>
                             </td>
                             <td class="border-0 align-middle text-white">{{ item.item.price }}</td>
-                            <td class="border-0 align-middle text-white">{{ item.amount }}</td>
+                            <td class="border-0 align-middle text-white">
+                                <button class="mx-2 btn btn-outline-light btn-update-cart"
+                                data-item_id="{{ item.item.id }}" data-action="remove_from_cart">-</button>
+                                <span class="mx-2">{{ item.amount }}</span>
+                                <button class="mx-2 btn btn-outline-light btn-update-cart"
+                                data-item_id="{{ item.item.id }}" data-action="add_to_cart">+</button>
+                            </td>
                             <td class="border-0 align-middle text-white">X</td>
                         </tr>
                         {% endfor %}
@@ -46,13 +52,16 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col mx-3">
-                <p class="h5">Items: {{ order.get_cart_total_amount }}</p>
-                <p class="h5">Total: {{ order.get_cart_total_price }}</p>
-                <div><a href="{% url 'checkout_page' %}" class="btn btn-outline-light mt-3">Оформить заказ</a></div>
-            </div>
-
-        </div>
+        {% with items_total=cart_items_total %}
+            {% if items_total %}
+                <div class="row">
+                    <div class="col mx-3">
+                        <p class="h5">Items: {{ items_total }}</p>
+                        <p class="h5">Total: {{ order.get_cart_total_price }}</p>
+                        <div><a href="{% url 'checkout_page' %}" class="btn btn-outline-light mt-3">Оформить заказ</a></div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
     </div>
 {% endblock content %}
