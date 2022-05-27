@@ -1,4 +1,7 @@
+import json
+
 from django.shortcuts import render
+from django.http import JsonResponse
 from django.views.generic import list, detail
 from .models import *
 
@@ -69,3 +72,13 @@ def checkout(request):
         'title': f'Оформление заказа',
     }
     return render(request, 'shop/checkout.html', context)
+
+
+def update_item(request):
+    data = json.loads(request.body)
+    print(data)
+    # item_id = data["itemId"]
+    action = data["action"]
+    # print(f'{item_id = }')
+    print(f'{action = }')
+    return JsonResponse('Item was added', safe=False)
