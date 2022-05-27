@@ -2,8 +2,7 @@ import json
 
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.views.generic import list, detail
-from django.db.models import F
+from django.views.generic import list, detail, TemplateView
 from .models import *
 
 
@@ -71,14 +70,15 @@ def cart(request):
     return render(request, 'shop/cart.html', context)
 
 
-def checkout(request):
-    context = {
+class CheckoutPage(TemplateView):
+    template_name = 'shop/checkout.html'
+    extra_context = {
         'title': f'Оформление заказа',
     }
-    return render(request, 'shop/checkout.html', context)
 
 
 def update_item(request):
+    """Update cart function"""
     data = json.loads(request.body)
     item_id = data["itemId"]
     action = data["action"]
