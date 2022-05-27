@@ -40,6 +40,11 @@
                 <li><a href="/admin" class="nav-link text-white">Админка</a></li>
             </ul>
             <div class="text-end">
+                {% with total=cart_items_total %}
+                    {% if total %}
+                        <button class="btn btn-sm btn-outline-light" id="cart_total">{{ total }}</button>
+                    {% endif %}
+                {% endwith %}
                 <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
             </div>
         </div>

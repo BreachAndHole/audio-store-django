@@ -35,6 +35,7 @@ function updateUserOrder(itemId, action) {
         })
 
         .then((data) => {
-            console.log('data', data)
+            // location.reload()
+            document.getElementById('cart_total').innerText = data['cart_items_total']
         })
 }

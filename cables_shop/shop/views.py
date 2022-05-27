@@ -3,6 +3,7 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.generic import list, detail
+from django.db.models import F
 from .models import *
 
 
@@ -54,15 +55,18 @@ def cart(request):
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, is_made=False)
         all_items = order.ordereditem_set.all()
+        cart_total_items = order.get_cart_total_amount
     else:
         # Kostyl'
         order = {'get_cart_total_price': 0, 'get_cart_total_amount': 0}
+        cart_total_items = 0
         all_items = []
 
     context = {
         'title': f'Корзина',
         'all_items': all_items,
         'order': order,
+        # 'cart_counter': cart_total_items,
     }
     return render(request, 'shop/cart.html', context)
 
@@ -93,4 +97,7 @@ def update_item(request):
     if ordered_item.amount < 0:
         ordered_item.delete()
 
-    return JsonResponse('Item was added', safe=False)
+    context = {
+        'cart_items_total': order.get_cart_total_amount,
+    }
+    return JsonResponse(context, safe=False)
