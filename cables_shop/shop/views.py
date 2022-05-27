@@ -94,10 +94,7 @@ def update_item(request):
         ordered_item.amount -= 1
 
     ordered_item.save()
-    if ordered_item.amount < 0:
+    if ordered_item.amount <= 0:
         ordered_item.delete()
 
-    context = {
-        'cart_items_total': order.get_cart_total_amount,
-    }
-    return JsonResponse(context, safe=False)
+    return JsonResponse('Date received', safe=False)
