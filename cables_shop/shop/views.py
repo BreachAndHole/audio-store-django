@@ -107,4 +107,4 @@ def user_login(request):
 
 def user_logout(request):
     logout(request)
-    return redirect('user_login_page')
+    return redirect('home_page')
