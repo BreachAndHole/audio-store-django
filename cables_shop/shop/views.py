@@ -42,18 +42,24 @@ class CablePageView(detail.DetailView):
         return context
 
 
-class CartPageView(TemplateView):
+class CartPageView(list.ListView):
+    model = OrderedProduct
+    context_object_name = 'ordered_products'
     template_name = 'shop/cart.html'
-    extra_context = {
-        'title': 'Корзина',
-    }
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Корзина'
 
-# def cart(request):
-#     context = {
-#         'title': f'Корзина',
-#     }
-#     return render(request, 'shop/cart.html', context)
+        ordered_products = context.get('ordered_products')
+        cart_total_price = sum([product.get_product_total_price for product in ordered_products])
+        context['cart_total_price'] = cart_total_price
+        return context
+
+    def get_queryset(self):
+        return OrderedProduct.objects.filter(
+            order__customer=self.request.user.customer
+        )
 
 
 class CheckoutPageView(TemplateView):
