@@ -2,6 +2,7 @@ from .models import *
 
 
 def get_cart_items_total(request):
+    """This context processor is made for displaying cart items amount"""
     if not request.user.is_authenticated:
         return {'cart_items_total': 0}
 

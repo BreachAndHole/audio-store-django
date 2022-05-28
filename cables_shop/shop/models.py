@@ -1,9 +1,10 @@
 from django.db import models
 from django.urls import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 
 class CableType(models.Model):
+
     name = models.CharField('название (ед.ч)', max_length=30, unique=True)
     name_plural = models.CharField('название (мн.ч)', max_length=50)
     slug = models.SlugField('URL')
@@ -28,6 +29,7 @@ class CableType(models.Model):
 
 
 class Cable(models.Model):
+
     name = models.CharField('название', max_length=50)
     slug = models.SlugField('URL')
     length_sm = models.PositiveSmallIntegerField('длина, см.', default=0)
@@ -57,6 +59,7 @@ class Cable(models.Model):
 
 
 class CablePhoto(models.Model):
+
     photo = models.ImageField('фото', upload_to='photos/cable_photos/%Y/%m')
     cable = models.ForeignKey(Cable, verbose_name='кабель', on_delete=models.CASCADE)
     is_title = models.BooleanField('является титульным')
@@ -67,7 +70,7 @@ class CablePhoto(models.Model):
         ordering = ('pk', '-is_title')
 
     def __str__(self):
-        return f'Фото#{self.pk}, {"title " if self.is_title else ""}{self.cable.name[:5]}...'
+        return f'{"title " if self.is_title else ""}{self.cable.name[:5]}...'
 
     @property
     def get_photo_url(self):
@@ -79,6 +82,7 @@ class CablePhoto(models.Model):
 
 
 class Customer(models.Model):
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     first_name = models.CharField(max_length=30, null=True)
     last_name = models.CharField(max_length=30, null=True)
@@ -91,6 +95,7 @@ class Customer(models.Model):
 
 
 class Order(models.Model):
+
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     order_date = models.DateTimeField(auto_now_add=True)
     is_made = models.BooleanField(default=False)
@@ -111,6 +116,7 @@ class Order(models.Model):
 
 
 class OrderedItem(models.Model):
+
     item = models.ForeignKey(Cable, on_delete=models.SET_NULL, null=True, blank=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.SmallIntegerField(default=0, null=True, blank=True)
@@ -125,6 +131,7 @@ class OrderedItem(models.Model):
 
 
 class ShippingAddress(models.Model):
+
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.CharField(max_length=150, null=True, blank=True)

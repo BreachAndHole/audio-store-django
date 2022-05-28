@@ -1,10 +1,12 @@
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.generic import list, detail, TemplateView
 from django.db.models import F
+from django.contrib import messages
 from .models import *
+from .forms import *
 
 
 class IndexPageView(list.ListView):
@@ -101,8 +103,20 @@ def update_item(request):
 
 
 def user_registration(request):
+    form = CreateUserForm()
+
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            user_name = form.cleaned_data.get('username', '')
+            messages.success(request, f'Аккаунт пользователя {user_name} создан')
+
+            return redirect('user_login_page')
+
     contex = {
         'title': 'Регистрация',
+        'form': form
     }
     return render(request, 'shop/registration.html', contex)
 

@@ -37,7 +37,7 @@
                 <li><a href="{% url 'all_cables_page' %}" class="nav-link text-white">Товары</a></li>
                 <li><a href="#" class="nav-link text-white">(Constructor)</a></li>
                 <li><a href="#" class="nav-link text-white">(About)</a></li>
-                <li><a href="/admin" class="nav-link text-white">Админка</a></li>
+                <li><a href="/admin" class="nav-link text-white" target="_blank">Админка</a></li>
             </ul>
             <div class="text-end">
 
@@ -47,8 +47,8 @@
                         <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
                     {% endif %}
                 {% endwith %}
-                <a href="{% url 'login_page' %}" class="btn btn-bg-dark btn-outline-light">Вход</a>
-                <a href="{% url 'registration_page' %}" class="btn btn-light">Регистрация</a>
+                <a href="{% url 'user_login_page' %}" class="btn btn-bg-dark btn-outline-light">Вход</a>
+                <a href="{% url 'user_registration_page' %}" class="btn btn-light">Регистрация</a>
             </div>
         </div>
     </div>
