@@ -26,3 +26,6 @@ class CablePhotoAdmin(admin.ModelAdmin):
 admin.site.register(CableType, CableTypeAdmin)
 admin.site.register(Cable, CableAdmin)
 admin.site.register(CablePhoto, CablePhotoAdmin)
+
+# Orders related
+admin.site.register(Customer)

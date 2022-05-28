@@ -1,9 +1,11 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class CableType(models.Model):
-
     name = models.CharField('название (ед.ч)', max_length=30, unique=True)
     name_plural = models.CharField('название (мн.ч)', max_length=50)
     slug = models.SlugField('URL')
@@ -28,7 +30,6 @@ class CableType(models.Model):
 
 
 class Cable(models.Model):
-
     name = models.CharField('название', max_length=50)
     slug = models.SlugField('URL')
     length_sm = models.PositiveSmallIntegerField('длина, см.', default=0)
@@ -58,7 +59,6 @@ class Cable(models.Model):
 
 
 class CablePhoto(models.Model):
-
     photo = models.ImageField('фото', upload_to='photos/cable_photos/%Y/%m')
     cable = models.ForeignKey(Cable, verbose_name='кабель', on_delete=models.CASCADE)
     is_title = models.BooleanField('является титульным')
@@ -78,3 +78,29 @@ class CablePhoto(models.Model):
         except ValueError:
             photo_url = ''
         return photo_url
+
+
+class Customer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True, verbose_name='пользователь')
+    first_name = models.CharField('имя', max_length=15)
+    last_name = models.CharField('фамилия', max_length=15)
+    middle_name = models.CharField('отчество', max_length=15, blank=True, null=True)
+    phone = models.CharField('номер телефона', max_length=15)
+
+    class Meta:
+        verbose_name = 'клиент'
+        verbose_name_plural = 'клиенты'
+
+    def __str__(self):
+        return f'#{self.pk} {self.user.username}'
+
+
+@receiver(post_save, sender=User)
+def create_customer_profile(sender, instance, created, **kwargs):
+    if created:
+        Customer.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_customer_profile(sender, instance, **kwargs):
+    instance.customer.save()
