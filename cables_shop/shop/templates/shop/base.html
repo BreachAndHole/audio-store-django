@@ -40,12 +40,15 @@
                 <li><a href="/admin" class="nav-link text-white">Админка</a></li>
             </ul>
             <div class="text-end">
+
                 {% with total=cart_items_total %}
                     {% if total %}
                         <button class="badge bg-white text-dark rounded-pill border-0 mx-2" id="cart_total">{{ total }}</button>
+                        <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
                     {% endif %}
                 {% endwith %}
-                <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
+                <a href="#" class="btn btn-bg-dark btn-outline-light">Вход</a>
+                <a href="#" class="btn btn-light">Регистрация</a>
             </div>
         </div>
     </div>
