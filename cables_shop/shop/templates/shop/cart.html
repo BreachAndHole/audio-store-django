@@ -1,69 +1,68 @@
 {% extends 'shop/base.html' %}
 {% block content %}
 
-<div class="container h1">Корзина :)</div>
-<!--    <div class="container">-->
-<!--        <div class="row">-->
-<!--            <div class="col-lg-12 my-3">-->
-<!--                <div class="table-responsive ">-->
-<!--                    <table class="table">-->
-<!--                        <thead>-->
-<!--                        <tr class="border-bottom">-->
-<!--                            <th scope="col" class="border-0 text-white">-->
-<!--                                <div class="p-2 text-uppercase">Наименование</div>-->
-<!--                            </th>-->
-<!--                            <th scope="col" class="border-0 text-white">-->
-<!--                                <div class="py-2 text-uppercase">Цена</div>-->
-<!--                            </th>-->
-<!--                            <th scope="col" class="border-0 text-white">-->
-<!--                                <div class="py-2 text-uppercase">Количество</div>-->
-<!--                            </th>-->
-<!--                            <th scope="col" class="border-0 text-white">-->
-<!--                                <div class="py-2 text-uppercase">Удалить</div>-->
-<!--                            </th>-->
-<!--                        </tr>-->
-<!--                        </thead>-->
-<!--                        <tbody>-->
-<!--                        {% for item in all_items %}-->
-<!--                        <tr class="border-bottom">-->
-<!--                            <td scope="row" class="border-0">-->
-<!--                                <div class="p-2  align-middle">-->
-<!--                                    <img src="{{ item.item.get_title_photo_url }}" alt="{{ item.item.name }} photo"-->
-<!--                                         width="70" class="img-fluid rounded">-->
-<!--                                    <div class="mx-3 d-inline-block">-->
-<!--                                        <a href="{{ item.item.get_absolute_url }}"-->
-<!--                                           class="h5 text-white d-inline-block text-decoration-none">-->
-<!--                                            {{ item.item.name }}-->
-<!--                                        </a>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </td>-->
-<!--                            <td class="border-0 align-middle text-white">{{ item.item.price }}</td>-->
-<!--                            <td class="border-0 align-middle text-white">-->
-<!--                                <button class="mx-2 btn btn-outline-light btn-update-cart"-->
-<!--                                data-item_id="{{ item.item.id }}" data-action="remove_from_cart">-</button>-->
-<!--                                <span class="mx-2">{{ item.amount }}</span>-->
-<!--                                <button class="mx-2 btn btn-outline-light btn-update-cart"-->
-<!--                                data-item_id="{{ item.item.id }}" data-action="add_to_cart">+</button>-->
-<!--                            </td>-->
-<!--                            <td class="border-0 align-middle text-white">X</td>-->
-<!--                        </tr>-->
-<!--                        {% endfor %}-->
-<!--                        </tbody>-->
-<!--                    </table>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        {% with items_total=cart_items_total %}-->
-<!--            {% if items_total %}-->
-<!--                <div class="row">-->
-<!--                    <div class="col mx-3">-->
-<!--                        <p class="h5">Items: {{ items_total }}</p>-->
-<!--                        <p class="h5">Total: {{ order.get_cart_total_price }}</p>-->
-<!--                        <div><a href="{% url 'checkout_page' %}" class="btn btn-outline-light mt-3">Оформить заказ</a></div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            {% endif %}-->
-<!--        {% endwith %}-->
-<!--    </div>-->
+<div class="container"></div>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 my-3">
+            <div class="table-responsive ">
+                <table class="table">
+                    <thead>
+                    <tr class="border-bottom">
+                        <th scope="col" class="border-0 text-white">
+                            <div class="p-2 text-uppercase">Наименование</div>
+                        </th>
+                        <th scope="col" class="border-0 text-white">
+                            <div class="py-2 text-uppercase">Цена</div>
+                        </th>
+                        <th scope="col" class="border-0 text-white">
+                            <div class="py-2 text-uppercase">Количество</div>
+                        </th>
+                        <th scope="col" class="border-0 text-white">
+                            <div class="py-2 text-uppercase">Удалить</div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in ordered_products %}
+                    <tr class="border-bottom">
+                        <td scope="row" class="border-0">
+                            <div class="p-2  align-middle">
+                                <img src="{{ product.product.get_title_photo_url }}"
+                                     alt="{{ product.product.name }} photo"
+                                     width="70" class="img-fluid rounded">
+                                <div class="mx-3 d-inline-block">
+                                    <a href="{{ product.product.get_absolute_url }}"
+                                       class="h5 text-white d-inline-block text-decoration-none">
+                                        {{ product.product.name }}
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="border-0 align-middle text-white">{{ product.product.price }}</td>
+                        <td class="border-0 align-middle text-white">
+                            <button class="mx-2 btn btn-outline-light btn-update-cart"
+                                    data-item_id="{{ product.product.id }}" data-action="remove_from_cart">-
+                            </button>
+                            <span class="mx-2">{{ product.quantity }}</span>
+                            <button class="mx-2 btn btn-outline-light btn-update-cart"
+                                    data-item_id="{{ product.product.id }}" data-action="add_to_cart">+
+                            </button>
+                        </td>
+                        <td class="border-0 align-middle text-white">X</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col mx-3">
+            <p class="h5">Items: {{ cart_items_total }}</p>
+            <p class="h5">Total: {{ cart_total_price }}</p>
+            <div><a href="{% url 'checkout_page' %}" class="btn btn-outline-light mt-3">Оформить заказ</a></div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
