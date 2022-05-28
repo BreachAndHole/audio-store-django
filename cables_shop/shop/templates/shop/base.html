@@ -47,8 +47,8 @@
                         <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
                     {% endif %}
                 {% endwith %}
-                <a href="#" class="btn btn-bg-dark btn-outline-light">Вход</a>
-                <a href="#" class="btn btn-light">Регистрация</a>
+                <a href="{% url 'login_page' %}" class="btn btn-bg-dark btn-outline-light">Вход</a>
+                <a href="{% url 'registration_page' %}" class="btn btn-light">Регистрация</a>
             </div>
         </div>
     </div>

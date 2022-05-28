@@ -3,6 +3,7 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.generic import list, detail, TemplateView
+from django.db.models import F
 from .models import *
 
 
@@ -53,7 +54,7 @@ def cart(request):
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, is_made=False)
-        all_items = order.ordereditem_set.all()
+        all_items = order.ordereditem_set.all().order_by('pk')
         cart_total_items = order.get_cart_total_amount
     else:
         # Kostyl'
@@ -79,22 +80,35 @@ class CheckoutPageView(TemplateView):
 
 def update_item(request):
     """Update cart function"""
-    data = json.loads(request.body)
-    item_id = data["itemId"]
-    action = data["action"]
+    received_data = json.loads(request.body)
+    item_id = received_data["itemId"]
+    action = received_data["action"]
 
     customer = request.user.customer
     item = Cable.objects.get(pk=item_id)
     order, created = Order.objects.get_or_create(customer=customer, is_made=False)
-    ordered_item, created = OrderedItem.objects.get_or_create(order=order, item=item)
+    ordered_item, _ = OrderedItem.objects.get_or_create(order=order, item=item)
 
     if action == 'add_to_cart':
-        ordered_item.amount += 1
+        ordered_item.amount = F('amount') + 1
     elif action == 'remove_from_cart':
-        ordered_item.amount -= 1
+        ordered_item.amount = F('amount') - 1
 
     ordered_item.save()
-    if ordered_item.amount <= 0:
-        ordered_item.delete()
+    OrderedItem.objects.filter(amount__lte=0).delete()
 
     return JsonResponse('Date received', safe=False)
+
+
+def user_registration(request):
+    contex = {
+        'title': 'Регистрация',
+    }
+    return render(request, 'shop/registration.html', contex)
+
+
+def user_login(request):
+    contex = {
+        'title': 'Войти в аккаунт',
+    }
+    return render(request, 'shop/login.html', contex)
