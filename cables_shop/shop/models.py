@@ -92,7 +92,7 @@ class Customer(models.Model):
         verbose_name_plural = 'клиенты'
 
     def __str__(self):
-        return f'#{self.pk} {self.user.username}'
+        return self.user.username
 
 
 @receiver(post_save, sender=User)
@@ -104,3 +104,47 @@ def create_customer_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_customer_profile(sender, instance, **kwargs):
     instance.customer.save()
+
+
+class Order(models.Model):
+    customer = models.ForeignKey(Customer, verbose_name='покупатель', on_delete=models.CASCADE)
+    order_date = models.DateTimeField('дата заказа', auto_now_add=True)
+    is_active = models.BooleanField('в процессе оформления', default=True)
+
+    class Meta:
+        verbose_name = 'заказ'
+        verbose_name_plural = 'заказы'
+
+    def get_cart_total_price(self):
+        ordered_products = self.orderedproducts_set
+        print(ordered_products)
+        return sum([product.get_product_total_price for product in ordered_products])
+
+
+class OrderedProduct(models.Model):
+    order = models.ForeignKey(Order, verbose_name='заказ', on_delete=models.CASCADE)
+    product = models.ForeignKey(Cable, verbose_name='товар', on_delete=models.CASCADE)
+    quantity = models.SmallIntegerField('количество')
+
+    class Meta:
+        verbose_name = 'заказанный товар'
+        verbose_name_plural = 'заказанные товары'
+
+    def __str__(self):
+        return f'#{self.order}, {self.product}'
+
+    @property
+    def get_product_total_price(self):
+        return self.product.price * self.quantity
+
+
+class ShippingAddress(models.Model):
+    customer = models.ForeignKey(Customer, verbose_name='покупатель', on_delete=models.CASCADE)
+    title = models.CharField('название', max_length=30)
+    country = models.CharField('страна', max_length=50, default='Российская Федерация')
+    city = models.CharField('город', max_length=50)
+    zipcode = models.CharField('почтовый индекс', max_length=10)
+    address = models.CharField('адресс', max_length=200)
+
+    def __str__(self):
+        return f'{self.customer}, {self.city}'
