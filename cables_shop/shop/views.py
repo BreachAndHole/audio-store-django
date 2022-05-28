@@ -1,9 +1,6 @@
-import json
-
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
 from django.views.generic import list, detail, TemplateView
-from django.db.models import F
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from .models import *
@@ -68,10 +65,10 @@ class CheckoutPageView(TemplateView):
 
 
 def user_registration(request):
-    form = CreateUserForm()
+    form = RegisterUserForm()
 
     if request.method == 'POST':
-        form = CreateUserForm(request.POST)
+        form = RegisterUserForm(request.POST)
         if form.is_valid():
             form.save()
             user_name = form.cleaned_data.get('username', '')
@@ -108,3 +105,11 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('home_page')
+
+
+@login_required(login_url='user_login_page')
+def user_profile(request):
+    contex = {
+        'title': 'Личный кабинет',
+    }
+    return render(request, 'shop/user_profile.html', contex)
