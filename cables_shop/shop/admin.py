@@ -29,3 +29,6 @@ admin.site.register(CablePhoto, CablePhotoAdmin)
 
 # Orders related
 admin.site.register(Customer)
+admin.site.register(Order)
+admin.site.register(OrderedProduct)
+admin.site.register(ShippingAddress)
