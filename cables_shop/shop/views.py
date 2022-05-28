@@ -22,10 +22,6 @@ class AllCablesPageView(list.ListView):
     model = Cable
     context_object_name = 'cables'
     template_name = 'shop/all_cables.html'
-    extra_context = {
-        'title': 'Товары',
-        'cable_types': CableType.objects.all(),
-    }
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -39,9 +35,6 @@ class CablePageView(detail.DetailView):
     context_object_name = 'cable'
     slug_url_kwarg = 'cable_slug'
     template_name = 'shop/cable.html'
-    extra_context = {
-        'title': f'Страница товара',
-    }
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -49,18 +42,24 @@ class CablePageView(detail.DetailView):
         return context
 
 
-# This needs to be refactored
-def cart(request):
-    context = {
-        'title': f'Корзина',
+class CartPageView(TemplateView):
+    template_name = 'shop/cart.html'
+    extra_context = {
+        'title': 'Корзина',
     }
-    return render(request, 'shop/cart.html', context)
+
+
+# def cart(request):
+#     context = {
+#         'title': f'Корзина',
+#     }
+#     return render(request, 'shop/cart.html', context)
 
 
 class CheckoutPageView(TemplateView):
     template_name = 'shop/checkout.html'
     extra_context = {
-        'title': f'Оформление заказа',
+        'title': 'Оформление заказа',
     }
 
 
