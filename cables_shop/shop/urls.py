@@ -8,7 +8,7 @@ urlpatterns = [
     path('cable/<slug:cable_slug>', views.CablePageView.as_view(), name='cable_page'),
     path('cart/', views.cart, name='cart_page'),
     path('checkout/', views.CheckoutPageView.as_view(), name='checkout_page'),
-    path('update_item/', views.update_item),
     path('registration/', views.user_registration, name='user_registration_page'),
     path('login/', views.user_login, name='user_login_page'),
+    path('logout/', views.user_logout, name='user_logout_page'),
 ]

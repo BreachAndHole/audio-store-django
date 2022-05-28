@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.views.generic import list, detail, TemplateView
 from django.db.models import F
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from .models import *
 from .forms import *
 
@@ -53,22 +54,8 @@ class CablePageView(detail.DetailView):
 
 # This needs to be refactored
 def cart(request):
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, is_made=False)
-        all_items = order.ordereditem_set.all().order_by('pk')
-        cart_total_items = order.get_cart_total_amount
-    else:
-        # Kostyl'
-        order = {'get_cart_total_price': 0, 'get_cart_total_amount': 0}
-        cart_total_items = 0
-        all_items = []
-
     context = {
         'title': f'Корзина',
-        'all_items': all_items,
-        'order': order,
-        # 'cart_counter': cart_total_items,
     }
     return render(request, 'shop/cart.html', context)
 
@@ -78,28 +65,6 @@ class CheckoutPageView(TemplateView):
     extra_context = {
         'title': f'Оформление заказа',
     }
-
-
-def update_item(request):
-    """Update cart function"""
-    received_data = json.loads(request.body)
-    item_id = received_data["itemId"]
-    action = received_data["action"]
-
-    customer = request.user.customer
-    item = Cable.objects.get(pk=item_id)
-    order, created = Order.objects.get_or_create(customer=customer, is_made=False)
-    ordered_item, _ = OrderedItem.objects.get_or_create(order=order, item=item)
-
-    if action == 'add_to_cart':
-        ordered_item.amount = F('amount') + 1
-    elif action == 'remove_from_cart':
-        ordered_item.amount = F('amount') - 1
-
-    ordered_item.save()
-    OrderedItem.objects.filter(amount__lte=0).delete()
-
-    return JsonResponse('Date received', safe=False)
 
 
 def user_registration(request):
@@ -122,7 +87,24 @@ def user_registration(request):
 
 
 def user_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username_field', '')
+        password = request.POST.get('password_field', '')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is None:
+            messages.info(request, 'Имя пользователя или пароль введены неверно')
+        else:
+            login(request, user)
+            return redirect('home_page')
+
     contex = {
         'title': 'Войти в аккаунт',
     }
     return render(request, 'shop/login.html', contex)
+
+
+def user_logout(request):
+    logout(request)
+    return redirect('user_login_page')
