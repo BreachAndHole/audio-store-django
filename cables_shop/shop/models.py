@@ -124,7 +124,8 @@ class Order(models.Model):
 class OrderedProduct(models.Model):
     order = models.ForeignKey(Order, verbose_name='заказ', on_delete=models.CASCADE)
     product = models.ForeignKey(Cable, verbose_name='товар', on_delete=models.CASCADE)
-    quantity = models.SmallIntegerField('количество')
+    quantity = models.SmallIntegerField('количество', default=0)
+    date_added = models.DateTimeField('время добавления', auto_now_add=True)
 
     class Meta:
         verbose_name = 'заказанный товар'

@@ -1,3 +1,6 @@
+import json
+
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.generic import list, detail, TemplateView
 from django.contrib.auth.decorators import login_required
@@ -59,6 +62,8 @@ class CartPageView(list.ListView):
     def get_queryset(self):
         return OrderedProduct.objects.filter(
             order__customer=self.request.user.customer
+        ).order_by(
+            'date_added'
         )
 
 
@@ -67,6 +72,40 @@ class CheckoutPageView(TemplateView):
     extra_context = {
         'title': 'Оформление заказа',
     }
+
+
+def update_cart(request):
+    try:
+        cart_update_received_data = json.loads(request.body)
+    except json.JSONDecodeError as ex:
+        return JsonResponse('Cart updated', safe=False)
+
+    product_id = cart_update_received_data.get('productId', None)
+    action = cart_update_received_data.get('action', None)
+    if product_id is None or action is None:
+        return JsonResponse('Cart updated', safe=False)
+
+    customer = request.user.customer
+    product = Cable.objects.get(pk=product_id)
+    order, order_is_created = Order.objects.get_or_create(customer=customer, is_active=True)
+    print(f'{order = } {order_is_created = }')
+
+    ordered_product, product_is_created = OrderedProduct.objects.get_or_create(order=order, product=product)
+
+    match action:
+        case 'add_to_cart':
+            ordered_product.quantity += 1
+        case 'remove_from_cart':
+            ordered_product.quantity -= 1
+        case 'delete_from_cart':
+            ordered_product.quantity = 0
+
+    ordered_product.save()
+
+    if ordered_product.quantity <= 0:
+        ordered_product.delete()
+
+    return JsonResponse('Cart updated', safe=False)
 
 
 def user_registration(request):

@@ -42,14 +42,18 @@
                         <td class="border-0 align-middle text-white">{{ product.product.price }}</td>
                         <td class="border-0 align-middle text-white">
                             <button class="mx-2 btn btn-outline-light btn-update-cart"
-                                    data-item_id="{{ product.product.id }}" data-action="remove_from_cart">-
+                                    data-product_id="{{ product.product.id }}" data-action="remove_from_cart">-
                             </button>
                             <span class="mx-2">{{ product.quantity }}</span>
                             <button class="mx-2 btn btn-outline-light btn-update-cart"
-                                    data-item_id="{{ product.product.id }}" data-action="add_to_cart">+
+                                    data-product_id="{{ product.product.id }}" data-action="add_to_cart">+
                             </button>
                         </td>
-                        <td class="border-0 align-middle text-white">X</td>
+                        <td class="border-0 align-middle text-white">
+                            <button class="mx-2 btn btn-outline-light btn-update-cart"
+                                    data-product_id="{{ product.product.id }}" data-action="delete_from_cart">X
+                            </button>
+                        </td>
                     </tr>
                     {% endfor %}
                     </tbody>
