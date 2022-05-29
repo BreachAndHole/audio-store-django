@@ -27,7 +27,7 @@ class AllCablesPageView(list.ListView):
     model = Cable
     context_object_name = 'cables'
     template_name = 'shop/all_cables.html'
-    paginate_by = 3
+    paginate_by = 6
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,7 +58,7 @@ class CartPageView(LoginRequiredMixin, list.ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Корзина'
 
-        ordered_products = context.get('ordered_products')
+        ordered_products = context.get('ordered_products', [])
         cart_total_price = sum([product.get_product_total_price for product in ordered_products])
         context['cart_total_price'] = cart_total_price
         return context
@@ -73,6 +73,7 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
 class CheckoutPageView(LoginRequiredMixin, TemplateView):
     login_url = 'user_login_page'
+
     template_name = 'shop/checkout.html'
     extra_context = {
         'title': 'Оформление заказа',

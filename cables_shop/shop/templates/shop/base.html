@@ -44,18 +44,19 @@
             </ul>
             <div class="text-end">
                 {% if user.is_authenticated %}
-                {% with cart_total=cart_items_total %}
-                {% if cart_total%}
-                <button class="badge bg-white text-dark rounded-pill border-0 mx-2" id="cart_total">{{ cart_total }}
-                </button>
-                <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
-                {% endif %}
-                {% endwith %}
-                <a href="{% url 'user_logout_page' %}" class="btn btn-bg-dark btn-outline-light">Выйти</a>
-                <a href="{% url 'user_profile_page' %}" class="btn btn-light">Личный кабинет</a>
+                    {% with cart_total=cart_items_total %}
+                        {% if cart_total and request.path != '/cart/checkout/' %}
+                            <button class="badge bg-white text-dark rounded-pill border-0 mx-2" id="cart_total">{{ cart_total }}
+                            </button>
+                            <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
+                        {% endif %}
+                    {% endwith %}
+
+                    <a href="{% url 'user_logout_page' %}" class="btn btn-bg-dark btn-outline-light">Выйти</a>
+                    <a href="{% url 'user_profile_page' %}" class="btn btn-light">Личный кабинет</a>
                 {% else %}
-                <a href="{% url 'user_login_page' %}" class="btn btn-bg-dark btn-outline-light">Вход</a>
-                <a href="{% url 'user_registration_page' %}" class="btn btn-light">Регистрация</a>
+                    <a href="{% url 'user_login_page' %}" class="btn btn-bg-dark btn-outline-light">Вход</a>
+                    <a href="{% url 'user_registration_page' %}" class="btn btn-light">Регистрация</a>
                 {% endif %}
             </div>
         </div>
@@ -67,24 +68,22 @@
 
 {% if paginator %}
 <!--    Pagination-->
-<div class="container mt-auto d-flex justify-content-center">
-    <nav aria-label="Pagination block">
-        <ul class="pagination">
+<div class="container d-flex justify-content-center my-4">
+    <nav aria-label="Pagination block d-flex align-items-center">
             {% for page_number in paginator.page_range %}
                 {% if page_obj.number == page_number %}
-                    <li><a href="?page={{ page_number }}" class="mx-1 btn btn-light">{{ page_number }}</a></li>
+                    <a href="?page={{ page_number }}" class="mx-1 btn btn-light">{{ page_number }}</a>
                 {% else %}
-                    <li><a href="?page={{ page_number }}" class="mx-1 btn btn-outline-light">{{ page_number }}</a></li>
+                    <a href="?page={{ page_number }}" class="mx-1 btn btn-outline-light">{{ page_number }}</a>
                 {% endif %}
             {% endfor %}
-        </ul>
     </nav>
 </div>
 {% endif %}
 
 <!--Footer-->
 <div class="container bg-dark mt-auto">
-    <footer class="my-2">
+    <footer>
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
             <li class="nav-item"><a href="{% url 'home_page' %}" class="nav-link px-2 text-white">Home</a></li>
             <li class="nav-item"><a href="{% url 'all_cables_page' %}" class="nav-link px-2 text-white">Products</a>
