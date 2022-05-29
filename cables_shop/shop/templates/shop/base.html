@@ -23,6 +23,11 @@
             return cookieValue
         }
         var csrftoken = getToken('csrftoken');
+
+
+
+
+
     </script>
 </head>
 
@@ -60,6 +65,24 @@
 {% block content %}
 {% endblock content %}
 
+{% if paginator %}
+<!--    Pagination-->
+<div class="container mt-auto d-flex justify-content-center">
+    <nav aria-label="Pagination block">
+        <ul class="pagination">
+            {% for page_number in paginator.page_range %}
+                {% if page_obj.number == page_number %}
+                    <li><a href="?page={{ page_number }}" class="mx-1 btn btn-light">{{ page_number }}</a></li>
+                {% else %}
+                    <li><a href="?page={{ page_number }}" class="mx-1 btn btn-outline-light">{{ page_number }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+<!--Footer-->
 <div class="container bg-dark mt-auto">
     <footer class="my-2">
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">

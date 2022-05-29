@@ -3,12 +3,12 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.generic import list, detail, TemplateView
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import *
+from django.contrib.auth.decorators import login_required
 from .forms import *
 from .utils import *
+from .models import *
 
 
 class IndexPageView(list.ListView):
@@ -26,6 +26,7 @@ class AllCablesPageView(list.ListView):
     model = Cable
     context_object_name = 'cables'
     template_name = 'shop/all_cables.html'
+    paginate_by = 3
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -78,7 +79,7 @@ class CheckoutPageView(TemplateView):
 def update_cart(request):
     try:
         cart_update_received_data = json.loads(request.body)
-    except json.JSONDecodeError as ex:
+    except json.JSONDecodeError:
         return JsonResponse('Cart has not been updated', safe=False)
 
     product_id = cart_update_received_data.get('productId', None)
