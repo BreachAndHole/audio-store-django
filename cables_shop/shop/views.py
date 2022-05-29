@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import list, detail, TemplateView
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .forms import *
 from .utils import *
@@ -47,7 +48,8 @@ class CablePageView(detail.DetailView):
         return context
 
 
-class CartPageView(list.ListView):
+class CartPageView(LoginRequiredMixin, list.ListView):
+    login_url = 'user_login_page'
     model = OrderedProduct
     context_object_name = 'ordered_products'
     template_name = 'shop/cart.html'
@@ -69,7 +71,8 @@ class CartPageView(list.ListView):
         )
 
 
-class CheckoutPageView(TemplateView):
+class CheckoutPageView(LoginRequiredMixin, TemplateView):
+    login_url = 'user_login_page'
     template_name = 'shop/checkout.html'
     extra_context = {
         'title': 'Оформление заказа',
