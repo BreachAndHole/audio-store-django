@@ -116,7 +116,7 @@ class Order(models.Model):
         verbose_name_plural = 'заказы'
 
     def get_cart_total_price(self):
-        ordered_products = self.orderedproducts_set
+        ordered_products = self.orderedproduct_set.all()
         print(ordered_products)
         return sum([product.get_product_total_price for product in ordered_products])
 
