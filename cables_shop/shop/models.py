@@ -84,7 +84,6 @@ class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True, verbose_name='пользователь')
     first_name = models.CharField('имя', max_length=15)
     last_name = models.CharField('фамилия', max_length=15)
-    middle_name = models.CharField('отчество', max_length=15, blank=True, null=True)
     phone = models.CharField('номер телефона', max_length=15)
 
     class Meta:
@@ -140,12 +139,11 @@ class OrderedProduct(models.Model):
 
 
 class ShippingAddress(models.Model):
-    customer = models.ForeignKey(Customer, verbose_name='покупатель', on_delete=models.CASCADE)
-    title = models.CharField('название', max_length=30)
-    country = models.CharField('страна', max_length=50, default='Российская Федерация')
-    city = models.CharField('город', max_length=50)
-    zipcode = models.CharField('почтовый индекс', max_length=10)
-    address = models.CharField('адресс', max_length=200)
+    customer = models.OneToOneField(Customer, verbose_name='покупатель', on_delete=models.CASCADE)
+    address = models.CharField('адрес', max_length=200, default='')
+    city = models.CharField('город', max_length=50, default='')
+    state = models.CharField('область', max_length=70, default='')
+    zipcode = models.CharField('почтовый индекс', max_length=10, default='')
 
     def __str__(self):
         return f'{self.customer}, {self.city}'

@@ -27,6 +27,7 @@ class AllCablesPageView(list.ListView):
     model = Cable
     context_object_name = 'cables'
     template_name = 'shop/all_cables.html'
+
     # paginate_by = 5
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -75,13 +76,27 @@ class CartPageView(LoginRequiredMixin, list.ListView):
         )
 
 
-class CheckoutPageView(LoginRequiredMixin, TemplateView):
-    login_url = 'user_login_page'
+@login_required(login_url='user_login_page')
+def checkout(request):
 
-    template_name = 'shop/checkout.html'
-    extra_context = {
+    if request.method == 'POST':
+        form = CheckoutForm(request.POST)
+
+        if form.is_valid():
+            print('Form is valid')
+            return redirect('home_page')
+    form = CheckoutForm()
+    customer = request.user.customer
+    order = Order.objects.get(customer=customer, is_active=True)
+    context = {
         'title': 'Оформление заказа',
+        'form': form,
+        'customer': customer,
+        'ordered_products': order.orderedproduct_set.all(),
+        'cart_total_price': order.get_cart_total_price,
     }
+
+    return render(request, 'shop/checkout.html', context)
 
 
 def update_cart(request):
