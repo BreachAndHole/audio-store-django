@@ -139,7 +139,7 @@ class OrderedProduct(models.Model):
 
 
 class ShippingAddress(models.Model):
-    customer = models.OneToOneField(Customer, verbose_name='покупатель', on_delete=models.CASCADE)
+    customer = models.OneToOneField(Customer, verbose_name='покупатель', on_delete=models.CASCADE, related_name='shipping_address')
     address = models.CharField('адрес', max_length=200, default='')
     city = models.CharField('город', max_length=50, default='')
     state = models.CharField('область', max_length=70, default='')

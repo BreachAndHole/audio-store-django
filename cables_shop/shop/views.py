@@ -70,7 +70,8 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
     def get_queryset(self):
         return OrderedProduct.objects.filter(
-            order__customer=self.request.user.customer
+            order__customer=self.request.user.customer,
+            order__is_active=True
         ).order_by(
             'date_added'
         )
@@ -85,6 +86,12 @@ def checkout(request):
         form = CheckoutForm(request.POST)
 
         if form.is_valid():
+            order.is_active = False
+            order.save()
+
+            print(customer.__dict__)
+            print(customer.shipping_address)
+
             return redirect('home_page')
 
         return redirect('checkout_page')
