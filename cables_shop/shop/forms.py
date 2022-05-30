@@ -25,12 +25,89 @@ class RegisterUserForm(UserCreationForm):
 
 
 class CheckoutForm(forms.Form):
-    first_name = forms.CharField(label='Имя', max_length=15)
-    last_name = forms.CharField(label='Фамилия', max_length=15)
-    # middle_name = forms.CharField(label='Отчество', max_length=15)
-    phone = forms.CharField(label='Номер телефона', max_length=15)
+    first_name = forms.CharField(
+        label='Имя',
+        max_length=15,
+        widget=(
+            forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Иван',
+                }
+            )
+        ),
+    )
+    last_name = forms.CharField(
+        label='Фамилия',
+        max_length=15,
+        widget=(
+            forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Иванов',
+                }
+            )
+        ),
+    )
+    phone = forms.CharField(
+        label='Номер телефона',
+        max_length=15,
+        widget=(
+            forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': '+7 999-111-22-33',
+                }
+            )
+        ),
+    )
 
-    address = forms.CharField(label='Адрес', max_length=200)
-    city = forms.CharField(label='Город', max_length=50)
-    state = forms.CharField(label='Область', max_length=70)
-    zipcode = forms.CharField(label='Почтовый индекс', max_length=10)
+    address = forms.CharField(
+        label='Адрес',
+        max_length=200,
+        widget=(
+            forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Московский проспект 322, кв. 69',
+                }
+            )
+        ),
+    )
+    city = forms.CharField(
+        label='Город',
+        max_length=50,
+        widget=(
+            forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Санкт-Петербург',
+                }
+            )
+        ),
+    )
+    state = forms.CharField(
+        label='Область',
+        max_length=70,
+        required=False,
+        widget=(
+            forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Ленинградская область',
+                }
+            )
+        ),
+    )
+    zipcode = forms.CharField(
+        label='Почтовый индекс',
+        max_length=10,
+        widget=(
+            forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': '123456',
+                }
+            )
+        ),
+    )

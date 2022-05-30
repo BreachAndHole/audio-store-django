@@ -78,16 +78,19 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
 @login_required(login_url='user_login_page')
 def checkout(request):
+    customer = request.user.customer
+    order = Order.objects.get(customer=customer, is_active=True)
 
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
 
         if form.is_valid():
-            print('Form is valid')
             return redirect('home_page')
+
+        return redirect('checkout_page')
+
     form = CheckoutForm()
-    customer = request.user.customer
-    order = Order.objects.get(customer=customer, is_active=True)
+
     context = {
         'title': 'Оформление заказа',
         'form': form,
