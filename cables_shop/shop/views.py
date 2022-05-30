@@ -27,12 +27,16 @@ class AllCablesPageView(list.ListView):
     model = Cable
     context_object_name = 'cables'
     template_name = 'shop/all_cables.html'
-    paginate_by = 6
+    # paginate_by = 5
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Товары'
         context['cable_types'] = CableType.objects.all()
+
+        cable_prices = [cable.price for cable in context.get('cables', [])]
+        context['min_price'] = min(cable_prices)
+        context['max_price'] = max(cable_prices)
         return context
 
 
