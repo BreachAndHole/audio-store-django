@@ -26,3 +26,28 @@ def update_ordered_product(request: HttpRequest, product_id: int, action: str) -
 
     if ordered_product.quantity <= 0:
         ordered_product.delete()
+
+
+def get_checkout_form_initials(customer: Customer) -> dict:
+    initials = {
+        'first_name': customer.first_name or '',
+        'last_name': customer.last_name or '',
+        'phone': customer.phone or '',
+        'address': customer.shipping_address.address or '',
+        'city': customer.shipping_address.city or '',
+        'state': customer.shipping_address.state or '',
+        'zipcode': customer.shipping_address.zipcode or '',
+    }
+    return initials
+
+
+def update_customer_information(customer: Customer, updated_data: dict) -> None:
+    customer.first_name = updated_data.get('first_name', '')
+    customer.last_name = updated_data.get('last_name', '')
+    customer.phone = updated_data.get('phone', '')
+    customer.shipping_address.address = updated_data.get('address', '')
+    customer.shipping_address.city = updated_data.get('city', '')
+    customer.shipping_address.state = updated_data.get('state', '')
+    customer.shipping_address.zipcode = updated_data.get('zipcode', '')
+    customer.save()
+    customer.shipping_address.save()
