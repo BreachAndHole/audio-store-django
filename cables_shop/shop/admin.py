@@ -27,5 +27,6 @@ class CablePhotoAdmin(admin.ModelAdmin):
 
 # Orders related
 admin.site.register(Customer)
+admin.site.register(ShippingAddress)
 admin.site.register(Order)
 admin.site.register(OrderedProduct)

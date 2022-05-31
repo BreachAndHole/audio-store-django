@@ -86,11 +86,6 @@ class Customer(models.Model):
     last_name = models.CharField('фамилия', max_length=15)
     phone = models.CharField('номер телефона', max_length=15)
 
-    address = models.CharField('адрес', max_length=200, default='')
-    city = models.CharField('город', max_length=50, default='')
-    state = models.CharField('область', max_length=70, default='')
-    zipcode = models.CharField('почтовый индекс', max_length=10, default='')
-
     class Meta:
         verbose_name = 'клиент'
         verbose_name_plural = 'клиенты'
@@ -110,6 +105,14 @@ def save_customer_profile(sender, instance, **kwargs):
     instance.customer.save()
 
 
+class ShippingAddress(models.Model):
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name='shipping_address', verbose_name='покупатель')
+    address = models.CharField('адрес', max_length=200, null=True)
+    city = models.CharField('город', max_length=50, null=True)
+    state = models.CharField('область', max_length=70, null=True)
+    zipcode = models.CharField('почтовый индекс', max_length=10, null=True)
+
+
 class Order(models.Model):
     customer = models.ForeignKey(Customer, verbose_name='покупатель', on_delete=models.CASCADE)
     order_date = models.DateTimeField('дата заказа', auto_now_add=True)
@@ -124,7 +127,6 @@ class Order(models.Model):
 
     def get_cart_total_price(self):
         ordered_products = self.orderedproduct_set.all()
-        print(ordered_products)
         return sum([product.get_product_total_price for product in ordered_products])
 
 
@@ -139,7 +141,7 @@ class OrderedProduct(models.Model):
         verbose_name_plural = 'заказанные товары'
 
     def __str__(self):
-        return f'#{self.order}, {self.product}'
+        return f'#{self.order.pk}, {self.product}'
 
     @property
     def get_product_total_price(self):

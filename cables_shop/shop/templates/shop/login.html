@@ -12,14 +12,14 @@
                                 <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Вход</p>
                                 <form class="mx-1 mx-md-4" method="post">
                                     {% csrf_token %}
-                                    {% for message in messages %}
-                                        <p>{{ message }}</p>
-                                    {% endfor %}
                                     <div class="d-flex flex-row align-items-center mb-4">
+                                        {% for message in messages %}
+                                            <p>{{ message }}</p>
+                                        {% endfor %}
                                         <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
                                         <div class="form-outline flex-fill mb-0">
                                             <input type="text" id="username_field" name="username_field" class="form-control"/>
-                                            <label class="form-label" for="username_field">Username</label>
+                                            <label class="form-label" for="username_field">Имя пользователя</label>
                                         </div>
                                     </div>
 

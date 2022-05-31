@@ -28,8 +28,6 @@ class AllCablesPageView(list.ListView):
     context_object_name = 'cables'
     template_name = 'shop/all_cables.html'
 
-    # paginate_by = 5
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Товары'
@@ -81,21 +79,26 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 def checkout(request):
     customer = request.user.customer
     order = Order.objects.get(customer=customer, is_active=True)
+    form = CheckoutForm(request.POST or None)
 
-    if request.method == 'POST':
-        form = CheckoutForm(request.POST)
+    if request.method == 'POST' and form.is_valid():
+        customer.first_name = form.cleaned_data['first_name']
+        customer.last_name = form.cleaned_data['last_name']
+        customer.phone = form.cleaned_data['phone']
+        customer.save()
 
-        if form.is_valid():
-            return redirect('home_page')
+        shipping_address, _ = ShippingAddress.objects.get_or_create(customer=customer)
+        shipping_address.address = form.cleaned_data['address']
+        shipping_address.city = form.cleaned_data['city']
+        shipping_address.state = form.cleaned_data['state']
+        shipping_address.zipcode = form.cleaned_data['zipcode']
+        shipping_address.save()
 
-        return redirect('checkout_page')
-
-    form = CheckoutForm()
+        return redirect('home_page')
 
     context = {
         'title': 'Оформление заказа',
         'form': form,
-        'customer': customer,
         'ordered_products': order.orderedproduct_set.all(),
         'cart_total_price': order.get_cart_total_price,
     }
