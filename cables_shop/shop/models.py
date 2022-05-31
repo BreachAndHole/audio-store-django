@@ -129,6 +129,9 @@ class Order(models.Model):
         ordered_products = self.orderedproduct_set.all()
         return sum([product.get_product_total_price for product in ordered_products])
 
+    def get_cart_total_products(self):
+        return len(self.orderedproduct_set.all())
+
 
 class OrderedProduct(models.Model):
     order = models.ForeignKey(Order, verbose_name='заказ', on_delete=models.CASCADE)
