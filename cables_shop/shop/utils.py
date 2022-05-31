@@ -16,7 +16,8 @@ def update_ordered_product(request: HttpRequest, product_id: int, action: str) -
 
     match action:
         case 'add_to_cart':
-            ordered_product.quantity += 1
+            if ordered_product.quantity < product.units_in_stock:
+                ordered_product.quantity += 1
         case 'remove_from_cart':
             ordered_product.quantity -= 1
         case 'delete_from_cart':
