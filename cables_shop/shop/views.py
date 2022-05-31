@@ -77,23 +77,17 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
 @login_required(login_url='user_login_page')
 def checkout(request):
-    customer = request.user.customer
+    customer, _ = Customer.objects.get_or_create(user=request.user)
     order = Order.objects.get(customer=customer, is_active=True)
-    form = CheckoutForm(request.POST or None)
+
+    form_initial_values = get_checkout_form_initials(customer=customer)
+    form = CheckoutForm(request.POST or None, initial=form_initial_values)
 
     if request.method == 'POST' and form.is_valid():
-        customer.first_name = form.cleaned_data['first_name']
-        customer.last_name = form.cleaned_data['last_name']
-        customer.phone = form.cleaned_data['phone']
-        customer.save()
-
-        shipping_address, _ = ShippingAddress.objects.get_or_create(customer=customer)
-        shipping_address.address = form.cleaned_data['address']
-        shipping_address.city = form.cleaned_data['city']
-        shipping_address.state = form.cleaned_data['state']
-        shipping_address.zipcode = form.cleaned_data['zipcode']
-        shipping_address.save()
-
+        update_customer_information(
+            customer=customer,
+            updated_data=form.cleaned_data
+        )
         return redirect('home_page')
 
     context = {
