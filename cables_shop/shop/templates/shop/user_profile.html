@@ -2,6 +2,53 @@
 
 {% block content %}
 <div class="container">
-    <h1>Тут будет личный кабинет :)</h1>
+    <div class="row">
+        <div class="col-4">
+            <p class="h5">Имя: {{ customer.first_name }}</p>
+            <p class="h5">Фамилия: {{ customer.last_name }}</p>
+            <p class="h5">Номер телефона: {{ customer.phone }}</p>
+            <p></p>
+            <p class="h5">Адресс доставки: {{ customer.shipping_address.zipcode }}, {{ customer.shipping_address.city }}, {{ customer.shipping_address.address }}</p>
+            <button class="btn btn-light" type="submit">Редактировать</button>
+        </div>
+        <div class="col-8 border-start">
+
+            <div class="table-responsive ">
+                <table class="table">
+                    <thead>
+                    <tr class="border-bottom">
+                        <th scope="col" class="border-0 text-white">
+                            <div class="p-2 text-uppercase">№</div>
+                        </th>
+                        <th scope="col" class="border-0 text-white">
+                            <div class="py-2 text-uppercase">Дата</div>
+                        </th>
+                        <th scope="col" class="border-0 text-white">
+                            <div class="py-2 text-uppercase">Товаров</div>
+                        </th>
+                        <th scope="col" class="border-0 text-white">
+                            <div class="py-2 text-uppercase">Сумма</div>
+                        </th>
+
+                        <th scope="col" class="border-0 text-white">
+                            <div class="py-2 text-uppercase">Статус</div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for order in customer.order_set.all %}
+                        <tr class="border-bottom">
+                            <td class="border-0 align-middle text-white">{{ order.pk }}</td>
+                            <td class="border-0 align-middle text-white">15 марта 2022</td>
+                            <td class="border-0 align-middle text-white">{{ order.get_cart_total_products}}</td>
+                            <td class="border-0 align-middle text-white">{{ order.get_cart_total_price }}</td>
+                            <td class="border-0 align-middle text-white">{{ order.is_active }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock content %}
