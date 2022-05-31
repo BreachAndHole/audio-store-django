@@ -79,6 +79,7 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 def checkout(request):
     customer, _ = Customer.objects.get_or_create(user=request.user)
     order = Order.objects.get(customer=customer, is_active=True)
+    ordered_products = order.orderedproduct_set.all()
 
     form_initial_values = get_checkout_form_initials(customer=customer)
     form = CheckoutForm(request.POST or None, initial=form_initial_values)
@@ -88,12 +89,20 @@ def checkout(request):
             customer=customer,
             updated_data=form.cleaned_data
         )
+        order.is_active = False
+        order.save()
+
+        for product in ordered_products:
+            cable = Cable.objects.get(pk=product.product.pk)
+            cable.units_in_stock -= product.quantity
+            cable.save()
+
         return redirect('home_page')
 
     context = {
         'title': 'Оформление заказа',
         'form': form,
-        'ordered_products': order.orderedproduct_set.all(),
+        'ordered_products': ordered_products,
         'cart_total_price': order.get_cart_total_price,
     }
 
@@ -109,7 +118,7 @@ def update_cart(request):
     product_id = cart_update_received_data.get('productId', None)
     action = cart_update_received_data.get('action', None)
     if product_id is None or action is None:
-        return JsonResponse('Cart updated', safe=False)
+        return JsonResponse('Cart has not been updated', safe=False)
 
     update_ordered_product(request, product_id, action)
 
@@ -123,8 +132,9 @@ def user_registration(request):
         form = RegisterUserForm(request.POST)
         if form.is_valid():
             form.save()
+
             user_name = form.cleaned_data.get('username', '')
-            messages.success(request, f'Аккаунт пользователя {user_name} создан')
+            messages.success(request, f'Аккаунт {user_name} создан')
 
             return redirect('user_login_page')
 
@@ -137,9 +147,8 @@ def user_registration(request):
 
 def user_login(request):
     if request.method == 'POST':
-        username = request.POST.get('username_field', '')
-        password = request.POST.get('password_field', '')
-
+        username = request.POST.get('username_field', None)
+        password = request.POST.get('password_field', None)
         user = authenticate(request, username=username, password=password)
 
         if user is None:
@@ -163,5 +172,6 @@ def user_logout(request):
 def user_profile(request):
     contex = {
         'title': 'Личный кабинет',
+        'customer': request.user.customer,
     }
     return render(request, 'shop/user_profile.html', contex)
