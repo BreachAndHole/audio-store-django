@@ -13,9 +13,6 @@
                                 <form class="mx-1 mx-md-4" method="post">
                                     {% csrf_token %}
                                     <div class="d-flex flex-row align-items-center mb-4">
-                                        {% for message in messages %}
-                                            <p>{{ message }}</p>
-                                        {% endfor %}
                                         <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
                                         <div class="form-outline flex-fill mb-0">
                                             <input type="text" id="username_field" name="username_field" class="form-control"/>
@@ -30,6 +27,9 @@
                                             <label class="form-label" for="password_field">Пароль</label>
                                         </div>
                                     </div>
+                                        {% for message in messages %}
+                                            <p class="mb-4 h6 text-center">{{ message }}</p>
+                                        {% endfor %}
                                     <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                                         <button type="submit" class="btn btn-light btn-lg">Войти</button>
                                     </div>
