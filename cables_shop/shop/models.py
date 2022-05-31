@@ -10,7 +10,12 @@ class CableType(models.Model):
     name_plural = models.CharField('название (мн.ч)', max_length=50)
     slug = models.SlugField('URL')
     description = models.TextField('описание', blank=True, null=True)
-    photo = models.ImageField('фото', upload_to='photos/cable_types/', null=True, blank=True)
+    photo = models.ImageField(
+        'фото',
+        upload_to='photos/cable_types/',
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         verbose_name = 'тип кабеля'
@@ -21,11 +26,13 @@ class CableType(models.Model):
         return self.name
 
     @property
-    def get_photo_url(self):
+    def get_photo_url(self) -> str:
+        """Get photo URL or empty string"""
         try:
             photo_url = self.photo.url
         except ValueError:
             photo_url = ''
+
         return photo_url
 
 
@@ -49,12 +56,14 @@ class Cable(models.Model):
     def get_absolute_url(self):
         return reverse('cable_page', kwargs={'cable_slug': self.slug})
 
-    def get_title_photo_url(self):
+    @property
+    def get_title_photo_url(self) -> str:
+        """Get photo URL or empty string"""
         try:
             title_photo_url = self.cablephoto_set.get(is_title=True).photo.url
         except ValueError:
             title_photo_url = ''
-        print(f'{title_photo_url = }')
+
         return title_photo_url
 
 
@@ -72,11 +81,13 @@ class CablePhoto(models.Model):
         return f'{"title " if self.is_title else ""}{self.cable.name[:5]}...'
 
     @property
-    def get_photo_url(self):
+    def get_photo_url(self) -> str:
+        """Get photo URL or empty string"""
         try:
             photo_url = self.photo.url
         except ValueError:
             photo_url = ''
+
         return photo_url
 
 
@@ -125,11 +136,13 @@ class Order(models.Model):
     def __str__(self):
         return f'#{self.pk} {self.customer}, {"active" if self.is_active else "ordered"}'
 
-    def get_cart_total_price(self):
+    def get_cart_total_price(self) -> int:
+        """Returns total price for all products in cart"""
         ordered_products = self.orderedproduct_set.all()
         return sum([product.get_product_total_price for product in ordered_products])
 
-    def get_cart_total_products(self):
+    def get_cart_total_products(self) -> int:
+        """Returns total amount of unique products in cart"""
         return len(self.orderedproduct_set.all())
 
 
@@ -147,5 +160,6 @@ class OrderedProduct(models.Model):
         return f'#{self.order.pk}, {self.product}'
 
     @property
-    def get_product_total_price(self):
+    def get_product_total_price(self) -> int:
+        """Return total price for this product"""
         return self.product.price * self.quantity

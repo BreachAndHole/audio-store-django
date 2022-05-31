@@ -1,5 +1,4 @@
 import json
-
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.generic import list, detail
@@ -152,7 +151,10 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
 
         if user is None:
-            messages.info(request, 'Имя пользователя или пароль введены неверно')
+            messages.info(
+                request,
+                'Имя пользователя или пароль введены неверно'
+            )
         else:
             login(request, user)
             return redirect('home_page')

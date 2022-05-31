@@ -2,7 +2,12 @@ from django.http import HttpRequest
 from .models import *
 
 
-def update_ordered_product(request: HttpRequest, product_id: int, action: str) -> None:
+def update_ordered_product(
+        request: HttpRequest,
+        product_id: int,
+        action: str
+) -> None:
+
     product = Cable.objects.get(pk=product_id)
     order, _ = Order.objects.get_or_create(
         customer=request.user.customer,
@@ -42,7 +47,11 @@ def get_checkout_form_initials(customer: Customer) -> dict:
     return initials
 
 
-def update_customer_information(customer: Customer, updated_data: dict) -> None:
+def update_customer_information(
+        customer: Customer,
+        updated_data: dict
+) -> None:
+
     customer.first_name = updated_data.get('first_name', '')
     customer.last_name = updated_data.get('last_name', '')
     customer.phone = updated_data.get('phone', '')
