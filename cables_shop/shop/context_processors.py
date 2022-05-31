@@ -5,11 +5,10 @@ def get_cart_items_total(request):
     if not request.user.is_authenticated:
         return {'items_in_cart': 0}
 
-    customer = request.user.customer
-
-    order, is_created = Order.objects.get_or_create(customer=customer, is_active=True)
-    if is_created or order is None:
-        return {'cart_items_total': 0}
+    order, _ = Order.objects.get_or_create(
+        customer=request.user.customer,
+        is_active=True
+    )
 
     ordered_items = OrderedProduct.objects.filter(order=order)
     items_in_cart = len(ordered_items)
