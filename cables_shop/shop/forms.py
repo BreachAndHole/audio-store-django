@@ -10,7 +10,6 @@ class RegisterUserForm(UserCreationForm):
         for field in ('username', 'email', 'password1', 'password2'):
             self.fields[field].widget.attrs.update({
                 'type': 'text',
-                'id': 'form3Example1c',
                 'class': "form-control",
             })
 

@@ -86,12 +86,6 @@ def checkout(request):
         form = CheckoutForm(request.POST)
 
         if form.is_valid():
-            order.is_active = False
-            order.save()
-
-            print(customer.__dict__)
-            print(customer.shipping_address)
-
             return redirect('home_page')
 
         return redirect('checkout_page')

@@ -29,4 +29,3 @@ class CablePhotoAdmin(admin.ModelAdmin):
 admin.site.register(Customer)
 admin.site.register(Order)
 admin.site.register(OrderedProduct)
-admin.site.register(ShippingAddress)

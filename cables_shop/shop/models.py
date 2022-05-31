@@ -86,6 +86,11 @@ class Customer(models.Model):
     last_name = models.CharField('фамилия', max_length=15)
     phone = models.CharField('номер телефона', max_length=15)
 
+    address = models.CharField('адрес', max_length=200, default='')
+    city = models.CharField('город', max_length=50, default='')
+    state = models.CharField('область', max_length=70, default='')
+    zipcode = models.CharField('почтовый индекс', max_length=10, default='')
+
     class Meta:
         verbose_name = 'клиент'
         verbose_name_plural = 'клиенты'
@@ -114,6 +119,9 @@ class Order(models.Model):
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
 
+    def __str__(self):
+        return f'#{self.pk} {self.customer}, {"active" if self.is_active else "ordered"}'
+
     def get_cart_total_price(self):
         ordered_products = self.orderedproduct_set.all()
         print(ordered_products)
@@ -136,14 +144,3 @@ class OrderedProduct(models.Model):
     @property
     def get_product_total_price(self):
         return self.product.price * self.quantity
-
-
-class ShippingAddress(models.Model):
-    customer = models.OneToOneField(Customer, verbose_name='покупатель', on_delete=models.CASCADE, related_name='shipping_address')
-    address = models.CharField('адрес', max_length=200, default='')
-    city = models.CharField('город', max_length=50, default='')
-    state = models.CharField('область', max_length=70, default='')
-    zipcode = models.CharField('почтовый индекс', max_length=10, default='')
-
-    def __str__(self):
-        return f'{self.customer}, {self.city}'
