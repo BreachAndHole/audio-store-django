@@ -2,12 +2,12 @@ import json
 
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.views.generic import list, detail, TemplateView
+from django.views.generic import list, detail
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from .forms import *
+from .forms import RegisterUserForm, CheckoutForm
 from .utils import *
 from .models import *
 
