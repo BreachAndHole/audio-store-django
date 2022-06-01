@@ -1,6 +1,6 @@
 import json
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import list, detail
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -175,8 +175,32 @@ def user_logout(request):
 
 @login_required(login_url='user_login_page')
 def user_profile(request):
+    customer = request.user.customer
     contex = {
         'title': 'Личный кабинет',
-        'customer': request.user.customer,
+        'customer': customer,
+        'orders': Order.objects.filter(
+            customer=customer
+        ).exclude(
+            status=Order.OrderStatus.IN_CART
+        ).order_by(
+            '-pk'
+        ),
     }
     return render(request, 'shop/user_profile.html', contex)
+
+
+@login_required(login_url='user_login_page')
+def order_information(request, order_pk):
+    customer = request.user.customer
+    order = get_object_or_404(Order, pk=order_pk)
+
+    # If order don't belong to current user or the order still in cart
+    if order.customer != customer or order.status == Order.OrderStatus.IN_CART:
+        return redirect('home_page')
+
+    contex = {
+        'title': f'Заказ №{order.pk}',
+        'order': order,
+    }
+    return render(request, 'shop/order_info.html', contex)
