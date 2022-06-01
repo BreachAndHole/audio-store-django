@@ -177,6 +177,9 @@ class Order(models.Model):
     def __str__(self):
         return f'#{self.pk}: {self.customer}, {self.get_status_display()}'
 
+    def get_absolute_url(self):
+        return reverse('order_info_page', kwargs={'order_pk': self.pk})
+
     def get_cart_total_price(self) -> int:
         """Returns total price for all products in cart"""
         ordered_products = self.orderedproduct_set.all()
