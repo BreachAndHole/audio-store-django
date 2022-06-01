@@ -1,0 +1,68 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row g-5">
+        <div class="col-md-7 col-lg-8">
+            <h4 class="mb-3">Обновление информации</h4>
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        {{ form.first_name.label }}
+                        {{ form.first_name }}
+                        <div class="invalid-feedback">
+                            Имя обязательно для ввода.
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        {{ form.last_name.label }}
+                        {{ form.last_name }}
+                        <div class="invalid-feedback">
+                            Фамилия обязательна для ввода.
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        {{ form.phone.label }}
+                        {{ form.phone }}
+                        <div class="invalid-feedback">
+                            Пожалуйста введите верный телефонный номер
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        {{ form.address.label }}
+                        {{ form.address }}
+                        <div class="invalid-feedback">
+                            Необходимо ввести адрес
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        {{ form.city.label }}
+                        {{ form.city }}
+                        <div class="invalid-feedback">
+                            Необходимо ввести город
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        {{ form.state.label }}
+                        {{ form.state }}
+                    </div>
+
+                    <div class="col-md-3">
+                        {{ form.zipcode.label }}
+                        {{ form.zipcode }}
+                        <div class="invalid-feedback">
+                            Необходимо ввести почтовый индекс
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4">
+                <button class="btn btn-light btn-lg w-100" type="submit">Обновить информацию</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

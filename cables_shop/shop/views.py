@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from .forms import RegisterUserForm, CheckoutForm
+from .forms import UserRegistrationForm, CustomerInformationForm
 from .utils import *
 from .models import *
 
@@ -61,7 +61,9 @@ class CartPageView(LoginRequiredMixin, list.ListView):
         context['title'] = 'Корзина'
 
         ordered_products = context.get('ordered_products', [])
-        cart_total_price = sum([product.get_product_total_price for product in ordered_products])
+        cart_total_price = sum(
+            [product.get_product_total_price for product in ordered_products]
+        )
         context['cart_total_price'] = cart_total_price
         return context
 
@@ -83,8 +85,10 @@ def checkout(request):
     )
     ordered_products = order.orderedproduct_set.all()
 
-    form_initial_values = get_checkout_form_initials(customer=customer)
-    form = CheckoutForm(request.POST or None, initial=form_initial_values)
+    form_initial_values = get_checkout_form_initials(customer)
+    form = CustomerInformationForm(
+        request.POST or None, initial=form_initial_values
+    )
 
     if request.method == 'POST' and form.is_valid():
         update_customer_information(
@@ -105,7 +109,7 @@ def checkout(request):
         'title': 'Оформление заказа',
         'form': form,
         'ordered_products': ordered_products,
-        'cart_total_price': order.get_cart_total_price,
+        'cart_total_price': order.get_order_total_price,
     }
 
     return render(request, 'shop/checkout.html', context)
@@ -128,10 +132,10 @@ def update_cart(request):
 
 
 def user_registration(request):
-    form = RegisterUserForm()
+    form = UserRegistrationForm()
 
     if request.method == 'POST':
-        form = RegisterUserForm(request.POST)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
 
@@ -191,7 +195,7 @@ def user_profile(request):
 
 
 @login_required(login_url='user_login_page')
-def order_information(request, order_pk):
+def order_information(request, order_pk: int):
     customer = request.user.customer
     order = get_object_or_404(Order, pk=order_pk)
 
@@ -204,3 +208,26 @@ def order_information(request, order_pk):
         'order': order,
     }
     return render(request, 'shop/order_info.html', contex)
+
+
+@login_required(login_url='user_login_page')
+def user_profile_update(request):
+    customer = request.user.customer
+    form_initial_values = get_checkout_form_initials(customer)
+    form = CustomerInformationForm(
+        request.POST or None,
+        initial=form_initial_values
+    )
+
+    if request.method == 'POST' and form.is_valid():
+        update_customer_information(
+            customer=customer,
+            updated_data=form.cleaned_data
+        )
+        return redirect('user_profile_page')
+
+    contex = {
+        'title': 'Обновление профиля',
+        'form': form,
+    }
+    return render(request, 'shop/user_profile_update.html', contex)

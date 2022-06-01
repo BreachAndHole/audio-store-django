@@ -4,15 +4,15 @@ from . import views
 
 
 urlpatterns = [
-    path('', cache_page(10)(views.IndexPageView.as_view()), name='home_page'),
+    path('', views.IndexPageView.as_view(), name='home_page'),
     path(
         'cables/',
-        cache_page(10)(views.AllCablesPageView.as_view()),
+        views.AllCablesPageView.as_view(),
         name='all_cables_page'
     ),
     path(
         'cable/<slug:cable_slug>',
-        cache_page(10)(views.CablePageView.as_view()),
+        views.CablePageView.as_view(),
         name='cable_page'
     ),
     path('cart/', views.CartPageView.as_view(), name='cart_page'),
@@ -25,6 +25,11 @@ urlpatterns = [
     path('user/login/', views.user_login, name='user_login_page'),
     path('user/logout/', views.user_logout, name='user_logout_page'),
     path('user/profile/', views.user_profile, name='user_profile_page'),
+    path(
+        'user/profile/update',
+        views.user_profile_update,
+        name='user_profile_update_page'
+    ),
     path(
         'user/order/<int:order_pk>',
         views.order_information,

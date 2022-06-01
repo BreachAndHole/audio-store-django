@@ -9,7 +9,7 @@
             <p class="h5">Номер телефона: {{ customer.phone }}</p>
             <p></p>
             <p class="h5">Адресс доставки: {{ customer.shipping_address.zipcode }}, {{ customer.shipping_address.city }}, {{ customer.shipping_address.address }}</p>
-            <button class="btn btn-light" type="submit">Редактировать</button>
+            <a href="{% url 'user_profile_update_page' %}" class="btn btn-light">Редактировать</a>
         </div>
         <div class="col-8 border-start">
 
@@ -39,9 +39,9 @@
                     {% for order in orders %}
                         <tr class="border-bottom">
                             <td class="border-0 align-middle text-white">{{ order.pk }}</td>
-                            <td class="border-0 align-middle text-white">{{ order.order_date }}</td>
-                            <td class="border-0 align-middle text-white">{{ order.get_cart_total_products}}</td>
-                            <td class="border-0 align-middle text-white">{{ order.get_cart_total_price }}</td>
+                            <td class="border-0 align-middle text-white">{{ order.order_accepted_date }}</td>
+                            <td class="border-0 align-middle text-white">{{ order.get_order_total_products}}</td>
+                            <td class="border-0 align-middle text-white">{{ order.get_order_total_price }}</td>
                             <td class="border-0 align-middle text-white">{{ order.get_status_display }}</td>
                             <td class="border-0 align-middle text-white">
                                 <a href="{{ order.get_absolute_url }}" class="btn btn-sm btn-outline-light">Подробнее</a>
