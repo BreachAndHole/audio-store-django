@@ -159,9 +159,13 @@ class Order(models.Model):
         verbose_name='покупатель',
         on_delete=models.CASCADE
     )
-    order_date = models.DateTimeField(
+    order_accepted_date = models.DateField(
         'дата оформления заказа',
-        auto_now_add=True
+        auto_now_add=True,
+    )
+    order_last_update_date = models.DateField(
+        'дата последнего обновления заказа',
+        auto_now_add=True,
     )
     status = models.CharField(
         'статус заказа',
@@ -180,14 +184,14 @@ class Order(models.Model):
     def get_absolute_url(self):
         return reverse('order_info_page', kwargs={'order_pk': self.pk})
 
-    def get_cart_total_price(self) -> int:
+    def get_order_total_price(self) -> int:
         """Returns total price for all products in cart"""
         ordered_products = self.orderedproduct_set.all()
         return sum(
             [product.get_product_total_price for product in ordered_products]
         )
 
-    def get_cart_total_products(self) -> int:
+    def get_order_total_products(self) -> int:
         """Returns total amount of unique products in cart"""
         return len(self.orderedproduct_set.all())
 

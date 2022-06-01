@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 
-class RegisterUserForm(UserCreationForm):
+class UserRegistrationForm(UserCreationForm):
     """User registration form"""
 
     # Changing styles
@@ -25,7 +25,7 @@ class RegisterUserForm(UserCreationForm):
         ]
 
 
-class CheckoutForm(forms.Form):
+class CustomerInformationForm(forms.Form):
     """
     Form for checkout page.
     Handling both customer and shipping address models

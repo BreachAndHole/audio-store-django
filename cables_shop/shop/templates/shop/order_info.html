@@ -4,30 +4,31 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-12 my-3">
+            <a href="{% url 'user_profile_page' %}" class="btn btn-outline-light">Вернуться в профиль</a>
             <div class="table-responsive ">
                 <table class="table">
                     <thead>
                     <tr class="border-bottom">
                         <th scope="col" class="border-0 text-white">
-                            <div class="p-2 text-uppercase">#</div>
+                            <div class="p-2 text-uppercase text-center">#</div>
                         </th>
                         <th scope="col" class="border-0 text-white">
-                            <div class="p-2 text-uppercase">Наименование</div>
+                            <div class="p-2 text-uppercase text-start">Наименование</div>
                         </th>
                         <th scope="col" class="border-0 text-white">
-                            <div class="py-2 text-uppercase">Количество</div>
+                            <div class="py-2 text-uppercase text-center">Количество</div>
                         </th>
                         <th scope="col" class="border-0 text-white">
-                            <div class="py-2 text-uppercase">Сумма</div>
+                            <div class="py-2 text-uppercase text-center">Сумма</div>
                         </th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for product in order.orderedproduct_set.all %}
                     <tr class="border-bottom">
-                        <td class="border-0 align-middle text-white">{{ forloop.counter }}</td>
-                        <td scope="row" class="border-0">
-                            <div class="p-2  align-middle">
+                        <td class="border-0 align-middle text-white text-center">{{ forloop.counter }}</td>
+                        <td scope="row" class="border-0 text-start">
+                            <div class="p-2  align-middle ">
                                 <img src="{{ product.product.title_photo_url }}"
                                      alt="{{ product.product.name }} photo"
                                      width="70" class="img-fluid rounded">
@@ -39,10 +40,16 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="border-0 align-middle text-white">{{ product.quantity }}</td>
-                        <td class="border-0 align-middle text-white">{{ product.get_product_total_price }}</td>
+                        <td class="border-0 align-middle text-white text-center">{{ product.quantity }}</td>
+                        <td class="border-0 align-middle text-white text-center">{{ product.get_product_total_price }}</td>
                     </tr>
                     {% endfor %}
+                    <tr>
+                        <td class="border-0"></td>
+                        <td scope="row" class="border-0"></td>
+                        <td class="border-0 align-middle text-white text-end">Итого:</td>
+                        <td class="border-0 align-middle text-white text-center">{{ order.get_order_total_price }}</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
