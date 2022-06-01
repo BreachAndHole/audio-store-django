@@ -85,23 +85,30 @@ def checkout(request):
     )
     ordered_products = order.orderedproduct_set.all()
 
+    # Prefilling checkout form with customer information we have
     form_initial_values = get_checkout_form_initials(customer)
     form = CustomerInformationForm(
         request.POST or None, initial=form_initial_values
     )
 
     if request.method == 'POST' and form.is_valid():
-        update_customer_information(
-            customer=customer,
-            updated_data=form.cleaned_data
-        )
+        # Check if the customer want to save his info for further orders
+        if 'update_customer_info' in request.POST:
+            update_customer_information(
+                customer=customer,
+                updated_data=form.cleaned_data
+            )
+
+        # Check in all ordered cables still in stock
+        if is_all_cart_products_in_stock(ordered_products):
+            update_cables_quantity_in_stock(ordered_products)
+        else:
+            messages.error(request, f'Части позиций осталось меньше, чем вы заказали')
+            return redirect('checkout_page')
+
+        # Changing order status and saving it
         order.status = Order.OrderStatus.ACCEPTED
         order.save()
-
-        for product in ordered_products:
-            cable = Cable.objects.get(pk=product.product.pk)
-            cable.units_in_stock -= product.quantity
-            cable.save()
 
         return redirect('home_page')
 
@@ -126,7 +133,7 @@ def update_cart(request):
     if product_id is None or action is None:
         return JsonResponse('Cart has not been updated', safe=False)
 
-    update_ordered_product(request, product_id, action)
+    update_ordered_product_in_cart(request, product_id, action)
 
     return JsonResponse('Cart has been updated', safe=False)
 

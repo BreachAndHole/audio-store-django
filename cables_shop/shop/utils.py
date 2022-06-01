@@ -1,13 +1,16 @@
+from typing import List
+
+from django.db.models import F
 from django.http import HttpRequest
 from .models import *
 
 
-def update_ordered_product(
+def update_ordered_product_in_cart(
         request: HttpRequest,
         product_id: int,
         action: str
 ) -> None:
-
+    """This function add, remove and delete products from cart"""
     product = Cable.objects.get(pk=product_id)
     order, _ = Order.objects.get_or_create(
         customer=request.user.customer,
@@ -34,7 +37,31 @@ def update_ordered_product(
         ordered_product.delete()
 
 
+def is_all_cart_products_in_stock(
+        ordered_products: List[OrderedProduct]
+) -> bool:
+    for product in ordered_products:
+        ordered_cable: Cable = Cable.objects.get(pk=product.product.pk)
+        if ordered_cable.units_in_stock < product.quantity:
+            return False
+
+    return True
+
+
+def update_cables_quantity_in_stock(
+        ordered_products: List[OrderedProduct]
+) -> None:
+    for product in ordered_products:
+        ordered_cable = Cable.objects.get(pk=product.product.pk)
+        ordered_cable.units_in_stock = F('units_in_stock') - product.quantity
+        ordered_cable.save()
+
+
 def get_checkout_form_initials(customer: Customer) -> dict:
+    """
+    This function forming a dict of initial values
+    for customer information form
+    """
     initials = {
         'first_name': customer.first_name or '',
         'last_name': customer.last_name or '',
@@ -51,7 +78,7 @@ def update_customer_information(
         customer: Customer,
         updated_data: dict
 ) -> None:
-
+    """This function update customer info with data from customer info form"""
     customer.first_name = updated_data.get('first_name', '')
     customer.last_name = updated_data.get('last_name', '')
     customer.phone = updated_data.get('phone', '')

@@ -5,7 +5,8 @@
     <div class="row g-5">
         <div class="col-md-5 col-lg-4 order-md-last ">
             <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <a href="{% url 'cart_page' %}" class="btn btn btn-bg-dark text-white"><span class="h4">Корзина</span></a>
+                <a href="{% url 'cart_page' %}"
+                   class="btn btn btn-bg-dark text-white"><span class="h4">Корзина</span></a>
                 <span class="badge bg-white text-dark rounded-pill">{{ cart_items_total }}</span>
             </h4>
             <ul class="list-group mb-3">
@@ -13,8 +14,9 @@
                 <li class="list-group-item d-flex justify-content-between lh-sm bg-dark border border-light">
                     <div>
                         <h6 class="my-0 text-white">{{ product.product.name }}</h6>
-<!--                        <small class="text-white">{{ product.product.type.name }}</small>-->
-                        <small class="text-white">{{ product.quantity }} шт.</small>
+                        <!--                        <small class="text-white">{{ product.product.type.name }}</small>-->
+                        <small class="text-white">{{ product.quantity }}
+                            шт.</small>
                     </div>
                     <span class="text-white">{{ product.get_product_total_price }}</span>
                 </li>
@@ -24,6 +26,9 @@
                     <strong class="text-white">{{ cart_total_price }}</strong>
                 </li>
             </ul>
+            {% for message in messages %}
+                <p class="h6 text-center text-white">{{ message }}</p>
+            {% endfor %}
         </div>
         <div class="col-md-7 col-lg-8">
             <h4 class="mb-3">Доставка</h4>
@@ -83,59 +88,66 @@
                 </div>
 
                 <hr class="my-4">
+                <label>Обновить контактные данные и адрес
+                    <input type="checkbox" name="update_customer_info"
+                           class="mx-3">
+                </label>
+                <hr class="my-4">
 
-<!--                <h4 class="mb-3">Оплата</h4>-->
-<!--                <div class="my-3">-->
-<!--                    <div class="form-check">-->
-<!--                        <input id="online" name="paymentMethod" type="radio" class="form-check-input" checked=""-->
-<!--                               required="">-->
-<!--                        <label class="form-check-label" for="online">Картой онлайн</label>-->
-<!--                    </div>-->
-<!--                    <div class="form-check">-->
-<!--                        <input id="cod" name="paymentMethod" type="radio" class="form-check-input" required="">-->
-<!--                        <label class="form-check-label" for="cod">Наложный платёж</label>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                <h4 class="mb-3">Оплата</h4>-->
+                <!--                <div class="my-3">-->
+                <!--                    <div class="form-check">-->
+                <!--                        <input id="online" name="paymentMethod" type="radio" class="form-check-input" checked=""-->
+                <!--                               required="">-->
+                <!--                        <label class="form-check-label" for="online">Картой онлайн</label>-->
+                <!--                    </div>-->
+                <!--                    <div class="form-check">-->
+                <!--                        <input id="cod" name="paymentMethod" type="radio" class="form-check-input" required="">-->
+                <!--                        <label class="form-check-label" for="cod">Наложный платёж</label>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
-<!--                <div class="row gy-3">-->
-<!--                    <div class="col-md-6">-->
-<!--                        <label for="cc-name" class="form-label">Имя на карте</label>-->
-<!--                        <input type="text" class="form-control" id="cc-name" placeholder="IVAN IVANOV" required="">-->
-<!--                        <small class="text-secondary">Введите имя, указанное на карте</small>-->
-<!--                        <div class="invalid-feedback">-->
-<!--                            Name on card is required-->
-<!--                        </div>-->
-<!--                    </div>-->
+                <!--                <div class="row gy-3">-->
+                <!--                    <div class="col-md-6">-->
+                <!--                        <label for="cc-name" class="form-label">Имя на карте</label>-->
+                <!--                        <input type="text" class="form-control" id="cc-name" placeholder="IVAN IVANOV" required="">-->
+                <!--                        <small class="text-secondary">Введите имя, указанное на карте</small>-->
+                <!--                        <div class="invalid-feedback">-->
+                <!--                            Name on card is required-->
+                <!--                        </div>-->
+                <!--                    </div>-->
 
-<!--                    <div class="col-md-6">-->
-<!--                        <label for="cc-number" class="form-label">Номер карты</label>-->
-<!--                        <input type="text" class="form-control" id="cc-number" placeholder="1234 5678 9012 3456"-->
-<!--                               required="">-->
-<!--                        <div class="invalid-feedback">-->
-<!--                            Необходимо ввести номер карты-->
-<!--                        </div>-->
-<!--                    </div>-->
+                <!--                    <div class="col-md-6">-->
+                <!--                        <label for="cc-number" class="form-label">Номер карты</label>-->
+                <!--                        <input type="text" class="form-control" id="cc-number" placeholder="1234 5678 9012 3456"-->
+                <!--                               required="">-->
+                <!--                        <div class="invalid-feedback">-->
+                <!--                            Необходимо ввести номер карты-->
+                <!--                        </div>-->
+                <!--                    </div>-->
 
-<!--                    <div class="col-md-3">-->
-<!--                        <label for="cc-expiration" class="form-label">Срок действия</label>-->
-<!--                        <input type="text" class="form-control" id="cc-expiration" placeholder="11/28" required="">-->
-<!--                        <div class="invalid-feedback">-->
-<!--                            Необходимо ввести срок действия-->
-<!--                        </div>-->
-<!--                    </div>-->
+                <!--                    <div class="col-md-3">-->
+                <!--                        <label for="cc-expiration" class="form-label">Срок действия</label>-->
+                <!--                        <input type="text" class="form-control" id="cc-expiration" placeholder="11/28" required="">-->
+                <!--                        <div class="invalid-feedback">-->
+                <!--                            Необходимо ввести срок действия-->
+                <!--                        </div>-->
+                <!--                    </div>-->
 
-<!--                    <div class="col-md-3">-->
-<!--                        <label for="cc-cvv" class="form-label">CVV</label>-->
-<!--                        <input type="text" class="form-control" id="cc-cvv" placeholder="123" required="">-->
-<!--                        <div class="invalid-feedback">-->
-<!--                            Необходимо ввести CVV-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                    <div class="col-md-3">-->
+                <!--                        <label for="cc-cvv" class="form-label">CVV</label>-->
+                <!--                        <input type="text" class="form-control" id="cc-cvv" placeholder="123" required="">-->
+                <!--                        <div class="invalid-feedback">-->
+                <!--                            Необходимо ввести CVV-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
-<!--                <hr class="my-4">-->
+                <!--                <hr class="my-4">-->
 
-                <button class="btn btn-light btn-lg w-100" type="submit">Завершить оформление</button>
+                <button class="btn btn-light btn-lg w-100" type="submit">
+                    Завершить оформление
+                </button>
             </form>
         </div>
     </div>
