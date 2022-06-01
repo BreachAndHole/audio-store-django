@@ -9,11 +9,11 @@
                     {% for photo in cable.cablephoto_set.all %}
                         {% if photo.is_title %}
                             <div class="carousel-item active">
-                                <img src="{{ photo.get_photo_url }}" class="d-block w-100" alt="Photo for {{ cable.name }}">
+                                <img src="{{ photo.photo_url }}" class="d-block w-100" alt="Photo for {{ cable.name }}">
                             </div>
                         {% else %}
                             <div class="carousel-item">
-                                <img src="{{ photo.get_photo_url }}" class="d-block w-100" alt="Photo for {{ cable.name }}">
+                                <img src="{{ photo.photo_url }}" class="d-block w-100" alt="Photo for {{ cable.name }}">
                             </div>
                         {% endif %}
                     {% endfor %}

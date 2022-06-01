@@ -39,10 +39,10 @@
                     {% for order in customer.order_set.all %}
                         <tr class="border-bottom">
                             <td class="border-0 align-middle text-white">{{ order.pk }}</td>
-                            <td class="border-0 align-middle text-white">15 марта 2022</td>
+                            <td class="border-0 align-middle text-white">{{ order.order_date }}</td>
                             <td class="border-0 align-middle text-white">{{ order.get_cart_total_products}}</td>
                             <td class="border-0 align-middle text-white">{{ order.get_cart_total_price }}</td>
-                            <td class="border-0 align-middle text-white">{{ order.is_active }}</td>
+                            <td class="border-0 align-middle text-white">{{ order.get_status_display }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>

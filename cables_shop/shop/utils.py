@@ -11,7 +11,7 @@ def update_ordered_product(
     product = Cable.objects.get(pk=product_id)
     order, _ = Order.objects.get_or_create(
         customer=request.user.customer,
-        is_active=True
+        status=Order.OrderStatus.IN_CART,
     )
 
     ordered_product, _ = OrderedProduct.objects.get_or_create(

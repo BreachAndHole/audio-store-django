@@ -68,7 +68,7 @@ class CartPageView(LoginRequiredMixin, list.ListView):
     def get_queryset(self):
         return OrderedProduct.objects.filter(
             order__customer=self.request.user.customer,
-            order__is_active=True
+            order__status=Order.OrderStatus.IN_CART
         ).order_by(
             'date_added'
         )
@@ -77,7 +77,10 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 @login_required(login_url='user_login_page')
 def checkout(request):
     customer, _ = Customer.objects.get_or_create(user=request.user)
-    order = Order.objects.get(customer=customer, is_active=True)
+    order = Order.objects.get(
+        customer=customer,
+        status=Order.OrderStatus.IN_CART,
+    )
     ordered_products = order.orderedproduct_set.all()
 
     form_initial_values = get_checkout_form_initials(customer=customer)
@@ -88,7 +91,7 @@ def checkout(request):
             customer=customer,
             updated_data=form.cleaned_data
         )
-        order.is_active = False
+        order.status = Order.OrderStatus.ACCEPTED
         order.save()
 
         for product in ordered_products:
