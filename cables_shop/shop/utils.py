@@ -1,9 +1,10 @@
+import json
 from enum import Enum
 from typing import TypedDict, NamedTuple
 from django.db.models import F
 from django.http import HttpRequest
-
-import shop.forms
+from django.core.exceptions import ObjectDoesNotExist
+from .errors import *
 from .models import *
 
 
@@ -23,54 +24,95 @@ class UpdateCartAction(Enum):
     DELETE_FROM_CART = 'delete_from_cart'
 
 
-class UpdateCartJSONData(NamedTuple):
-    product_id:int
-    action: UpdateCartAction
-
-
-def parse_json_update_data(request) -> UpdateCartJSONData:
-    pass
-
-
-
-def update_ordered_product_in_cart(
-    request: HttpRequest,
-    product_id: int,
+class CartUpdateParsedData(NamedTuple):
+    product_id: int
     action: str
-) -> None:
-    """This function add, remove and delete products from cart"""
-    product = Cable.objects.get(pk=product_id)
+
+
+def process_cart_update(request: HttpRequest) -> None:
+    parsed_response = _parse_json_update_data(request)
+    order, _ = Order.objects.get_or_create(
+        customer=request.user.customer,
+        status=Order.OrderStatus.IN_CART,
+    )
+    ordered_product = _get_product_to_update(
+        order,
+        parsed_response.product_id
+    )
+    _update_product_quantity_in_cart(
+        ordered_product,
+        parsed_response.action
+    )
+    _save_or_delete_product_in_cart(ordered_product)
+
+
+def _parse_json_update_data(request: HttpRequest) -> CartUpdateParsedData:
+    """
+    This function is parsing json response from cart.js script.
+    """
+    try:
+        received_data = json.loads(request.body)
+    except json.JSONDecodeError:
+        raise JSONResponseParsingError('Error during json response decoding')
 
     try:
-        order = Order.objects.get(
-            customer=request.user.customer,
-            status=Order.OrderStatus.IN_CART,
+        parsed_data = CartUpdateParsedData(
+            product_id=received_data.get('productId'),
+            action=received_data.get('action')
         )
-    except Exception:
-        raise NotImplementedError
+    except KeyError:
+        raise JSONResponseParsingError(
+            'productId or action is not in response'
+        )
+
+    return parsed_data
+
+
+def _get_product_to_update(
+        order: Order,
+        product_id: int
+) -> OrderedProduct:
+    """Getting or creating new ordered product for further updating"""
+    try:
+        cable = Cable.objects.get(pk=product_id)
+    except ObjectDoesNotExist:
+        raise UpdateCartError(
+            f'There is no product with {product_id=}'
+        )
 
     ordered_product, _ = OrderedProduct.objects.get_or_create(
         order=order,
-        product=product
+        product=cable
     )
+    return ordered_product
 
+
+def _update_product_quantity_in_cart(
+        ordered_product: OrderedProduct,
+        action: str
+) -> None:
+    """This function is changing quantity of product needed to update"""
     match action:
-        case 'add_to_cart':
-            if ordered_product.quantity < product.units_in_stock:
+        case UpdateCartAction.ADD_TO_CART.value:
+            if ordered_product.quantity < ordered_product.product.units_in_stock:
                 ordered_product.quantity += 1
-        case 'remove_from_cart':
+        case UpdateCartAction.REMOVE_FROM_CART.value:
             ordered_product.quantity -= 1
-        case 'delete_from_cart':
+        case UpdateCartAction.DELETE_FROM_CART.value:
             ordered_product.quantity = 0
+        case _:
+            raise UpdateCartError(f'Undefined {action = }')
 
-    ordered_product.save()
 
+def _save_or_delete_product_in_cart(ordered_product: OrderedProduct) -> None:
     if ordered_product.quantity <= 0:
         ordered_product.delete()
+    else:
+        ordered_product.save()
 
 
 def is_all_cart_products_in_stock(
-    ordered_products: list[OrderedProduct]
+        ordered_products: list[OrderedProduct]
 ) -> bool:
     """
     This function checks if in stock are still
@@ -87,7 +129,7 @@ def is_all_cart_products_in_stock(
 
 
 def update_cables_quantity_in_stock(
-    ordered_products: list[OrderedProduct]
+        ordered_products: list[OrderedProduct]
 ) -> None:
     """This function updates in stock quantity of ordered cables"""
     for ordered_product in ordered_products:
@@ -97,7 +139,7 @@ def update_cables_quantity_in_stock(
 
 
 def correct_cart_products_quantity(
-    ordered_products: list[OrderedProduct]
+        ordered_products: list[OrderedProduct]
 ) -> None:
     for ordered_product in ordered_products:
         cable: Cable = Cable.objects.get(pk=ordered_product.product.pk)
@@ -126,8 +168,8 @@ def get_customer_form_initials(customer: Customer) -> CustomerFormInitials:
 
 
 def update_customer_information(
-    customer: Customer,
-    updated_data: dict
+        customer: Customer,
+        updated_data: dict
 ) -> None:
     """This function update customer info with data from customer info form"""
     customer.first_name = updated_data.get('first_name', '')

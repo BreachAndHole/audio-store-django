@@ -56,9 +56,9 @@ class CartPageView(LoginRequiredMixin, list.ListView):
         context['title'] = 'Корзина'
 
         # Adding cart total price to context
-        order_pk = context.get('ordered_products', [])[0].order.pk
         context['cart_total_price'] = Order.objects.get(
-            pk=order_pk
+            customer=self.request.user.customer,
+            status=Order.OrderStatus.IN_CART
         ).get_order_total_price
         return context
 
@@ -157,22 +157,21 @@ def checkout(request):
 
 
 def update_cart(request):
+    """
+    This view is working with JSON-response sent by cart.js on every
+    cart items related button click
+    """
+
+    # Double-checking if user is authenticated
     if not request.user.is_authenticated:
         messages.info('Для заказа необходимо войти в аккаунт')
         redirect('user_login_page')
-
-        #parse_json_update_data(request)
     try:
-        cart_update_received_data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse('Cart has not been updated', safe=False)
-
-    product_id = cart_update_received_data.get('productId', None)
-    action = cart_update_received_data.get('action', None)
-    if product_id is None or action is None:
-        return JsonResponse('Cart has not been updated', safe=False)
-
-    update_ordered_product_in_cart(request, product_id, action)
+        process_cart_update(request)
+    except JSONResponseParsingError:
+        return JsonResponse('Error during parsing response', safe=False)
+    except UpdateCartError:
+        return JsonResponse('Error during cart update', safe=False)
 
     return JsonResponse('Cart has been updated', safe=False)
 
