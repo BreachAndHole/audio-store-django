@@ -122,12 +122,13 @@ def save_customer_profile(sender, instance, **kwargs):
 class ShippingAddress(models.Model):
     """
     Customer shipping address model.
-    One to one relation with customer (user).
+    One to many relation with customer (user).
     """
-    customer = models.OneToOneField(
+    customer = models.ForeignKey(
         Customer, on_delete=models.CASCADE, related_name='shipping_address',
         verbose_name='покупатель'
     )
+    is_primary = models.BooleanField('основной адрес', default=False)
     address = models.CharField('адрес', max_length=200, null=True)
     city = models.CharField('город', max_length=50, null=True)
     state = models.CharField('область', max_length=70, null=True)
@@ -138,7 +139,7 @@ class ShippingAddress(models.Model):
         verbose_name_plural = 'адреса доставки'
 
     def __str__(self):
-        return f'Адрес покупателя {self.customer}'
+        return f'Адрес покупателя {self.customer}, {self.zipcode}'
 
 
 class Order(models.Model):
@@ -158,6 +159,12 @@ class Order(models.Model):
         Customer,
         verbose_name='покупатель',
         on_delete=models.CASCADE
+    )
+    shipping_address = models.ForeignKey(
+        ShippingAddress,
+        verbose_name='адресс доставки',
+        on_delete=models.CASCADE,
+        null=True
     )
     order_accepted_date = models.DateField(
         'дата оформления заказа',

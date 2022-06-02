@@ -10,8 +10,5 @@ def get_cart_items_total(request: HttpRequest) -> dict[str, int]:
         customer=request.user.customer,
         status=Order.OrderStatus.IN_CART,
     )
-
     ordered_items = OrderedProduct.objects.filter(order=order)
-    items_in_cart = len(ordered_items)
-
-    return {'cart_items_total': items_in_cart}
+    return {'cart_items_total': len(ordered_items)}

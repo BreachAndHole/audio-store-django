@@ -55,5 +55,14 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col">
+            <p class="h3">Адрес доставки:</p>
+            <p class="h5">{{ order.shipping_address.address}}</p>
+            <p class="h5">{{ order.shipping_address.city}}</p>
+            <p class="h5">{{ order.shipping_address.state}}</p>
+            <p class="h5">{{ order.shipping_address.zipcode}}</p>
+        </div>
+    </div>
 </div>
 {% endblock content %}

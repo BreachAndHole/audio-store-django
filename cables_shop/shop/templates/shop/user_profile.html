@@ -8,7 +8,7 @@
             <p class="h5">Фамилия: {{ customer.last_name }}</p>
             <p class="h5">Номер телефона: {{ customer.phone }}</p>
             <p></p>
-            <p class="h5">Адресс доставки: {{ customer.shipping_address.zipcode }}, {{ customer.shipping_address.city }}, {{ customer.shipping_address.address }}</p>
+            <p class="h5">Адресс доставки: {{ address.zipcode }}, {{ address.city }}, {{ address.address }}</p>
             <a href="{% url 'user_profile_update_page' %}" class="btn btn-light">Редактировать</a>
         </div>
         <div class="col-8 border-start">
