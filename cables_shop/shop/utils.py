@@ -1,4 +1,5 @@
-from typing import TypedDict
+from enum import Enum
+from typing import TypedDict, NamedTuple
 from django.db.models import F
 from django.http import HttpRequest
 
@@ -14,6 +15,22 @@ class CustomerFormInitials(TypedDict):
     city: str
     state: str
     zipcode: str
+
+
+class UpdateCartAction(Enum):
+    ADD_TO_CART = 'add_to_cart'
+    REMOVE_FROM_CART = 'remove_from_cart'
+    DELETE_FROM_CART = 'delete_from_cart'
+
+
+class UpdateCartJSONData(NamedTuple):
+    product_id:int
+    action: UpdateCartAction
+
+
+def parse_json_update_data(request) -> UpdateCartJSONData:
+    pass
+
 
 
 def update_ordered_product_in_cart(

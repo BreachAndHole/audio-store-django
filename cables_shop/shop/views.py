@@ -55,11 +55,11 @@ class CartPageView(LoginRequiredMixin, list.ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Корзина'
 
-        ordered_products = context.get('ordered_products', [])
-        cart_total_price = sum(
-            [product.get_product_total_price for product in ordered_products]
-        )
-        context['cart_total_price'] = cart_total_price
+        # Adding cart total price to context
+        order_pk = context.get('ordered_products', [])[0].order.pk
+        context['cart_total_price'] = Order.objects.get(
+            pk=order_pk
+        ).get_order_total_price
         return context
 
     def get_queryset(self):
@@ -118,8 +118,6 @@ def checkout(request):
                 state=form.cleaned_data.get('state'),
                 zipcode=form.cleaned_data.get('zipcode'),
             )
-
-
         shipping_address.save()
 
         # Check if all ordered cables still in stock
@@ -163,6 +161,7 @@ def update_cart(request):
         messages.info('Для заказа необходимо войти в аккаунт')
         redirect('user_login_page')
 
+        #parse_json_update_data(request)
     try:
         cart_update_received_data = json.loads(request.body)
     except json.JSONDecodeError:
