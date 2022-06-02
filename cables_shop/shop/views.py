@@ -268,41 +268,7 @@ def order_information(request, order_pk: int):
 
 @login_required(login_url='user_login_page')
 def user_profile_update(request):
-    customer = request.user.customer
-    form_initial_values = get_customer_form_initials(customer)
-    form = CustomerInformationForm(
-        request.POST or None,
-        initial=form_initial_values
-    )
-
-    if request.method == 'POST' and form.is_valid():
-        update_customer_information(
-            customer=customer,
-            updated_data=form.cleaned_data
-        )
-
-        shipping_address = customer.shipping_address_set.all().get(
-            is_primary=True
-        )
-
-        ShippingAddress.objects.filter(
-            customer=customer
-        ).update(
-            is_primary=False
-        )
-
-        shipping_address.address = form.cleaned_data.get('address')
-        shipping_address.city = form.cleaned_data.get('city')
-        shipping_address.state = form.cleaned_data.get('state')
-        shipping_address.zipcode = form.cleaned_data.get('zipcode')
-        shipping_address.is_primary = True
-
-        shipping_address.save()
-
-        return redirect('user_profile_page')
-
     contex = {
         'title': 'Обновление профиля',
-        'form': form,
     }
     return render(request, 'shop/user_profile_update.html', contex)
