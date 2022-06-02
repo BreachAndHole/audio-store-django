@@ -1,6 +1,7 @@
 {% extends 'shop/base.html' %}
 {% load shop_tags %}
 {% block content %}
+{% get_all_cable_types as cable_types %}
 <div class="container">
     <form action="" method="post">
         {% csrf_token %}
