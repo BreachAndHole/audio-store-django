@@ -1,14 +1,23 @@
-from typing import List
-
+from typing import TypedDict
 from django.db.models import F
 from django.http import HttpRequest
 from .models import *
 
 
+class CustomerFormInitials(TypedDict):
+    first_name: str
+    last_name: str
+    phone: str
+    address: str
+    city: str
+    state: str
+    zipcode: str
+
+
 def update_ordered_product_in_cart(
-        request: HttpRequest,
-        product_id: int,
-        action: str
+    request: HttpRequest,
+    product_id: int,
+    action: str
 ) -> None:
     """This function add, remove and delete products from cart"""
     product = Cable.objects.get(pk=product_id)
@@ -38,26 +47,43 @@ def update_ordered_product_in_cart(
 
 
 def is_all_cart_products_in_stock(
-        ordered_products: List[OrderedProduct]
+    ordered_products: list[OrderedProduct]
 ) -> bool:
-    for product in ordered_products:
-        ordered_cable: Cable = Cable.objects.get(pk=product.product.pk)
-        if ordered_cable.units_in_stock < product.quantity:
+    """
+    This function checks if in stock are still
+    enough products to process the order.
+    It's made for a situations when one customer is filling the card
+    and at the same time another customer bought all the cables first one need
+    """
+    for ordered_product in ordered_products:
+        cable: Cable = Cable.objects.get(pk=ordered_product.product.pk)
+        if cable.units_in_stock < ordered_product.quantity:
             return False
 
     return True
 
 
 def update_cables_quantity_in_stock(
-        ordered_products: List[OrderedProduct]
+    ordered_products: list[OrderedProduct]
 ) -> None:
-    for product in ordered_products:
-        ordered_cable = Cable.objects.get(pk=product.product.pk)
-        ordered_cable.units_in_stock = F('units_in_stock') - product.quantity
-        ordered_cable.save()
+    """This function updates in stock quantity of ordered cables"""
+    for ordered_product in ordered_products:
+        cable: Cable = Cable.objects.get(pk=ordered_product.product.pk)
+        cable.units_in_stock = F('units_in_stock') - ordered_product.quantity
+        cable.save()
 
 
-def get_checkout_form_initials(customer: Customer) -> dict:
+def correct_cart_products_quantity(
+    ordered_products: list[OrderedProduct]
+) -> None:
+    for ordered_product in ordered_products:
+        cable: Cable = Cable.objects.get(pk=ordered_product.product.pk)
+        if ordered_product.quantity > cable.units_in_stock:
+            ordered_product.quantity = cable.units_in_stock
+            ordered_product.save()
+
+
+def get_checkout_form_initials(customer: Customer) -> CustomerFormInitials:
     """
     This function forming a dict of initial values
     for customer information form
@@ -75,8 +101,8 @@ def get_checkout_form_initials(customer: Customer) -> dict:
 
 
 def update_customer_information(
-        customer: Customer,
-        updated_data: dict
+    customer: Customer,
+    updated_data: dict
 ) -> None:
     """This function update customer info with data from customer info form"""
     customer.first_name = updated_data.get('first_name', '')
