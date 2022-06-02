@@ -1,4 +1,3 @@
-import json
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import list, detail
@@ -7,8 +6,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm, CustomerInformationForm
-from .utils import *
+from .utils.cart_utils import process_cart_update
+from .utils.checkout_utils import *
 from .models import *
+from .errors import *
 
 
 class IndexPageView(list.ListView):
@@ -93,31 +94,24 @@ def checkout(request):
                 customer=customer,
                 updated_data=form.cleaned_data
             )
-
         # making this address primary and every else not
-        if 'make_address_primary' in request.POST:
+        is_new_primary = 'make_address_primary' in request.POST
+        if is_new_primary:
             ShippingAddress.objects.filter(
                 customer=customer
             ).update(
                 is_primary=False
             )
-            shipping_address = ShippingAddress.objects.create(
-                customer=customer,
-                is_primary=True,
-                address=form.cleaned_data.get('address'),
-                city=form.cleaned_data.get('city'),
-                state=form.cleaned_data.get('state'),
-                zipcode=form.cleaned_data.get('zipcode'),
-            )
-        else:
-            shipping_address, _ = ShippingAddress.objects.create(
-                customer=customer,
-                is_primary=False,
-                address=form.cleaned_data.get('address'),
-                city=form.cleaned_data.get('city'),
-                state=form.cleaned_data.get('state'),
-                zipcode=form.cleaned_data.get('zipcode'),
-            )
+
+        shipping_address = ShippingAddress.objects.create(
+            customer=customer,
+            is_primary=is_new_primary,
+            address=form.cleaned_data.get('address'),
+            city=form.cleaned_data.get('city'),
+            state=form.cleaned_data.get('state'),
+            zipcode=form.cleaned_data.get('zipcode'),
+        )
+
         shipping_address.save()
 
         # Check if all ordered cables still in stock
