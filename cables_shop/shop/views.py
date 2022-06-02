@@ -103,7 +103,11 @@ def checkout(request):
         if is_all_cart_products_in_stock(ordered_products):
             update_cables_quantity_in_stock(ordered_products)
         else:
-            messages.error(request, f'Части позиций осталось меньше, чем вы заказали')
+            correct_cart_products_quantity(ordered_products)
+            messages.error(
+                request,
+                f'Части позиций осталось меньше, чем вы заказали. '
+                f'Колличество измененно на максимально возможное')
             return redirect('checkout_page')
 
         # Changing order status and saving it
