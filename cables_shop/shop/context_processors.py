@@ -2,7 +2,7 @@ from .models import *
 from django.http import HttpRequest
 
 
-def get_cart_items_total(request: HttpRequest) -> dict:
+def get_cart_items_total(request: HttpRequest) -> dict[str, int]:
     if not request.user.is_authenticated:
         return {'items_in_cart': 0}
 
