@@ -5,8 +5,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, CustomerInformationForm
-from .services.orders import CartUpdateService
+from .forms import UserRegistrationForm, CheckoutForm
+from .services.orders import CartUpdateService, CheckoutService
 from .services.checkout_utils import *
 from .models import *
 from .errors import *
@@ -74,79 +74,26 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
 @login_required(login_url='user_login_page')
 def checkout(request):
-    customer = get_object_or_404(Customer, user=request.user)
-    order = Order.objects.get(
-        customer=customer,
-        status=Order.OrderStatus.IN_CART,
-    )
-    ordered_products = order.orderedproduct_set.all()
-
-    # Prefilling checkout form with customer information we have
-    form_initial_values = get_customer_form_initials(customer)
-    form = CustomerInformationForm(
-        request.POST or None, initial=form_initial_values
-    )
-
+    checkout_service = CheckoutService(request)
+    form = checkout_service.checkout_form
     if request.method == 'POST' and form.is_valid():
-        # Check if the customer want to save his info for further orders
-        if 'update_customer_info' in request.POST:
-            update_customer_information(
-                customer=customer,
-                updated_data=form.cleaned_data
-            )
-        # making this address primary and every else not
-        is_new_primary = 'make_address_primary' in request.POST
-        if is_new_primary:
-            ShippingAddress.objects.filter(
-                customer=customer
-            ).update(
-                is_primary=False
-            )
-
-        shipping_address = ShippingAddress.objects.create(
-            customer=customer,
-            is_primary=is_new_primary,
-            address=form.cleaned_data.get('address'),
-            city=form.cleaned_data.get('city'),
-            state=form.cleaned_data.get('state'),
-            zipcode=form.cleaned_data.get('zipcode'),
-        )
-
-        shipping_address.save()
-
-        # Check if all ordered cables still in stock
-        if is_all_cart_products_in_stock(ordered_products):
-            update_cables_quantity_in_stock(ordered_products)
-        else:
-            correct_cart_products_quantity(ordered_products)
+        try:
+            checkout_service.process_checkout()
+        except ProductsQuantityError:
+            checkout_service.correct_ordered_products()
             messages.error(
                 request,
-                f'Части позиций осталось меньше, чем вы заказали. '
-                f'Колличество измененно на максимально возможное'
+                'Наличие некоторых товаров изменилось. '
+                'Корзина была обновлена. Пожалуйста повторите отправку заказа'
             )
             return redirect('checkout_page')
 
-        # Changing order status and saving it
-        order.shipping_address = shipping_address
-        order.status = Order.OrderStatus.ACCEPTED
-        order.save()
-
-        # Clean all non valid addresses
-        ShippingAddress.objects.filter(
-            customer=customer,
-            is_primary=False,
-            address__isnull=True
-        ).delete()
-
         return redirect('home_page')
-
     context = {
         'title': 'Оформление заказа',
         'form': form,
-        'ordered_products': ordered_products,
-        'cart_total_price': order.get_order_total_price,
+        'ordered_products': checkout_service.ordered_products,
     }
-
     return render(request, 'shop/checkout.html', context)
 
 
@@ -167,17 +114,15 @@ def update_cart(request):
 
 def user_registration(request):
     form = UserRegistrationForm()
-
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
 
+            # sent success message to user
             user_name = form.cleaned_data.get('username', '')
             messages.success(request, f'Аккаунт {user_name} создан')
-
             return redirect('user_login_page')
-
     contex = {
         'title': 'Регистрация',
         'form': form
@@ -199,16 +144,12 @@ def user_login(request):
         else:
             login(request, user)
 
+            # create empty cart if user has no cart
             customer = request.user.customer
-            ShippingAddress.objects.get_or_create(
-                customer=customer,
-                is_primary=True,
-            )
             Order.objects.get_or_create(
                 customer=customer,
                 status=Order.OrderStatus.IN_CART,
             )
-
             return redirect('home_page')
 
     contex = {
@@ -217,6 +158,7 @@ def user_login(request):
     return render(request, 'shop/login.html', contex)
 
 
+@login_required(login_url='user_login_page')
 def user_logout(request):
     logout(request)
     return redirect('home_page')
@@ -224,18 +166,10 @@ def user_logout(request):
 
 @login_required(login_url='user_login_page')
 def user_profile(request):
-    customer = request.user.customer
-    try:
-        primary_address = customer.shipping_address.get(is_primary=True)
-    except Exception:
-        raise NotImplementedError
-
     contex = {
         'title': 'Личный кабинет',
-        'customer': customer,
-        'address': primary_address,
         'orders': Order.objects.filter(
-            customer=customer
+            customer=request.user.customer
         ).exclude(
             status=Order.OrderStatus.IN_CART
         ).order_by(
@@ -259,11 +193,3 @@ def order_information(request, order_pk: int):
         'order': order,
     }
     return render(request, 'shop/order_info.html', contex)
-
-
-@login_required(login_url='user_login_page')
-def user_profile_update(request):
-    contex = {
-        'title': 'Обновление профиля',
-    }
-    return render(request, 'shop/user_profile_update.html', contex)

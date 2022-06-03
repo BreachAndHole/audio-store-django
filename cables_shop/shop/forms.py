@@ -25,7 +25,7 @@ class UserRegistrationForm(UserCreationForm):
         ]
 
 
-class CustomerInformationForm(forms.Form):
+class CheckoutForm(forms.Form):
     """
     Form for checkout page.
     Handling both customer and shipping address models

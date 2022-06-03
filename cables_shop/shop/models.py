@@ -90,7 +90,7 @@ class CablePhoto(models.Model):
 class Customer(models.Model):
     """
     Django User extension with customer information.
-    One to one relation with shipping address model.
+    OneToOne relation with shipping address model.
     """
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, unique=True,
@@ -128,7 +128,6 @@ class ShippingAddress(models.Model):
         Customer, on_delete=models.CASCADE, related_name='shipping_address',
         verbose_name='покупатель'
     )
-    is_primary = models.BooleanField('основной адрес', default=False)
     address = models.CharField('адрес', max_length=200, null=True)
     city = models.CharField('город', max_length=50, null=True)
     state = models.CharField('область', max_length=70, null=True)

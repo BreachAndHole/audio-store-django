@@ -1,9 +1,10 @@
 import json
 from enum import Enum
-from typing import NamedTuple
+from typing import NamedTuple, TypedDict
 from django.http import HttpRequest
 from django.core.exceptions import ObjectDoesNotExist
 from shop.errors import *
+from shop.forms import CheckoutForm
 from shop.models import *
 
 
@@ -18,27 +19,33 @@ class CartUpdateParsedData(NamedTuple):
     action: str
 
 
+class CheckoutFormInitials(TypedDict):
+    first_name: str
+    last_name: str
+    phone: str
+
+
 class CartUpdateService:
     def __init__(self, request: HttpRequest) -> None:
         self.request = request
 
     def process_cart_update(self) -> None:
-        parsed_response = self._parse_json_update_data()
+        parsed_response = self.__parse_json_update_data()
         order, _ = Order.objects.get_or_create(
             customer=self.request.user.customer,
             status=Order.OrderStatus.IN_CART,
         )
-        ordered_product = self._get_product_to_update(
+        ordered_product = self.__get_product_to_update(
             order,
             parsed_response.product_id
         )
-        self._update_product_quantity_in_cart(
+        self.__update_product_quantity_in_cart(
             ordered_product,
             parsed_response.action
         )
-        self._save_or_delete_product_in_cart(ordered_product)
+        self.__save_or_delete_product_in_cart(ordered_product)
 
-    def _parse_json_update_data(self) -> CartUpdateParsedData:
+    def __parse_json_update_data(self) -> CartUpdateParsedData:
         """
         This function is parsing json response from cart.js script.
         """
@@ -47,7 +54,7 @@ class CartUpdateService:
         except json.JSONDecodeError:
             raise JSONResponseParsingError(
                 'Error during json response decoding'
-                )
+            )
 
         try:
             parsed_data = CartUpdateParsedData(
@@ -62,9 +69,9 @@ class CartUpdateService:
         return parsed_data
 
     @staticmethod
-    def _get_product_to_update(
-        order: Order,
-        product_id: int
+    def __get_product_to_update(
+            order: Order,
+            product_id: int
     ) -> OrderedProduct:
         """Getting or creating new ordered product for further updating"""
         try:
@@ -81,9 +88,9 @@ class CartUpdateService:
         return ordered_product
 
     @staticmethod
-    def _update_product_quantity_in_cart(
-        ordered_product: OrderedProduct,
-        action: str
+    def __update_product_quantity_in_cart(
+            ordered_product: OrderedProduct,
+            action: str
     ) -> None:
         """This function is changing quantity of product needed to update"""
         match action:
@@ -98,10 +105,88 @@ class CartUpdateService:
                 raise CartUpdateError(f'Undefined {action = }')
 
     @staticmethod
-    def _save_or_delete_product_in_cart(
-        ordered_product: OrderedProduct
+    def __save_or_delete_product_in_cart(
+            ordered_product: OrderedProduct
     ) -> None:
         if ordered_product.quantity <= 0:
             ordered_product.delete()
         else:
             ordered_product.save()
+
+
+class CheckoutService:
+    def __init__(self, request: HttpRequest) -> None:
+        self.request = request
+        self.customer = self.request.user.customer
+        self.order = Order.objects.get(
+            customer=self.customer,
+            status=Order.OrderStatus.IN_CART
+        )
+        self.ordered_products = self.order.orderedproduct_set.all()
+        self.checkout_form = CheckoutForm(
+            self.request.POST or None,
+            initial=self.__get_checkout_form_initials()
+        )
+
+    def process_checkout(self) -> None:
+        self.__update_customer_information()
+        shipping_address = self.__get_shipping_address_for_this_order()
+
+        if not self.__order_is_valid():
+            raise ProductsQuantityError(
+                'Ordered quantity is greater than available'
+            )
+
+        self.__update_products_in_stock()
+        self.order.shipping_address = shipping_address
+        self.order.status = Order.OrderStatus.ACCEPTED
+        self.order.save()
+
+    def __update_customer_information(self) -> None:
+        checkout_form_data = self.checkout_form.cleaned_data
+        self.customer.first_name = checkout_form_data.get('first_name', '')
+        self.customer.last_name = checkout_form_data.get('last_name', '')
+        self.customer.phone = checkout_form_data.get('phone', '')
+
+    def __get_shipping_address_for_this_order(self) -> ShippingAddress:
+        checkout_form_data = self.checkout_form.cleaned_data
+        try:
+            shipping_address, _ = ShippingAddress.objects.get_or_create(
+                customer=self.customer,
+                address=checkout_form_data.get('address'),
+                city=checkout_form_data.get('city'),
+                state=checkout_form_data.get('state'),
+                zipcode=checkout_form_data.get('zipcode'),
+            )
+        except KeyError:
+            raise CreateShippingAddressError(
+                'Error during shipping address creation'
+            )
+        return shipping_address
+
+    def __order_is_valid(self) -> bool:
+        for ordered_product in self.ordered_products:
+            if ordered_product.quantity > ordered_product.product.units_in_stock:
+                return False
+        return True
+
+    def __update_products_in_stock(self) -> None:
+        for ordered_product in self.ordered_products:
+            ordered_product.product.units_in_stock = max(
+                0,
+                ordered_product.product.units_in_stock - ordered_product.quantity
+            )
+            ordered_product.product.save()
+
+    def correct_ordered_products(self) -> None:
+        for ordered_product in self.ordered_products:
+            ordered_product.quantity = ordered_product.product.units_in_stock
+            ordered_product.save()
+
+    def __get_checkout_form_initials(self) -> CheckoutFormInitials:
+        initials = {
+            'first_name': self.customer.first_name or '',
+            'last_name': self.customer.last_name or '',
+            'phone': self.customer.phone or '',
+        }
+        return initials
