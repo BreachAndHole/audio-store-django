@@ -25,11 +25,6 @@ urlpatterns = [
     path('user/logout/', views.user_logout, name='user_logout_page'),
     path('user/profile/', views.user_profile, name='user_profile_page'),
     path(
-        'user/profile/update',
-        views.user_profile_update,
-        name='user_profile_update_page'
-    ),
-    path(
         'user/order/<int:order_pk>',
         views.order_information,
         name='order_info_page'
