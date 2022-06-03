@@ -2,5 +2,5 @@ class JSONResponseParsingError(Exception):
     """Error during parsing JSON response with update cart data"""
 
 
-class UpdateCartError(Exception):
+class CartUpdateError(Exception):
     """Error during updating cart"""

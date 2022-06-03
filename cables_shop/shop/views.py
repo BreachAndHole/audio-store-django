@@ -6,8 +6,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm, CustomerInformationForm
-from .utils.cart_utils import process_cart_update
-from .utils.checkout_utils import *
+from .services.orders import CartUpdateService
+from .services.checkout_utils import *
 from .models import *
 from .errors import *
 
@@ -155,16 +155,11 @@ def update_cart(request):
     This view is working with JSON-response sent by cart.js on every
     cart items related button click
     """
-
-    # Double-checking if user is authenticated
-    if not request.user.is_authenticated:
-        messages.info('Для заказа необходимо войти в аккаунт')
-        redirect('user_login_page')
     try:
-        process_cart_update(request)
+        CartUpdateService(request).process_cart_update()
     except JSONResponseParsingError:
         return JsonResponse('Error during parsing response', safe=False)
-    except UpdateCartError:
+    except CartUpdateError:
         return JsonResponse('Error during cart update', safe=False)
 
     return JsonResponse('Cart has been updated', safe=False)
