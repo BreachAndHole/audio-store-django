@@ -23,6 +23,10 @@ class CheckoutFormInitials(TypedDict):
     first_name: str
     last_name: str
     phone: str
+    address: str
+    city: str
+    state: str
+    zipcode: str
 
 
 class CartUpdateService:
@@ -147,6 +151,7 @@ class CheckoutService:
         self.customer.first_name = checkout_form_data.get('first_name', '')
         self.customer.last_name = checkout_form_data.get('last_name', '')
         self.customer.phone = checkout_form_data.get('phone', '')
+        self.customer.save()
 
     def __get_shipping_address_for_this_order(self) -> ShippingAddress:
         checkout_form_data = self.checkout_form.cleaned_data
@@ -184,9 +189,16 @@ class CheckoutService:
             ordered_product.save()
 
     def __get_checkout_form_initials(self) -> CheckoutFormInitials:
+
+        last_address = self.customer.shippingaddress_set.last()
+
         initials = {
             'first_name': self.customer.first_name or '',
             'last_name': self.customer.last_name or '',
             'phone': self.customer.phone or '',
+            'address': last_address.address if last_address else '',
+            'city': last_address.city if last_address else '',
+            'state': last_address.state if last_address else '',
+            'zipcode': last_address.zipcode if last_address else '',
         }
         return initials

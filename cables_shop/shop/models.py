@@ -125,7 +125,7 @@ class ShippingAddress(models.Model):
     One to many relation with customer (user).
     """
     customer = models.ForeignKey(
-        Customer, on_delete=models.CASCADE, related_name='shipping_address',
+        Customer, on_delete=models.CASCADE,
         verbose_name='покупатель'
     )
     address = models.CharField('адрес', max_length=200, null=True)

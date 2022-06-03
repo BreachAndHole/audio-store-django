@@ -5,9 +5,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, CheckoutForm
+from .forms import UserRegistrationForm
 from .services.orders import CartUpdateService, CheckoutService
-from .services.checkout_utils import *
 from .models import *
 from .errors import *
 
