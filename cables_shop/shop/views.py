@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm, CustomerInformationForm
 from .services.orders import CartUpdateService
-from .services.checkout_utils import *
+from .services.checkout_utils import CheckoutCustomerService
 from .models import *
 from .errors import *
 
@@ -74,77 +74,34 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
 @login_required(login_url='user_login_page')
 def checkout(request):
-    customer = get_object_or_404(Customer, user=request.user)
-    order = Order.objects.get(
-        customer=customer,
-        status=Order.OrderStatus.IN_CART,
-    )
-    ordered_products = order.orderedproduct_set.all()
-
-    # Prefilling checkout form with customer information we have
-    form_initial_values = get_customer_form_initials(customer)
-    form = CustomerInformationForm(
-        request.POST or None, initial=form_initial_values
-    )
+    checkout_service = CheckoutCustomerService(request)
+    form = checkout_service.checkout_form
 
     if request.method == 'POST' and form.is_valid():
-        # Check if the customer want to save his info for further orders
-        if 'update_customer_info' in request.POST:
-            update_customer_information(
-                customer=customer,
-                updated_data=form.cleaned_data
-            )
-        # making this address primary and every else not
-        is_new_primary = 'make_address_primary' in request.POST
-        if is_new_primary:
-            ShippingAddress.objects.filter(
-                customer=customer
-            ).update(
-                is_primary=False
-            )
-
-        shipping_address = ShippingAddress.objects.create(
-            customer=customer,
-            is_primary=is_new_primary,
-            address=form.cleaned_data.get('address'),
-            city=form.cleaned_data.get('city'),
-            state=form.cleaned_data.get('state'),
-            zipcode=form.cleaned_data.get('zipcode'),
-        )
-
-        shipping_address.save()
-
-        # Check if all ordered cables still in stock
-        if is_all_cart_products_in_stock(ordered_products):
-            update_cables_quantity_in_stock(ordered_products)
-        else:
-            correct_cart_products_quantity(ordered_products)
+        try:
+            checkout_service.process_checkout()
+        except CustomerInfoUpdateError:
             messages.error(
                 request,
-                f'Части позиций осталось меньше, чем вы заказали. '
-                f'Колличество измененно на максимально возможное'
+                'Ошибка при обновлении информации. '
+                'Пожалуйста повторите отправку заказа'
             )
             return redirect('checkout_page')
-
-        # Changing order status and saving it
-        order.shipping_address = shipping_address
-        order.status = Order.OrderStatus.ACCEPTED
-        order.save()
-
-        # Clean all non valid addresses
-        ShippingAddress.objects.filter(
-            customer=customer,
-            is_primary=False,
-            address__isnull=True
-        ).delete()
+        except NotEnoughProductsInStockError:
+            checkout_service.correct_ordered_products_quantity()
+            messages.error(
+                request,
+                'Часть товаров успела закончиться. Количество '
+                'изменено на максимальное доступное'
+            )
+            return redirect('checkout_page')
 
         return redirect('home_page')
 
     context = {
         'title': 'Оформление заказа',
         'form': form,
-        'ordered_products': ordered_products,
-        'cart_total_price': order.get_order_total_price,
+        'ordered_products': checkout_service.ordered_products,
     }
 
     return render(request, 'shop/checkout.html', context)
