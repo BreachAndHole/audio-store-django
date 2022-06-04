@@ -99,7 +99,8 @@ class CartUpdateService:
         """This function is changing quantity of product needed to update"""
         match action:
             case CartUpdateAction.ADD_TO_CART.value:
-                if ordered_product.quantity < ordered_product.product.units_in_stock:
+                units_in_stock = ordered_product.product.units_in_stock
+                if ordered_product.quantity < units_in_stock:
                     ordered_product.quantity += 1
             case CartUpdateAction.REMOVE_FROM_CART.value:
                 ordered_product.quantity -= 1

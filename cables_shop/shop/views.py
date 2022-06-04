@@ -82,7 +82,7 @@ def checkout(request):
             checkout_service.correct_ordered_products()
             messages.error(
                 request,
-                'Наличие некоторых товаров изменилось. '
+                'Количетсво некоторых товаров в наличии изменилось. '
                 'Корзина была обновлена. Пожалуйста повторите отправку заказа'
             )
             return redirect('checkout_page')
@@ -101,6 +101,9 @@ def update_cart(request):
     This view is working with JSON-response sent by cart.js on every
     cart items related button click
     """
+    if request.user.username == 'AnonymousUser':
+        print('User is not logged in')
+
     try:
         CartUpdateService(request).process_cart_update()
     except JSONResponseParsingError:

@@ -6,6 +6,10 @@ class CartUpdateError(Exception):
     """ Error during updating cart """
 
 
+class UserIsAnonymousError(Exception):
+    """ User is anonymous """
+
+
 class CreateShippingAddressError(Exception):
     """ Error during creating shipping address for the order"""
 

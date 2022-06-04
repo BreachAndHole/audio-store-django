@@ -148,11 +148,11 @@ class Order(models.Model):
     """
 
     class OrderStatus(models.TextChoices):
-        IN_CART = 'IC', 'В корзине'
-        ACCEPTED = 'AC', 'Принят'
-        PREPARING = 'PR', 'На сборе'
-        SHIPPED = 'SH', 'Отправлен'
-        COMPLETE = 'CO', 'Выполнен'
+        IN_CART = 'IC', 'В корзине'  # Products in cart
+        ACCEPTED = 'AC', 'Принят'  # Checkout finished
+        PREPARING = 'PR', 'На сборе'  # Products are being assembled
+        SHIPPED = 'SH', 'Отправлен'  # Shipped if needed
+        COMPLETE = 'CO', 'Выполнен'  # Order is complete
 
     customer = models.ForeignKey(
         Customer,
