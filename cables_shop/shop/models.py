@@ -51,7 +51,7 @@ class Cable(models.Model):
         ordering = ('type', 'price')
 
     def __str__(self):
-        return f'#{self.pk} {self.name}'
+        return f'{self.name}, {self.length_sm} см.'
 
     def get_absolute_url(self):
         return reverse('cable_page', kwargs={'cable_slug': self.slug})
@@ -105,7 +105,7 @@ class Customer(models.Model):
         verbose_name_plural = 'клиенты'
 
     def __str__(self):
-        return f'#{self.pk}: {self.last_name} {self.first_name}'
+        return f'{self.last_name} {self.first_name}'
 
 
 @receiver(post_save, sender=User)
@@ -185,7 +185,7 @@ class Order(models.Model):
         verbose_name_plural = 'заказы'
 
     def __str__(self):
-        return f'#{self.pk}: {self.customer}, {self.get_status_display()}'
+        return f'№{self.pk}: {self.customer}, {self.get_status_display()}'
 
     def get_absolute_url(self):
         return reverse('order_info_page', kwargs={'order_pk': self.pk})
@@ -209,7 +209,7 @@ class OrderedProduct(models.Model):
     product = models.ForeignKey(
         Cable, verbose_name='товар', on_delete=models.CASCADE
     )
-    quantity = models.SmallIntegerField('количество', default=0)
+    quantity = models.SmallIntegerField('заказанное количество', default=0)
     date_added = models.DateTimeField('время добавления', auto_now_add=True)
 
     class Meta:

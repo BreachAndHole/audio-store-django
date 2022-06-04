@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import *
 
 
+# Products related
 @admin.register(CableType)
 class CableTypeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'name_plural', 'description', 'slug')
@@ -26,7 +27,27 @@ class CablePhotoAdmin(admin.ModelAdmin):
 
 
 # Orders related
-admin.site.register(Customer)
-admin.site.register(ShippingAddress)
-admin.site.register(Order)
-admin.site.register(OrderedProduct)
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'first_name', 'last_name', 'phone')
+    list_display_links = ('user',)
+    ordering = ('-id',)
+
+
+@admin.register(ShippingAddress)
+class ShippingAddressAdmin(admin.ModelAdmin):
+    list_display = ('customer', 'state', 'city')
+    list_filter = ('customer',)
+    ordering = ('customer', 'address')
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'customer', 'status')
+    list_filter = ('status', 'customer')
+
+
+@admin.register(OrderedProduct)
+class OrderedProductAdmin(admin.ModelAdmin):
+    list_display = ('order', 'product', 'quantity')
+    list_filter = ('order', 'product')
