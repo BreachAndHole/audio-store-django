@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from cables_shop.settings import DELIVERY_PRICE
 
 
 class CableType(models.Model):
@@ -154,10 +155,15 @@ class Order(models.Model):
         SHIPPED = 'SH', 'Отправлен'  # Shipped if needed
         COMPLETE = 'CO', 'Выполнен'  # Order is complete
 
+    class DeliveryType(models.TextChoices):
+        PICK_UP = 'PU', 'Самовывоз'  # Pick up from store
+        DELIVERY = 'DE', 'Доставка ТК'  # Delivery to customer
+
     customer = models.ForeignKey(
         Customer,
         verbose_name='покупатель',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True
     )
     shipping_address = models.ForeignKey(
         ShippingAddress,
@@ -179,6 +185,12 @@ class Order(models.Model):
         choices=OrderStatus.choices,
         default=OrderStatus.IN_CART
     )
+    delivery_type = models.CharField(
+        'способ получения',
+        max_length=10,
+        choices=DeliveryType.choices,
+        default=DeliveryType.DELIVERY,
+    )
 
     class Meta:
         verbose_name = 'заказ'
@@ -190,12 +202,18 @@ class Order(models.Model):
     def get_absolute_url(self):
         return reverse('order_info_page', kwargs={'order_pk': self.pk})
 
-    def get_order_total_price(self) -> int:
+    def get_products_total_price(self) -> int:
         """Returns total price for all products in cart"""
         ordered_products = self.orderedproduct_set.all()
-        return sum(
+        products_price = sum(
             [product.get_product_total_price for product in ordered_products]
         )
+        return products_price
+
+    def get_order_total_price(self) -> int:
+        if self.delivery_type == Order.DeliveryType.DELIVERY:
+            return self.get_products_total_price() + DELIVERY_PRICE
+        return self.get_products_total_price()
 
     def get_order_total_products(self) -> int:
         """Returns total amount of unique products in cart"""

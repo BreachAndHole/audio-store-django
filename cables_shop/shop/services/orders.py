@@ -1,6 +1,6 @@
 import json
 from enum import Enum
-from typing import NamedTuple
+from typing import NamedTuple, TypedDict
 from django.http import HttpRequest, QueryDict
 from django.core.exceptions import ObjectDoesNotExist
 from shop.forms import CheckoutForm
@@ -92,7 +92,7 @@ class CartUpdateService:
     def __update_product_quantity_in_cart(
             ordered_product: OrderedProduct,
             action: str
-            ) -> None:
+    ) -> None:
         """This function is changing quantity of product needed to update"""
         match action:
             case CartUpdateAction.ADD_TO_CART.value:
@@ -117,11 +117,15 @@ class CartUpdateService:
 
 
 class CheckoutService:
+    delivery_types_converter = {
+        'delivery': Order.DeliveryType.DELIVERY,
+        'selfPickUp': Order.DeliveryType.PICK_UP
+    }
 
     def __init__(
             self, customer: Customer,
             post_request_data: QueryDict
-            ) -> None:
+    ) -> None:
         self.customer = customer
         self.order = Order.objects.get(
             customer=self.customer,
@@ -133,18 +137,25 @@ class CheckoutService:
             initial=CheckoutForm.get_checkout_form_initials(self.customer)
         )
 
+        self.delivery_type = self.delivery_types_converter.get(
+            post_request_data.get('radioDeliveryType')
+        )
+
     def process_checkout(self) -> None:
         self.__update_customer_information()
-        shipping_address = self.__get_shipping_address_for_this_order()
 
         if not self.__order_is_valid():
             raise ProductsQuantityError(
                 'Ordered quantity is greater than available'
             )
-
         self.__update_products_in_stock()
-        self.order.shipping_address = shipping_address
+
+        if self.delivery_type != Order.DeliveryType.PICK_UP:
+            shipping_address = self.__get_shipping_address_for_this_order()
+            self.order.shipping_address = shipping_address
+
         self.order.status = Order.OrderStatus.ACCEPTED
+        self.order.delivery_type = self.delivery_type
         self.order.save()
 
     def __update_customer_information(self) -> None:

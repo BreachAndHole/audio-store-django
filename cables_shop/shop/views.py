@@ -57,10 +57,10 @@ class CartPageView(LoginRequiredMixin, list.ListView):
         context['title'] = 'Корзина'
 
         # Adding cart total price to context
-        context['cart_total_price'] = Order.objects.get(
+        context['products_total_price'] = Order.objects.get(
             customer=self.request.user.customer,
             status=Order.OrderStatus.IN_CART
-        ).get_order_total_price
+        ).get_products_total_price()
         return context
 
     def get_queryset(self):
@@ -76,6 +76,7 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 def checkout(request):
     checkout_service = CheckoutService(request.user.customer, request.POST)
     form = checkout_service.checkout_form
+
     if request.method == 'POST' and form.is_valid():
         try:
             checkout_service.process_checkout()
@@ -94,7 +95,8 @@ def checkout(request):
         'form': form,
         'ordered_products': checkout_service.ordered_products,
         'delivery_price': DELIVERY_PRICE,
-        'cart_total_price': checkout_service.order.get_order_total_price
+        'order_total_price': checkout_service.order.get_order_total_price(),
+        'cart_total_price': checkout_service.order.get_products_total_price(),
     }
     return render(request, 'shop/checkout.html', context)
 

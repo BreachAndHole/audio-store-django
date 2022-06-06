@@ -30,7 +30,7 @@
                 </li>
                 <li class="list-group-item d-flex justify-content-between bg-dark border border-light">
                     <span class="text-white">Итого</span>
-                    <strong class="text-white" id="cartTotalPriceBlock">{{ cart_total_price|add:delivery_price }}</strong>
+                    <strong class="text-white" id="cartTotalPriceBlock">{{ order_total_price }}</strong>
                     <input type="hidden" id="cartTotalPrice" value="{{ cart_total_price }}">
                     <input type="hidden" id="deliveryPrice" value="{{ delivery_price }}">
                 </li>
@@ -40,24 +40,22 @@
             {% endfor %}
         </div>
         <div class="col-md-7 col-lg-8">
-            <h4 class="mb-3">Способ получения</h4>
-            <div class="form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" type="radio" name="radioDeliveryType" value="delivery" checked />
-                    Доставка транспортной компанией
-                </label>
-            </div>
-            <div class="form-check">
-              <label class="form-check-label">
-                  <input class="form-check-input" type="radio" name="radioDeliveryType" value="selfPickUp"/>
-                  Самовывоз
-              </label>
-            </div>
-
-            <hr class="my-4">
-
-
             <form method="POST" action="" id="deliveryForm">
+                <h4 class="mb-3">Способ получения</h4>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="radio" name="radioDeliveryType" value="delivery" checked />
+                        Доставка транспортной компанией
+                    </label>
+                </div>
+                <div class="form-check">
+                  <label class="form-check-label">
+                      <input class="form-check-input" type="radio" name="radioDeliveryType" value="selfPickUp"/>
+                      Самовывоз
+                  </label>
+                </div>
+
+                <hr class="my-4">
                 <h4 class="mb-3">Доставка</h4>
                 {% csrf_token %}
                 <div class="row g-3">
