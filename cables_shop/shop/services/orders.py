@@ -3,8 +3,8 @@ from enum import Enum
 from typing import NamedTuple, TypedDict
 from django.http import HttpRequest
 from django.core.exceptions import ObjectDoesNotExist
-from shop.errors import *
 from shop.forms import CheckoutForm
+from shop.errors import *
 from shop.models import *
 
 
@@ -130,7 +130,7 @@ class CheckoutService:
         self.ordered_products = self.order.orderedproduct_set.all()
         self.checkout_form = CheckoutForm(
             self.request.POST or None,
-            initial=self.__get_checkout_form_initials()
+            initial=CheckoutForm.get_checkout_form_initials(self.customer)
         )
 
     def process_checkout(self) -> None:
@@ -188,18 +188,3 @@ class CheckoutService:
         for ordered_product in self.ordered_products:
             ordered_product.quantity = ordered_product.product.units_in_stock
             ordered_product.save()
-
-    def __get_checkout_form_initials(self) -> CheckoutFormInitials:
-
-        last_address = self.customer.shippingaddress_set.last()
-
-        initials = {
-            'first_name': self.customer.first_name or '',
-            'last_name': self.customer.last_name or '',
-            'phone': self.customer.phone or '',
-            'address': last_address.address if last_address else '',
-            'city': last_address.city if last_address else '',
-            'state': last_address.state if last_address else '',
-            'zipcode': last_address.zipcode if last_address else '',
-        }
-        return initials
