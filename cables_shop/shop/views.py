@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from cables_shop.settings import DELIVERY_PRICE
 from .forms import UserRegistrationForm
 from .services.orders import CartUpdateService, CheckoutService
 from .models import *
@@ -73,7 +74,7 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
 @login_required(login_url='user_login_page')
 def checkout(request):
-    checkout_service = CheckoutService(request)
+    checkout_service = CheckoutService(request.user.customer, request.POST)
     form = checkout_service.checkout_form
     if request.method == 'POST' and form.is_valid():
         try:
@@ -92,6 +93,8 @@ def checkout(request):
         'title': 'Оформление заказа',
         'form': form,
         'ordered_products': checkout_service.ordered_products,
+        'delivery_price': DELIVERY_PRICE,
+        'cart_total_price': checkout_service.order.get_order_total_price
     }
     return render(request, 'shop/checkout.html', context)
 
@@ -101,15 +104,14 @@ def update_cart(request):
     This view is working with JSON-response sent by cart.js on every
     cart items related button click
     """
-    if request.user.username == 'AnonymousUser':
-        print('User is not logged in')
-
     try:
         CartUpdateService(request).process_cart_update()
     except JSONResponseParsingError:
         return JsonResponse('Error during parsing response', safe=False)
     except CartUpdateError:
         return JsonResponse('Error during cart update', safe=False)
+    except NotAuthenticatedError:
+        return JsonResponse('User was not authenticated', safe=False)
 
     return JsonResponse('Cart has been updated', safe=False)
 
@@ -166,19 +168,24 @@ def user_logout(request):
     return redirect('home_page')
 
 
-@login_required(login_url='user_login_page')
-def user_profile(request):
-    contex = {
-        'title': 'Личный кабинет',
-        'orders': Order.objects.filter(
-            customer=request.user.customer
+class UserProfileView(LoginRequiredMixin, list.ListView):
+    login_url = 'user_login_page'
+    model = Order
+    context_object_name = 'orders'
+    template_name = 'shop/user_profile.html'
+
+    def get_queryset(self):
+        customer_orders = Order.objects.filter(
+            customer=self.request.user.customer
         ).exclude(
             status=Order.OrderStatus.IN_CART
-        ).order_by(
-            '-pk'
-        ),
-    }
-    return render(request, 'shop/user_profile.html', contex)
+        ).order_by('-pk')
+        return customer_orders
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Личный кабинет'
+        return context
 
 
 @login_required(login_url='user_login_page')
@@ -195,3 +202,5 @@ def order_information(request, order_pk: int):
         'order': order,
     }
     return render(request, 'shop/order_info.html', contex)
+
+ 

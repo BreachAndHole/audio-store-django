@@ -1,20 +1,26 @@
 var updateBtns = document.getElementsByClassName('btn-update-cart')
+// var cartItemsTotalIndicator = document.getElementById('CartItemsTotalIndicator')
+
+const NOT_AUTHENTICATED_ACTION = 'not_authenticated'
+
 
 for (var i = 0; i < updateBtns.length; i++) {
     updateBtns[i].addEventListener('click', function () {
-        var productId = this.dataset.product_id
+        var productId = parseInt(this.dataset.product_id)
         var action = this.dataset.action
 
         var user = document.getElementById('user').value
         if (user == 'AnonymousUser') {
-            console.log('User is not authenticated')
+            sendJSONResponse(0, NOT_AUTHENTICATED_ACTION)
         } else {
-            updateUserOrder(productId, action)
+            sendJSONResponse(productId, action)
         }
+        updateTotalItemsIndicator(action)
     })
 }
 
-function updateUserOrder(productId, action) {
+
+function sendJSONResponse(productId, action) {
     var url = '/updateCart/'
 
     fetch(url, {

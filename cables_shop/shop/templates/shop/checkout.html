@@ -1,6 +1,7 @@
 {% extends 'shop/base.html' %}
 
 {% block content %}
+{% load static %}
 <div class="container mt-4">
     <div class="row g-5">
         <div class="col-md-5 col-lg-4 order-md-last ">
@@ -20,9 +21,18 @@
                     <span class="text-white">{{ product.get_product_total_price }}</span>
                 </li>
                 {% endfor %}
+                <li class="list-group-item d-flex justify-content-between lh-sm bg-dark border border-light delivery-price-block">
+                    <div>
+                        <h6 class="my-0 text-white">Доставка ТК</h6>
+                        <small class="text-white">1 шт.</small>
+                    </div>
+                    <span class="text-white">500</span>
+                </li>
                 <li class="list-group-item d-flex justify-content-between bg-dark border border-light">
                     <span class="text-white">Итого</span>
-                    <strong class="text-white">{{ cart_total_price }}</strong>
+                    <strong class="text-white" id="cartTotalPriceBlock">{{ cart_total_price|add:delivery_price }}</strong>
+                    <input type="hidden" id="cartTotalPrice" value="{{ cart_total_price }}">
+                    <input type="hidden" id="deliveryPrice" value="{{ delivery_price }}">
                 </li>
             </ul>
             {% for message in messages %}
@@ -30,28 +40,25 @@
             {% endfor %}
         </div>
         <div class="col-md-7 col-lg-8">
-
             <h4 class="mb-3">Способ получения</h4>
-
             <div class="form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" type="radio" name="radioDeliveryType" checked/>
+                    <input class="form-check-input" type="radio" name="radioDeliveryType" value="delivery" checked />
                     Доставка транспортной компанией
                 </label>
             </div>
-
-            <!-- Default checked radio -->
             <div class="form-check">
               <label class="form-check-label">
-                  <input class="form-check-input" type="radio" name="radioDeliveryType"/>
+                  <input class="form-check-input" type="radio" name="radioDeliveryType" value="selfPickUp"/>
                   Самовывоз
               </label>
             </div>
 
             <hr class="my-4">
 
-            <h4 class="mb-3">Доставка</h4>
-            <form method="post" action="">
+
+            <form method="POST" action="" id="deliveryForm">
+                <h4 class="mb-3">Доставка</h4>
                 {% csrf_token %}
                 <div class="row g-3">
                     <div class="col-sm-6">
@@ -77,14 +84,14 @@
                         </div>
                     </div>
 
-                    <div class="col-12">
+                    <div class="col-12 address-information-block">
                         {{ form.address.label }}
                         {{ form.address }}
                         <div class="invalid-feedback">
                             Необходимо ввести адрес
                         </div>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-5 address-information-block">
                         {{ form.city.label }}
                         {{ form.city }}
                         <div class="invalid-feedback">
@@ -92,12 +99,12 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-4 address-information-block">
                         {{ form.state.label }}
                         {{ form.state }}
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-3 address-information-block">
                         {{ form.zipcode.label }}
                         {{ form.zipcode }}
                         <div class="invalid-feedback">
@@ -106,58 +113,6 @@
                     </div>
                 </div>
                 <hr class="my-4">
-
-                <!--                <h4 class="mb-3">Оплата</h4>-->
-                <!--                <div class="my-3">-->
-                <!--                    <div class="form-check">-->
-                <!--                        <input id="online" name="paymentMethod" type="radio" class="form-check-input" checked=""-->
-                <!--                               required="">-->
-                <!--                        <label class="form-check-label" for="online">Картой онлайн</label>-->
-                <!--                    </div>-->
-                <!--                    <div class="form-check">-->
-                <!--                        <input id="cod" name="paymentMethod" type="radio" class="form-check-input" required="">-->
-                <!--                        <label class="form-check-label" for="cod">Наложный платёж</label>-->
-                <!--                    </div>-->
-                <!--                </div>-->
-
-                <!--                <div class="row gy-3">-->
-                <!--                    <div class="col-md-6">-->
-                <!--                        <label for="cc-name" class="form-label">Имя на карте</label>-->
-                <!--                        <input type="text" class="form-control" id="cc-name" placeholder="IVAN IVANOV" required="">-->
-                <!--                        <small class="text-secondary">Введите имя, указанное на карте</small>-->
-                <!--                        <div class="invalid-feedback">-->
-                <!--                            Name on card is required-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-
-                <!--                    <div class="col-md-6">-->
-                <!--                        <label for="cc-number" class="form-label">Номер карты</label>-->
-                <!--                        <input type="text" class="form-control" id="cc-number" placeholder="1234 5678 9012 3456"-->
-                <!--                               required="">-->
-                <!--                        <div class="invalid-feedback">-->
-                <!--                            Необходимо ввести номер карты-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-
-                <!--                    <div class="col-md-3">-->
-                <!--                        <label for="cc-expiration" class="form-label">Срок действия</label>-->
-                <!--                        <input type="text" class="form-control" id="cc-expiration" placeholder="11/28" required="">-->
-                <!--                        <div class="invalid-feedback">-->
-                <!--                            Необходимо ввести срок действия-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-
-                <!--                    <div class="col-md-3">-->
-                <!--                        <label for="cc-cvv" class="form-label">CVV</label>-->
-                <!--                        <input type="text" class="form-control" id="cc-cvv" placeholder="123" required="">-->
-                <!--                        <div class="invalid-feedback">-->
-                <!--                            Необходимо ввести CVV-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-                <!--                </div>-->
-
-                <!--                <hr class="my-4">-->
-
                 <button class="btn btn-light btn-lg w-100" type="submit">
                     Завершить оформление
                 </button>
@@ -165,4 +120,5 @@
         </div>
     </div>
 </div>
+<script src="{% static 'shop/js/checkout.js' %}" type="text/javascript"></script>
 {% endblock content %}

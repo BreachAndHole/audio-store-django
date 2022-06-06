@@ -41,7 +41,9 @@
                 {% if user.is_authenticated %}
                     {% with cart_total=cart_items_total %}
                         {% if cart_total and request.path != '/cart/checkout/' %}
-                            <button class="badge bg-white text-dark rounded-pill border-0 mx-2" id="cart_total">{{ cart_total }}
+                            <button class="badge bg-white text-dark rounded-pill border-0 mx-2" id="CartItemsTotalIndicator"
+                            value="{{ cart_items_total }}">
+                                {{ cart_total }}
                             </button>
                             <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
                         {% endif %}

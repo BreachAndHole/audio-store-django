@@ -23,7 +23,11 @@ urlpatterns = [
     ),
     path('user/login/', views.user_login, name='user_login_page'),
     path('user/logout/', views.user_logout, name='user_logout_page'),
-    path('user/profile/', views.user_profile, name='user_profile_page'),
+    path(
+        'user/profile/',
+        views.UserProfileView.as_view(),
+        name='user_profile_page'
+    ),
     path(
         'user/order/<int:order_pk>',
         views.order_information,

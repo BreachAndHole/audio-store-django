@@ -6,6 +6,10 @@ class CartUpdateError(Exception):
     """ Error during updating cart """
 
 
+class NotAuthenticatedError(Exception):
+    """ User tried to update cart without authentication """
+
+
 class UserIsAnonymousError(Exception):
     """ User is anonymous """
 

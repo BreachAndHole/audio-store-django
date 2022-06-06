@@ -1,7 +1,7 @@
 import json
 from enum import Enum
-from typing import NamedTuple, TypedDict
-from django.http import HttpRequest
+from typing import NamedTuple
+from django.http import HttpRequest, QueryDict
 from django.core.exceptions import ObjectDoesNotExist
 from shop.forms import CheckoutForm
 from shop.errors import *
@@ -19,21 +19,15 @@ class CartUpdateParsedData(NamedTuple):
     action: str
 
 
-class CheckoutFormInitials(TypedDict):
-    first_name: str
-    last_name: str
-    phone: str
-    address: str
-    city: str
-    state: str
-    zipcode: str
-
-
 class CartUpdateService:
+
     def __init__(self, request: HttpRequest) -> None:
         self.request = request
 
     def process_cart_update(self) -> None:
+        if not self.request.user.is_authenticated:
+            raise NotAuthenticatedError('User is not authenticated')
+
         parsed_response = self.__parse_json_update_data()
         order, _ = Order.objects.get_or_create(
             customer=self.request.user.customer,
@@ -62,13 +56,16 @@ class CartUpdateService:
 
         try:
             parsed_data = CartUpdateParsedData(
-                product_id=received_data.get('productId'),
+                product_id=int(received_data.get('productId')),
                 action=received_data.get('action')
             )
         except KeyError:
             raise JSONResponseParsingError(
                 'productId or action is not in response'
             )
+
+        if parsed_data.product_id < 0:
+            raise JSONResponseParsingError('Invalid product id')
 
         return parsed_data
 
@@ -95,7 +92,7 @@ class CartUpdateService:
     def __update_product_quantity_in_cart(
             ordered_product: OrderedProduct,
             action: str
-    ) -> None:
+            ) -> None:
         """This function is changing quantity of product needed to update"""
         match action:
             case CartUpdateAction.ADD_TO_CART.value:
@@ -120,16 +117,19 @@ class CartUpdateService:
 
 
 class CheckoutService:
-    def __init__(self, request: HttpRequest) -> None:
-        self.request = request
-        self.customer = self.request.user.customer
+
+    def __init__(
+            self, customer: Customer,
+            post_request_data: QueryDict
+            ) -> None:
+        self.customer = customer
         self.order = Order.objects.get(
             customer=self.customer,
             status=Order.OrderStatus.IN_CART
         )
         self.ordered_products = self.order.orderedproduct_set.all()
         self.checkout_form = CheckoutForm(
-            self.request.POST or None,
+            post_request_data or None,
             initial=CheckoutForm.get_checkout_form_initials(self.customer)
         )
 
