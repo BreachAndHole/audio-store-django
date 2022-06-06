@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from cables_shop.settings import DELIVERY_PRICE
 from .forms import UserRegistrationForm
 from .services.orders import CartUpdateService, CheckoutService
 from .models import *
@@ -88,8 +87,8 @@ def checkout(request):
                 'Корзина была обновлена. Пожалуйста повторите отправку заказа'
             )
             return redirect('checkout_page')
-
         return redirect('home_page')
+
     context = {
         'title': 'Оформление заказа',
         'form': form,
@@ -204,5 +203,3 @@ def order_information(request, order_pk: int):
         'order': order,
     }
     return render(request, 'shop/order_info.html', contex)
-
- 
