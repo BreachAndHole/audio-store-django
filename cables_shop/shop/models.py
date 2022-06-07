@@ -60,7 +60,10 @@ class Cable(models.Model):
     @property
     def title_photo_url(self) -> str:
         """Get photo URL or empty string"""
-        return self.cablephoto_set.get(is_title=True).photo_url
+        try:
+            return self.cablephoto_set.get(is_title=True).photo_url
+        except CablePhoto.DoesNotExist:
+            return ''
 
 
 class CablePhoto(models.Model):
@@ -202,20 +205,23 @@ class Order(models.Model):
     def get_absolute_url(self):
         return reverse('order_info_page', kwargs={'order_pk': self.pk})
 
-    def get_products_total_price(self) -> int:
+    @property
+    def products_total_price(self) -> int:
         """Returns total price for all products in cart"""
         ordered_products = self.orderedproduct_set.all()
         products_price = sum(
-            [product.get_product_total_price for product in ordered_products]
+            [product.product_total_price for product in ordered_products]
         )
         return products_price
 
-    def get_order_total_price(self) -> int:
+    @property
+    def order_total_price(self) -> int:
         if self.delivery_type == Order.DeliveryType.DELIVERY:
-            return self.get_products_total_price() + DELIVERY_PRICE
-        return self.get_products_total_price()
+            return self.products_total_price + DELIVERY_PRICE
+        return self.products_total_price
 
-    def get_order_total_products(self) -> int:
+    @property
+    def order_total_products(self) -> int:
         """Returns total amount of unique products in cart"""
         return len(self.orderedproduct_set.all())
 
@@ -238,6 +244,6 @@ class OrderedProduct(models.Model):
         return f'#{self.order.pk}, {self.product}'
 
     @property
-    def get_product_total_price(self) -> int:
+    def product_total_price(self) -> int:
         """Return total price for this product"""
         return self.product.price*self.quantity
