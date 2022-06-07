@@ -59,7 +59,7 @@ class CartPageView(LoginRequiredMixin, list.ListView):
         context['products_total_price'] = Order.objects.get(
             customer=self.request.user.customer,
             status=Order.OrderStatus.IN_CART
-        ).get_products_total_price()
+        ).products_total_price()
         return context
 
     def get_queryset(self):
@@ -94,8 +94,8 @@ def checkout(request):
         'form': form,
         'ordered_products': checkout_service.ordered_products,
         'delivery_price': DELIVERY_PRICE,
-        'order_total_price': checkout_service.order.get_order_total_price(),
-        'cart_total_price': checkout_service.order.get_products_total_price(),
+        'order_total_price': checkout_service.order.order_total_price(),
+        'cart_total_price': checkout_service.order.products_total_price(),
     }
     return render(request, 'shop/checkout.html', context)
 
@@ -118,16 +118,14 @@ def update_cart(request):
 
 
 def user_registration(request):
-    form = UserRegistrationForm()
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
+    form = UserRegistrationForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        # sent success message to user
+        user_name = form.cleaned_data.get('username', '')
+        messages.success(request, f'Аккаунт {user_name} создан успешно')
+        return redirect('user_login_page')
 
-            # sent success message to user
-            user_name = form.cleaned_data.get('username', '')
-            messages.success(request, f'Аккаунт {user_name} создан')
-            return redirect('user_login_page')
     contex = {
         'title': 'Регистрация',
         'form': form
@@ -136,31 +134,31 @@ def user_registration(request):
 
 
 def user_login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username_field', None)
-        password = request.POST.get('password_field', None)
-        user = authenticate(request, username=username, password=password)
-
-        if user is None:
-            messages.info(
-                request,
-                'Имя пользователя или пароль введены неверно'
-            )
-        else:
-            login(request, user)
-
-            # create empty cart if user has no cart
-            customer = request.user.customer
-            Order.objects.get_or_create(
-                customer=customer,
-                status=Order.OrderStatus.IN_CART,
-            )
-            return redirect('home_page')
-
     contex = {
         'title': 'Войти в аккаунт',
     }
-    return render(request, 'shop/login.html', contex)
+    if request.method != 'POST':
+        return render(request, 'shop/login.html', contex)
+
+    username = request.POST.get('username_field', None)
+    password = request.POST.get('password_field', None)
+    user = authenticate(request, username=username, password=password)
+    if user is None:
+        messages.info(
+            request,
+            'Имя пользователя или пароль введены неверно'
+        )
+        return render(request, 'shop/login.html', contex)
+
+    login(request, user)
+
+    # create empty cart if user has no cart
+    customer = request.user.customer
+    Order.objects.get_or_create(
+        customer=customer,
+        status=Order.OrderStatus.IN_CART,
+    )
+    return redirect('home_page')
 
 
 @login_required(login_url='user_login_page')
