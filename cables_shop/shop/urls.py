@@ -14,9 +14,6 @@ urlpatterns = [
         views.CablePageView.as_view(),
         name='cable_page'
     ),
-    path('cart/', views.CartPageView.as_view(), name='cart_page'),
-    path('updateCart/', views.update_cart, name='update_cart_page'),
-    path('cart/checkout/', views.checkout, name='checkout_page'),
     path(
         'user/registration/', views.user_registration,
         name='user_registration_page'
@@ -28,6 +25,10 @@ urlpatterns = [
         views.UserProfileView.as_view(),
         name='user_profile_page'
     ),
+    path('cart/', views.CartPageView.as_view(), name='cart_page'),
+
+    path('cart/checkout/', views.checkout, name='checkout_page'),
+    path('updateCart/', views.update_cart, name='update_cart_page'),
     path(
         'user/order/<int:order_pk>',
         views.order_information,
