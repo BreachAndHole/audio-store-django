@@ -33,8 +33,8 @@
         <div class="col-6 align-self-top">
             <div>
                 <h1 class="text-white">{{ cable.name }}</h1>
-                <h5 class="text-white mt-3">Цена: {{ cable.price }}₽</h5>
-                <h6 class="text-white mt-3">Длина: {{ cable.length_sm }} sm</h6>
+                <h5 class="text-white mt-3">Цена: {{ cable.price }} ₽</h5>
+                <h6 class="text-white mt-3">Длина: {{ cable.length_sm }} см.</h6>
                 {% if cable.units_in_stock %}
                     <div>
                         <button class="btn-update-cart btn btn-sm btn-outline-light mt-3"
@@ -46,7 +46,7 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="text-white mt-3">{{ cable.description }}</div>
+            <div class="text-white text-start mt-3">{{ cable.description }}</div>
         </div>
     </div>
 </div>
