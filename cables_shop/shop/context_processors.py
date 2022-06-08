@@ -1,5 +1,5 @@
 from typing import TypedDict
-from .models import *
+from .models import Order, OrderedProduct
 from django.http import HttpRequest
 
 
