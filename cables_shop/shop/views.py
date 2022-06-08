@@ -7,7 +7,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
 from .services.orders import CartUpdateService, CheckoutService
-from .models import *
+from . import utils
+from .models import CableType, Cable, Order, OrderedProduct
+from cables_shop.settings import DELIVERY_PRICE
 
 
 class IndexPageView(list.ListView):
@@ -55,10 +57,10 @@ class CartPageView(LoginRequiredMixin, list.ListView):
         context['title'] = 'Корзина'
 
         # Adding cart total price to context
-        context['products_total_price'] = Order.objects.get(
-            customer=self.request.user.customer,
-            status=Order.OrderStatus.IN_CART
-        ).products_total_price
+        products_total_price = sum(
+            product.total_price for product in context['ordered_products']
+        )
+        context['products_total_price'] = products_total_price
         return context
 
     def get_queryset(self):
@@ -80,7 +82,7 @@ def checkout(request: HttpRequest):
             checkout_service.correct_ordered_products()
             messages.error(
                 request,
-                'Количетсво некоторых товаров в наличии изменилось. '
+                'Количество некоторых товаров в наличии изменилось. '
                 'Корзина была обновлена. Пожалуйста повторите отправку заказа'
             )
             return redirect('checkout_page')
@@ -146,13 +148,8 @@ def user_login(request: HttpRequest):
         return render(request, 'shop/login.html', contex)
 
     login(request, user)
-
     # create empty cart if user has no cart
-    customer = request.user.customer
-    Order.objects.get_or_create(
-        customer=customer,
-        status=Order.OrderStatus.IN_CART,
-    )
+    utils.create_empty_cart(request.user.customer)
     return redirect('home_page')
 
 
@@ -171,14 +168,15 @@ class UserProfileView(LoginRequiredMixin, list.ListView):
     def get_queryset(self):
         customer_orders = Order.objects.filter(
             customer=self.request.user.customer
-        ).exclude(
-            status=Order.OrderStatus.IN_CART
-        ).order_by('-pk')
+        ).exclude(status=Order.OrderStatus.IN_CART).order_by('-pk')
         return customer_orders
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Личный кабинет'
+        context['last_used_address'] = utils.get_last_used_customer_address(
+            self.request.user.customer
+        )
         return context
 
 
