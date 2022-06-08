@@ -27,9 +27,7 @@ class BaseTestCase(TestCase):
         self.registration_url = reverse('user_registration_page')
         self.login_url = reverse('user_login_page')
         self.user_profile_url = reverse('user_profile_page')
-        self.order_url = reverse(
-            'order_info_page', kwargs={'order_pk': order.pk}
-        )
+        self.order_url = reverse('order_info_page', kwargs={'order_pk': order.pk})
         self.logout_url = reverse('user_logout_page')
 
 
@@ -53,10 +51,7 @@ class SimpleViewsTestCase(BaseTestCase):
             type=self.cable_type,
         )
 
-        self.cable_url = reverse(
-            'cable_page',
-            kwargs={'cable_slug': self.cable.slug}
-        )
+        self.cable_url = reverse('cable_page', kwargs={'cable_slug': self.cable.slug})
 
     def test_home_page_GET(self):
         template_name = 'shop/index.html'
@@ -127,10 +122,7 @@ class UserRegistrationTestCase(BaseTestCase):
         )
         [print(t.name) for t in response.templates]
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            User.objects.filter(username='testuser2').count(),
-            1
-        )
+        self.assertEqual(User.objects.filter(username='testuser2').count(), 1)
 
     def test_user_registration_page_invalid_POST(self):
         """
@@ -143,16 +135,10 @@ class UserRegistrationTestCase(BaseTestCase):
             'password1': 'Frolov',
             'password2': 'Frolov_35',
         }
-        response = self.client.post(
-            self.registration_url,
-            registration_form_post_data,
-        )
+        response = self.client.post(self.registration_url, registration_form_post_data)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            User.objects.filter(username='testuser2').count(),
-            0
-        )
+        self.assertEqual(User.objects.filter(username='testuser2').count(), 0)
 
 
 class UserLoginLogoutTestCase(BaseTestCase):
@@ -169,10 +155,7 @@ class UserLoginLogoutTestCase(BaseTestCase):
         self.assertTemplateUsed(response, template_name)
 
     def test_user_logout_page_GET(self):
-        self.client.login(
-            username=self.user.username,
-            password=self.user.password
-        )
+        self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(self.logout_url)
 
         self.assertEqual(response.status_code, 302)
@@ -188,7 +171,6 @@ class UserProfilePageTestCase(BaseTestCase):
         super().setUp()
 
     # ODO: test profile page GET
-
     # ODO: test order info GET
 
 

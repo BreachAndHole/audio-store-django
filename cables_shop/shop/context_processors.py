@@ -1,10 +1,15 @@
+from typing import TypedDict
 from .models import *
 from django.http import HttpRequest
 
 
-def get_cart_items_total(request: HttpRequest) -> dict[str, int]:
+class CartItemsTotalData(TypedDict):
+    cart_items_total: int
+
+
+def get_cart_items_total(request: HttpRequest) -> CartItemsTotalData:
     if not request.user.is_authenticated:
-        return {'items_in_cart': 0}
+        return {'cart_items_total': 0}
     order, _ = Order.objects.get_or_create(
         customer=request.user.customer,
         status=Order.OrderStatus.IN_CART,

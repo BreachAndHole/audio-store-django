@@ -68,52 +68,31 @@ class CablesTestCase(BaseTestCase):
         super().setUp()
 
     def test_cable_type_str(self):
-        self.assertEqual(
-            str(self.cable_type_with_photo),
-            'test type'
-        )
+        self.assertEqual(str(self.cable_type_with_photo), 'test type')
 
     def test_cable_type_photo_url(self):
         self.assertEqual(
             self.cable_type_with_photo.photo_url,
-            f'/media/cable_type_photo.jpg'
+            '/media/cable_type_photo.jpg'
         )
-        self.assertEqual(
-            self.cable_type_without_photo.photo_url,
-            ''
-        )
+        self.assertEqual(self.cable_type_without_photo.photo_url, '')
 
     def test_cable_str(self):
-        self.assertEqual(
-            str(self.cable_with_photo),
-            f'test cable, 100 см.'
-        )
+        self.assertEqual(str(self.cable_with_photo), 'test cable, 100 см.')
 
     def test_cable_absolute_url(self):
-        self.assertEqual(
-            self.cable_with_photo.get_absolute_url(),
-            f'/cable/test-cable'
-        )
+        self.assertEqual(self.cable_with_photo.get_absolute_url(), '/cable/test-cable')
 
     def test_cable_title_photo_url(self):
         self.assertEqual(
             self.cable_with_photo.title_photo_url,
             '/media/test_title_photo.jpg'
         )
-        self.assertEqual(
-            self.cable_without_photo.title_photo_url,
-            ''
-        )
+        self.assertEqual(self.cable_without_photo.title_photo_url, '')
 
     def test_cable_photo_str(self):
-        self.assertEqual(
-            str(self.title_cable_photo),
-            f'title test ...'
-        )
-        self.assertEqual(
-            str(self.nontitle_cable_photo),
-            f'test ...'
-        )
+        self.assertEqual(str(self.title_cable_photo), 'title test ...')
+        self.assertEqual(str(self.nontitle_cable_photo), 'test ...')
 
 
 class CustomerTestCase(BaseTestCase):
@@ -122,10 +101,7 @@ class CustomerTestCase(BaseTestCase):
         super().setUp()
 
     def test_customer_str(self):
-        self.assertEqual(
-            str(self.customer),
-            f'Frolov Sergey'
-        )
+        self.assertEqual(str(self.customer), 'Frolov Sergey')
 
 
 class OrderTestCase(BaseTestCase):
@@ -169,54 +145,30 @@ class OrderTestCase(BaseTestCase):
     def test_shipping_address_str(self):
         self.assertEqual(
             str(self.shipping_address),
-            f'Адрес покупателя Frolov Sergey, 1234'
+            'Адрес покупателя Frolov Sergey, 1234'
         )
 
     def test_ordered_product_str(self):
-        self.assertEqual(
-            str(self.product_1_in_cart),
-            f'#{self.product_1_in_cart.order.pk}, test cable, 100 см.'
-        )
+        self.assertEqual(str(self.product_1_in_cart), '#11, test cable, 100 см.')
 
     def test_get_product_total_price(self):
-        self.assertEqual(
-            self.product_1_in_cart.product_total_price,
-            300
-        )
+        self.assertEqual(self.product_1_in_cart.product_total_price, 300)
 
     def test_order_str(self):
-        self.assertEqual(
-            str(self.order_in_cart),
-            f'№{self.order_in_cart.pk}: Frolov Sergey, В корзине'
-        )
+        self.assertEqual(str(self.order_in_cart), '№5: Frolov Sergey, В корзине')
 
     def test_order_absolute_url(self):
-        self.assertEqual(
-            self.order_in_cart.get_absolute_url(),
-            f'/user/order/{self.order_in_cart.pk}'
-        )
+        self.assertEqual(self.order_in_cart.get_absolute_url(), '/user/order/3')
 
     def test_products_total_price(self):
-        self.assertEqual(
-            self.order_in_cart.products_total_price,
-            900
-        )
+        self.assertEqual(self.order_in_cart.products_total_price, 900)
 
     def test_order_total_price(self):
-        self.assertEqual(
-            self.order_in_cart.order_total_price,
-            900 + DELIVERY_PRICE
-        )
-        self.assertEqual(
-            self.accepted_order_pick_up.order_total_price,
-            500
-        )
+        self.assertEqual(self.order_in_cart.order_total_price, 900 + DELIVERY_PRICE)
+        self.assertEqual(self.accepted_order_pick_up.order_total_price, 500)
 
     def test_order_total_products(self):
-        self.assertEqual(
-            self.order_in_cart.order_total_products,
-            2
-        )
+        self.assertEqual(self.order_in_cart.order_total_products, 2)
 
 
 class ReceiversTestCase(BaseTestCase):

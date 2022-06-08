@@ -25,20 +25,12 @@ class UserRegistrationForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         for field in ('username', 'email', 'password1', 'password2'):
             self.fields[field].widget.attrs.update(
-                {
-                    'type': 'text',
-                    'class': "form-control",
-                }
+                {'type': 'text', 'class': "form-control"}
             )
 
     class Meta:
         model = User
-        fields = [
-            'username',
-            'email',
-            'password1',
-            'password2',
-        ]
+        fields = ['username', 'email', 'password1', 'password2', ]
 
 
 class CheckoutForm(forms.Form):

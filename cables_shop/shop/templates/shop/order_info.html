@@ -41,7 +41,7 @@
                             </div>
                         </td>
                         <td class="border-0 align-middle text-white text-center">{{ product.quantity }}</td>
-                        <td class="border-0 align-middle text-white text-center">{{ product.get_product_total_price }}
+                        <td class="border-0 align-middle text-white text-center">{{ product.product_total_price }}
                         </td>
                     </tr>
                     {% endfor %}
@@ -49,7 +49,7 @@
                     {% if order.get_delivery_type_display != 'Самовывоз' %}
                         <tr class="border-bottom">
                             <td class="border-0 align-middle text-white text-center">{{ forloop.counter }}</td>
-                            <td class="border-0 align-middle text-white text-start h5 ">Доставка транспортной компанией</td>
+                            <td class="border-0 align-middle text-white text-start h5">Доставка транспортной компанией</td>
                             <td class="border-0 align-middle text-white text-center">1</td>
                             <td class="border-0 align-middle text-white text-center"> 500</td>
                         </tr>
@@ -58,7 +58,7 @@
                         <td class="border-0"></td>
                         <td scope="row" class="border-0"></td>
                         <td class="border-0 align-middle text-white text-end">Итого:</td>
-                        <td class="border-0 align-middle text-white text-center">{{ order.get_order_total_price }}</td>
+                        <td class="border-0 align-middle text-white text-center">{{ order.order_total_price }}</td>
                     </tr>
                     </tbody>
                 </table>

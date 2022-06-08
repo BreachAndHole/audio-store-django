@@ -88,10 +88,7 @@ class URLsTestCase(TestCase):
 
     def test_user_logout_page_access(self):
         url = reverse('user_logout_page')
-        self.client.login(
-            username=self.user.username,
-            password=self.user.password
-        )
+        self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(url, follow=True)
 
         self.assertEqual(resolve(url).func, user_logout)
@@ -106,10 +103,7 @@ class URLsTestCase(TestCase):
 
     def test_user_profile_page_access(self):
         url = reverse('user_profile_page')
-        self.client.login(
-            username=self.user.username,
-            password=self.user.password
-        )
+        self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(url, follow=True)
         self.assertEqual(resolve(url).func.view_class, UserProfileView)
         self.assertEqual(response.status_code, 200)
@@ -123,10 +117,7 @@ class URLsTestCase(TestCase):
 
     def test_cart_page_access(self):
         url = reverse('cart_page')
-        self.client.login(
-            username=self.user.username,
-            password=self.user.password
-        )
+        self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(url, follow=True)
 
         self.assertEqual(resolve(url).func.view_class, CartPageView)
@@ -141,10 +132,7 @@ class URLsTestCase(TestCase):
 
     def test_checkout_page_access(self):
         url = reverse('checkout_page')
-        self.client.login(
-            username=self.user.username,
-            password=self.user.password
-        )
+        self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(url, follow=True)
 
         self.assertEqual(resolve(url).func, checkout)
@@ -161,10 +149,7 @@ class URLsTestCase(TestCase):
         """
         If user is not logged in, he must be redirected to login page
         """
-        url = reverse(
-            'order_info_page',
-            kwargs={'order_pk': self.accepted_order.pk}
-        )
+        url = reverse('order_info_page', kwargs={'order_pk': self.accepted_order.pk})
         response = self.client.get(url)
 
         self.assertEqual(resolve(url).func, order_information)
@@ -174,14 +159,8 @@ class URLsTestCase(TestCase):
         """
         If user is logged in, he must be able to see his order info page
         """
-        url = reverse(
-            'order_info_page',
-            kwargs={'order_pk': self.accepted_order.pk}
-        )
-        self.client.login(
-            username=self.user.username,
-            password=self.user.password
-        )
+        url = reverse('order_info_page', kwargs={'order_pk': self.accepted_order.pk})
+        self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(url, follow=True)
         self.assertEqual(resolve(url).func, order_information)
         self.assertEqual(response.status_code, 200)
@@ -191,19 +170,9 @@ class URLsTestCase(TestCase):
         If user is trying to access order info page of another user,
         he must be redirected to home page.
         """
-        url = reverse(
-            'order_info_page',
-            kwargs={'order_pk': self.accepted_order.pk}
-        )
-        another_user = User.objects.create(
-            username='tester2',
-            password='tester2'
-        )
-
-        self.client.login(
-            username=another_user.username,
-            password=another_user.password
-        )
+        url = reverse('order_info_page', kwargs={'order_pk': self.accepted_order.pk})
+        user_2 = User.objects.create(username='tester2', password='tester2')
+        self.client.login(username=user_2.username, password=user_2.password)
         response = self.client.get(url)
         self.assertEqual(resolve(url).func, order_information)
         self.assertEqual(response.status_code, 302)
@@ -213,10 +182,7 @@ class URLsTestCase(TestCase):
         If order is not checked out,
         user must be redirected to home page
         """
-        url = reverse(
-            'order_info_page',
-            kwargs={'order_pk': self.in_cart_order.pk}
-        )
+        url = reverse('order_info_page', kwargs={'order_pk': self.in_cart_order.pk})
         self.client.login(
             username=self.user.username,
             password=self.user.password

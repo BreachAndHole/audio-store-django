@@ -72,9 +72,7 @@ class CablePhoto(models.Model):
     Title photo is the one displayed on cable card on all cables page
     """
     photo = models.ImageField('фото', upload_to='photos/cable_photos/%Y/%m')
-    cable = models.ForeignKey(
-        Cable, verbose_name='кабель', on_delete=models.CASCADE
-    )
+    cable = models.ForeignKey(Cable, verbose_name='кабель', on_delete=models.CASCADE)
     is_title = models.BooleanField('является титульным')
 
     class Meta:
@@ -176,11 +174,11 @@ class Order(models.Model):
     )
     order_accepted_date = models.DateField(
         'дата оформления заказа',
-        auto_now_add=True,
+        auto_now_add=True
     )
     order_last_update_date = models.DateField(
         'дата последнего обновления заказа',
-        auto_now_add=True,
+        auto_now_add=True
     )
     status = models.CharField(
         'статус заказа',
@@ -192,7 +190,7 @@ class Order(models.Model):
         'способ получения',
         max_length=10,
         choices=DeliveryType.choices,
-        default=DeliveryType.DELIVERY,
+        default=DeliveryType.DELIVERY
     )
 
     class Meta:
@@ -227,12 +225,8 @@ class Order(models.Model):
 
 
 class OrderedProduct(models.Model):
-    order = models.ForeignKey(
-        Order, verbose_name='заказ', on_delete=models.CASCADE
-    )
-    product = models.ForeignKey(
-        Cable, verbose_name='товар', on_delete=models.CASCADE
-    )
+    order = models.ForeignKey(Order, verbose_name='заказ', on_delete=models.CASCADE)
+    product = models.ForeignKey(Cable, verbose_name='товар', on_delete=models.CASCADE)
     quantity = models.SmallIntegerField('заказанное количество', default=0)
     date_added = models.DateTimeField('время добавления', auto_now_add=True)
 

@@ -4,7 +4,6 @@ from typing import NamedTuple, TypedDict
 from django.http import HttpRequest, QueryDict
 from django.core.exceptions import ObjectDoesNotExist
 from shop.forms import CheckoutForm
-from shop.errors import *
 from shop.models import *
 
 
@@ -20,14 +19,16 @@ class CartUpdateParsedData(NamedTuple):
 
 
 class CartUpdateService:
+    class JSONResponseParsingError(Exception):
+        """ Error during parsing JSON response with update cart data """
+
+    class CartUpdateError(Exception):
+        """ Error during updating cart """
 
     def __init__(self, request: HttpRequest) -> None:
         self.request = request
 
     def process_cart_update(self) -> None:
-        if not self.request.user.is_authenticated:
-            raise NotAuthenticatedError('User is not authenticated')
-
         parsed_response = self.__parse_json_update_data()
         order, _ = Order.objects.get_or_create(
             customer=self.request.user.customer,
@@ -50,7 +51,7 @@ class CartUpdateService:
         try:
             received_data = json.loads(self.request.body)
         except json.JSONDecodeError:
-            raise JSONResponseParsingError(
+            raise self.JSONResponseParsingError(
                 'Error during json response decoding'
             )
 
@@ -60,17 +61,17 @@ class CartUpdateService:
                 action=received_data.get('action')
             )
         except KeyError:
-            raise JSONResponseParsingError(
+            raise self.JSONResponseParsingError(
                 'productId or action is not in response'
             )
 
         if parsed_data.product_id < 0:
-            raise JSONResponseParsingError('Invalid product id')
+            raise self.JSONResponseParsingError('Invalid product id')
 
         return parsed_data
 
-    @staticmethod
     def __get_product_to_update(
+            self,
             order: Order,
             product_id: int
     ) -> OrderedProduct:
@@ -78,7 +79,7 @@ class CartUpdateService:
         try:
             cable = Cable.objects.get(pk=product_id)
         except ObjectDoesNotExist:
-            raise CartUpdateError(
+            raise self.CartUpdateError(
                 f'There is no product with {product_id=}'
             )
 
@@ -88,8 +89,8 @@ class CartUpdateService:
         )
         return ordered_product
 
-    @staticmethod
     def __update_product_quantity_in_cart(
+            self,
             ordered_product: OrderedProduct,
             action: str
     ) -> None:
@@ -104,7 +105,7 @@ class CartUpdateService:
             case CartUpdateAction.DELETE_FROM_CART.value:
                 ordered_product.quantity = 0
             case _:
-                raise CartUpdateError(f'Undefined {action = }')
+                raise self.CartUpdateError(f'Undefined {action = }')
 
     @staticmethod
     def __save_or_delete_product_in_cart(
@@ -121,6 +122,18 @@ class CheckoutService:
         'delivery': Order.DeliveryType.DELIVERY,
         'selfPickUp': Order.DeliveryType.PICK_UP
     }
+
+    class NotAuthenticatedError(Exception):
+        """ User tried to update cart without authentication """
+
+    class UserIsAnonymousError(Exception):
+        """ User is anonymous """
+
+    class CreateShippingAddressError(Exception):
+        """ Error during creating shipping address for the order"""
+
+    class ProductsQuantityError(Exception):
+        """ Ordered quantity is greater than available """
 
     def __init__(
             self, customer: Customer,
@@ -145,7 +158,7 @@ class CheckoutService:
         self.__update_customer_information()
 
         if not self.__order_is_valid():
-            raise ProductsQuantityError(
+            raise self.ProductsQuantityError(
                 'Ordered quantity is greater than available'
             )
         self.__update_products_in_stock()
@@ -176,7 +189,7 @@ class CheckoutService:
                 zipcode=checkout_form_data.get('zipcode'),
             )
         except KeyError:
-            raise CreateShippingAddressError(
+            raise self.CreateShippingAddressError(
                 'Error during shipping address creation'
             )
         return shipping_address

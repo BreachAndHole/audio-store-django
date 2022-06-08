@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import list, detail
 from django.contrib import messages
@@ -8,7 +8,6 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
 from .services.orders import CartUpdateService, CheckoutService
 from .models import *
-from .errors import *
 
 
 class IndexPageView(list.ListView):
@@ -59,27 +58,25 @@ class CartPageView(LoginRequiredMixin, list.ListView):
         context['products_total_price'] = Order.objects.get(
             customer=self.request.user.customer,
             status=Order.OrderStatus.IN_CART
-        ).products_total_price()
+        ).products_total_price
         return context
 
     def get_queryset(self):
         return OrderedProduct.objects.filter(
             order__customer=self.request.user.customer,
             order__status=Order.OrderStatus.IN_CART
-        ).order_by(
-            'date_added'
-        )
+        ).order_by('date_added')
 
 
 @login_required(login_url='user_login_page')
-def checkout(request):
+def checkout(request: HttpRequest):
     checkout_service = CheckoutService(request.user.customer, request.POST)
     form = checkout_service.checkout_form
 
     if request.method == 'POST' and form.is_valid():
         try:
             checkout_service.process_checkout()
-        except ProductsQuantityError:
+        except checkout_service.ProductsQuantityError:
             checkout_service.correct_ordered_products()
             messages.error(
                 request,
@@ -94,30 +91,28 @@ def checkout(request):
         'form': form,
         'ordered_products': checkout_service.ordered_products,
         'delivery_price': DELIVERY_PRICE,
-        'order_total_price': checkout_service.order.order_total_price(),
-        'cart_total_price': checkout_service.order.products_total_price(),
+        'order_total_price': checkout_service.order.order_total_price,
+        'cart_total_price': checkout_service.order.products_total_price,
     }
     return render(request, 'shop/checkout.html', context)
 
 
-def update_cart(request):
+def update_cart(request: HttpRequest):
     """
     This view is working with JSON-response sent by cart.js on every
     cart items related button click
     """
     try:
         CartUpdateService(request).process_cart_update()
-    except JSONResponseParsingError:
+    except CartUpdateService.JSONResponseParsingError:
         return JsonResponse('Error during parsing response', safe=False)
-    except CartUpdateError:
+    except CartUpdateService.CartUpdateError:
         return JsonResponse('Error during cart update', safe=False)
-    except NotAuthenticatedError:
-        return JsonResponse('User was not authenticated', safe=False)
 
     return JsonResponse('Cart has been updated', safe=False)
 
 
-def user_registration(request):
+def user_registration(request: HttpRequest):
     form = UserRegistrationForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
         form.save()
@@ -133,7 +128,7 @@ def user_registration(request):
     return render(request, 'shop/registration.html', contex)
 
 
-def user_login(request):
+def user_login(request: HttpRequest):
     contex = {
         'title': 'Войти в аккаунт',
     }
@@ -188,7 +183,7 @@ class UserProfileView(LoginRequiredMixin, list.ListView):
 
 
 @login_required(login_url='user_login_page')
-def order_information(request, order_pk: int):
+def order_information(request: HttpRequest, order_pk: int):
     customer = request.user.customer
     order = get_object_or_404(Order, pk=order_pk)
 
