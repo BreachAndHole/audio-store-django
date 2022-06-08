@@ -150,15 +150,13 @@ class Order(models.Model):
     """
 
     class OrderStatus(models.TextChoices):
-        IN_CART = 'IC', 'В корзине'  # Products in cart
-        ACCEPTED = 'AC', 'Принят'  # Checkout finished
-        PREPARING = 'PR', 'На сборе'  # Products are being assembled
-        SHIPPED = 'SH', 'Отправлен'  # Shipped if needed
-        COMPLETE = 'CO', 'Выполнен'  # Order is complete
+        IN_CART = 'IC', 'В корзине'
+        ACCEPTED = 'AC', 'Принят'
+        COMPLETE = 'CO', 'Выполнен'
 
     class DeliveryType(models.TextChoices):
-        PICK_UP = 'PU', 'Самовывоз'  # Pick up from store
-        DELIVERY = 'DE', 'Доставка ТК'  # Delivery to customer
+        PICK_UP = 'PU', 'Самовывоз'
+        DELIVERY = 'DE', 'Доставка'
 
     customer = models.ForeignKey(
         Customer,
