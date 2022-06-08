@@ -1,6 +1,6 @@
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
-from django.views.generic import list, detail
+from django.views.generic import TemplateView, list, detail
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -196,3 +196,12 @@ def order_information(request: HttpRequest, order_pk: int):
         'order': order,
     }
     return render(request, 'shop/order_info.html', contex)
+
+
+class AboutPageView(TemplateView):
+    template_name = 'shop/about.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Обо мне'
+        return context
