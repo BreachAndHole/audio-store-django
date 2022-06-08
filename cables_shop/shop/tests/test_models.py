@@ -152,7 +152,7 @@ class OrderTestCase(BaseTestCase):
         self.assertEqual(str(self.product_1_in_cart), '#11, test cable, 100 см.')
 
     def test_get_product_total_price(self):
-        self.assertEqual(self.product_1_in_cart.product_total_price, 300)
+        self.assertEqual(self.product_1_in_cart.total_price, 300)
 
     def test_order_str(self):
         self.assertEqual(str(self.order_in_cart), '№5: Frolov Sergey, В корзине')

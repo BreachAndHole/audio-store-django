@@ -1,52 +1,127 @@
 {% extends 'shop/base.html' %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-4">
-            Информация о пользователе
+<div class="container mb-5">
+  <div class="row">
+    <div class="col-4 border-end">
+      <div class="card bg-dark border-0">
+        <div class="card-body text-center">
+          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+               alt="avatar" class="rounded-circle img-fluid"
+               style="width: 150px;">
+          <h5 class="my-3">{{ user.customer.last_name }} {{ user.customer.first_name }}</h5>
+          <h6 class="my-3">{{ user.customer.phone }}</h6>
+          <div class="d-flex justify-content-center mb-2">
+              <a href="#" class="btn btn-light">Обновить информацию</a>
+          </div>
         </div>
-        <div class="col-8 border-start">
-
-            <div class="table-responsive ">
-                <table class="table">
-                    <thead>
-                    <tr class="border-bottom">
-                        <th scope="col" class="border-0 text-white">
-                            <div class="p-2 text-uppercase">№</div>
-                        </th>
-                        <th scope="col" class="border-0 text-white">
-                            <div class="py-2 text-uppercase">Дата</div>
-                        </th>
-                        <th scope="col" class="border-0 text-white">
-                            <div class="py-2 text-uppercase">Товаров</div>
-                        </th>
-                        <th scope="col" class="border-0 text-white">
-                            <div class="py-2 text-uppercase">Сумма</div>
-                        </th>
-
-                        <th scope="col" class="border-0 text-white">
-                            <div class="py-2 text-uppercase">Статус</div>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for order in orders %}
-                        <tr class="border-bottom">
-                            <td class="border-0 align-middle text-white">{{ order.pk }}</td>
-                            <td class="border-0 align-middle text-white">{{ order.order_accepted_date }}</td>
-                            <td class="border-0 align-middle text-white">{{ order.order_total_products}}</td>
-                            <td class="border-0 align-middle text-white">{{ order.order_total_price }}</td>
-                            <td class="border-0 align-middle text-white">{{ order.get_status_display }}</td>
-                            <td class="border-0 align-middle text-white">
-                                <a href="{{ order.get_absolute_url }}" class="btn btn-sm btn-outline-light">Подробнее</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+      </div>
+      <div class="card bg-dark border-0">
+        <div class="card-body">
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Имя</p>
             </div>
+            <div class="col-sm-9">
+              <p class="mb-0">{{ user.customer.first_name }} {{ user.customer.last_name }}</p>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Email</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="mb-0">{{ user.email }}</p>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Телефон</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="mb-0">{{ user.customer.phone }}</p>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Город</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="mb-0">Санкт-Петербург</p>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Адрес</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="mb-0">Московский проспект 220, 177</p>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Индекс</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="mb-0">1906066</p>
+            </div>
+          </div>
+          <hr>
         </div>
+      </div>
     </div>
+    <div class="col-8">
+      <div class="table-responsive ">
+        <table class="table">
+          <thead>
+          <tr class="border-bottom">
+            <th scope="col" class="border-0 text-white">
+              <div class="p-2 text-uppercase text-center">№</div>
+            </th>
+            <th scope="col" class="border-0 text-white">
+              <div class="py-2 text-uppercase text-start">Дата</div>
+            </th>
+            <th scope="col" class="border-0 text-white">
+              <div class="py-2 text-uppercase text-center">Товаров</div>
+            </th>
+            <th scope="col" class="border-0 text-white">
+              <div class="py-2 text-uppercase text-center">Сумма</div>
+            </th>
+
+            <th scope="col" class="border-0 text-white">
+              <div class="py-2 text-uppercase text-center">Статус</div>
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for order in orders %}
+          <tr class="border-bottom">
+            <td class="border-0 align-middle text-white text-center">{{ order.pk }}
+            </td>
+            <td class="border-0 align-middle text-white text-start">{{ order.order_accepted_date }}
+            </td>
+            <td class="border-0 align-middle text-white text-center">{{ order.order_total_products}}
+            </td>
+            <td class="border-0 align-middle text-white text-center">{{ order.order_total_price }}
+            </td>
+            <td class="border-0 align-middle text-white text-center">{{ order.get_status_display }}
+            </td>
+            <td class="border-0 align-middle text-white text-center">
+              <a href="{{ order.get_absolute_url }}"
+                 class="btn btn-sm btn-outline-light">Подробнее</a>
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock content %}

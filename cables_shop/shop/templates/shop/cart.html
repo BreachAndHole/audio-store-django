@@ -3,70 +3,81 @@
 
 <div class="container"></div>
 <div class="container">
-    <div class="row">
-        <div class="col-lg-12 my-3">
-            <div class="table-responsive ">
-                <table class="table">
-                    <thead>
-                    <tr class="border-bottom">
-                        <th scope="col" class="border-0 text-white">
-                            <div class="p-2 text-uppercase">Наименование</div>
-                        </th>
-                        <th scope="col" class="border-0 text-white">
-                            <div class="py-2 text-uppercase">Цена</div>
-                        </th>
-                        <th scope="col" class="border-0 text-white">
-                            <div class="py-2 text-uppercase">Количество</div>
-                        </th>
-                        <th scope="col" class="border-0 text-white">
-                            <div class="py-2 text-uppercase">Удалить</div>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for product in ordered_products %}
-                    <tr class="border-bottom">
-                        <td scope="row" class="border-0">
-                            <div class="p-2  align-middle">
-                                <img src="{{ product.product.title_photo_url }}"
-                                     alt="{{ product.product.name }} photo"
-                                     width="70" class="img-fluid rounded">
-                                <div class="mx-3 d-inline-block">
-                                    <a href="{{ product.product.get_absolute_url }}"
-                                       class="h5 text-white d-inline-block text-decoration-none">
-                                        {{ product.product.name }}
-                                    </a>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="border-0 align-middle text-white">{{ product.product.price }}</td>
-                        <td class="border-0 align-middle text-white">
-                            <button class="mx-2 btn btn-outline-light btn-update-cart"
-                                    data-product_id="{{ product.product.id }}" data-action="remove_from_cart">-
-                            </button>
-                            <span class="mx-2">{{ product.quantity }}</span>
-                            <button class="mx-2 btn btn-outline-light btn-update-cart"
-                                    data-product_id="{{ product.product.id }}" data-action="add_to_cart">+
-                            </button>
-                        </td>
-                        <td class="border-0 align-middle text-white">
-                            <button class="mx-2 btn btn-outline-light btn-update-cart"
-                                    data-product_id="{{ product.product.id }}" data-action="delete_from_cart">X
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <div class="row">
+    <div class="col-lg-12 mt-3">
+      <div class="table-responsive ">
+        <table class="table">
+          <thead>
+          <tr class="border-bottom">
+            <th scope="col" class="border-0 text-white text-center">
+              <div class="p-2 text-uppercase">№</div>
+            </th>
+            <th scope="col" class="border-0 text-white text-start">
+              <div class="p-2 text-uppercase">Наименование</div>
+            </th>
+            <th scope="col" class="border-0 text-white text-center">
+              <div class="py-2 text-uppercase">Цена</div>
+            </th>
+            <th scope="col" class="border-0 text-white text-center">
+              <div class="py-2 text-uppercase">Количество</div>
+            </th>
+            <th scope="col" class="border-0 text-white text-center">
+              <div class="py-2 text-uppercase">Сумма</div>
+            </th>
+            <th scope="col" class="border-0 text-white text-center">
+              <div class="py-2 text-uppercase"></div>
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for product in ordered_products %}
+          <tr class="border-bottom">
+            <td class="border-0 align-middle text-white text-center">{{ forloop.counter }}</td>
+            <td scope="row" class="border-0">
+              <div class="p-2  align-middle text-start">
+                <img src="{{ product.product.title_photo_url }}"
+                     alt="{{ product.product.name }} photo"
+                     width="70" class="img-fluid rounded">
+                <div class="mx-3 d-inline-block">
+                  <a href="{{ product.product.get_absolute_url }}"
+                     class="h5 text-white d-inline-block text-decoration-none">
+                    {{ product.product.name }}
+                  </a>
+                </div>
+              </div>
+            </td>
+            <td class="border-0 align-middle text-white text-center">{{ product.product.price }} ₽</td>
+            <td class="border-0 align-middle text-white text-center">
+              <button class="mx-2 btn btn-outline-light btn-update-cart"
+                      data-product_id="{{ product.product.id }}" data-action="remove_from_cart">-
+              </button>
+              <span class="mx-2 btn btn-dark">{{ product.quantity }}</span>
+              <button class="mx-2 btn btn-outline-light btn-update-cart"
+                      data-product_id="{{ product.product.id }}" data-action="add_to_cart">+
+              </button>
+            </td>
+            <td class="border-0 align-middle text-white text-center">{{ product.total_price }} ₽</td>
+            <td class="border-0 align-middle text-white text-center">
+              <button class="mx-2 btn btn-outline-light btn-update-cart"
+                      data-product_id="{{ product.product.id }}" data-action="delete_from_cart">X
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="row">
-        <div class="col mx-3">
-            <p class="h5">Items: {{ cart_items_total }}</p>
-            <p class="h5">Total: {{ products_total_price }}</p>
-            <div><a href="{% url 'checkout_page' %}" class="btn btn-outline-light mt-3">Оформить заказ</a></div>
-        </div>
+      <div class="col text-start d-flex align-items-end">
+        <a href="{% url 'all_cables_page' %}"
+           class="btn btn-outline-light">Продолжить покупки</a>
+      </div>
+      <div class="col text-end">
+        <p class="h5 mt-2 mb-3">Итого: {{ products_total_price }} ₽</p>
+        <a href="{% url 'checkout_page' %}" class="btn btn-light">Оформить заказ</a>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock content %}

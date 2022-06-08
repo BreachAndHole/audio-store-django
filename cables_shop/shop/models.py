@@ -208,7 +208,7 @@ class Order(models.Model):
         """Returns total price for all products in cart"""
         ordered_products = self.orderedproduct_set.all()
         products_price = sum(
-            [product.product_total_price for product in ordered_products]
+            [product.total_price for product in ordered_products]
         )
         return products_price
 
@@ -238,6 +238,6 @@ class OrderedProduct(models.Model):
         return f'#{self.order.pk}, {self.product}'
 
     @property
-    def product_total_price(self) -> int:
+    def total_price(self) -> int:
         """Return total price for this product"""
         return self.product.price*self.quantity
