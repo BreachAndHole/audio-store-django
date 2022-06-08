@@ -1,13 +1,12 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse, resolve
-from shop.models import *
-from shop.views import *
+from shop.models import Order, Cable, CableType
+from shop import views
 
 
 class URLsTestCase(TestCase):
     def setUp(self):
-        User = get_user_model()
         self.user = User.objects.create_user(
             username='test_user',
             email='test@test.ru',
@@ -33,14 +32,14 @@ class URLsTestCase(TestCase):
         url = reverse('home_page')
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func.view_class, IndexPageView)
+        self.assertEqual(resolve(url).func.view_class, views.IndexPageView)
         self.assertEqual(response.status_code, 200)
 
     def test_all_cables_page_access(self):
         url = reverse('all_cables_page')
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func.view_class, AllCablesPageView)
+        self.assertEqual(resolve(url).func.view_class, views.AllCablesPageView)
         self.assertEqual(response.status_code, 200)
 
     def test_cable_page_access(self):
@@ -62,28 +61,28 @@ class URLsTestCase(TestCase):
         url = reverse('cable_page', kwargs={'cable_slug': cable.slug})
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func.view_class, CablePageView)
+        self.assertEqual(resolve(url).func.view_class, views.CablePageView)
         self.assertEqual(response.status_code, 200)
 
     def test_user_registration_page_access(self):
         url = reverse('user_registration_page')
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func, user_registration)
+        self.assertEqual(resolve(url).func, views.user_registration)
         self.assertEqual(response.status_code, 200)
 
     def test_user_login_page_access(self):
         url = reverse('user_login_page')
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func, user_login)
+        self.assertEqual(resolve(url).func, views.user_login)
         self.assertEqual(response.status_code, 200)
 
     def test_user_logout_page_redirect(self):
         url = reverse('user_logout_page')
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func, user_logout)
+        self.assertEqual(resolve(url).func, views.user_logout)
         self.assertEqual(response.status_code, 302)
 
     def test_user_logout_page_access(self):
@@ -91,28 +90,28 @@ class URLsTestCase(TestCase):
         self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(url, follow=True)
 
-        self.assertEqual(resolve(url).func, user_logout)
+        self.assertEqual(resolve(url).func, views.user_logout)
         self.assertEqual(response.status_code, 200)
 
     def test_user_profile_page_redirect(self):
         url = reverse('user_profile_page')
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func.view_class, UserProfileView)
+        self.assertEqual(resolve(url).func.view_class, views.UserProfileView)
         self.assertEqual(response.status_code, 302)
 
     def test_user_profile_page_access(self):
         url = reverse('user_profile_page')
         self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(url, follow=True)
-        self.assertEqual(resolve(url).func.view_class, UserProfileView)
+        self.assertEqual(resolve(url).func.view_class, views.UserProfileView)
         self.assertEqual(response.status_code, 200)
 
     def test_cart_page_redirect(self):
         url = reverse('cart_page')
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func.view_class, CartPageView)
+        self.assertEqual(resolve(url).func.view_class, views.CartPageView)
         self.assertEqual(response.status_code, 302)
 
     def test_cart_page_access(self):
@@ -120,14 +119,14 @@ class URLsTestCase(TestCase):
         self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(url, follow=True)
 
-        self.assertEqual(resolve(url).func.view_class, CartPageView)
+        self.assertEqual(resolve(url).func.view_class, views.CartPageView)
         self.assertEqual(response.status_code, 200)
 
     def test_checkout_page_redirect(self):
         url = reverse('checkout_page')
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func, checkout)
+        self.assertEqual(resolve(url).func, views.checkout)
         self.assertEqual(response.status_code, 302)
 
     def test_checkout_page_access(self):
@@ -135,14 +134,14 @@ class URLsTestCase(TestCase):
         self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(url, follow=True)
 
-        self.assertEqual(resolve(url).func, checkout)
+        self.assertEqual(resolve(url).func, views.checkout)
         self.assertEqual(response.status_code, 200)
 
     def test_update_cart_page_access(self):
         url = reverse('update_cart_page')
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func, update_cart)
+        self.assertEqual(resolve(url).func, views.update_cart)
         self.assertEqual(response.status_code, 200)
 
     def test_order_info_page_redirect(self):
@@ -152,7 +151,7 @@ class URLsTestCase(TestCase):
         url = reverse('order_info_page', kwargs={'order_pk': self.accepted_order.pk})
         response = self.client.get(url)
 
-        self.assertEqual(resolve(url).func, order_information)
+        self.assertEqual(resolve(url).func, views.order_information)
         self.assertEqual(response.status_code, 302)
 
     def test_order_info_page_access(self):
@@ -162,7 +161,7 @@ class URLsTestCase(TestCase):
         url = reverse('order_info_page', kwargs={'order_pk': self.accepted_order.pk})
         self.client.login(username=self.user.username, password=self.user.password)
         response = self.client.get(url, follow=True)
-        self.assertEqual(resolve(url).func, order_information)
+        self.assertEqual(resolve(url).func, views.order_information)
         self.assertEqual(response.status_code, 200)
 
     def test_not_this_user_order_info_page_redirect(self):
@@ -174,7 +173,7 @@ class URLsTestCase(TestCase):
         user_2 = User.objects.create(username='tester2', password='tester2')
         self.client.login(username=user_2.username, password=user_2.password)
         response = self.client.get(url)
-        self.assertEqual(resolve(url).func, order_information)
+        self.assertEqual(resolve(url).func, views.order_information)
         self.assertEqual(response.status_code, 302)
 
     def test_not_accepted_order_info_page_redirect(self):
@@ -188,5 +187,5 @@ class URLsTestCase(TestCase):
             password=self.user.password
         )
         response = self.client.get(url)
-        self.assertEqual(resolve(url).func, order_information)
+        self.assertEqual(resolve(url).func, views.order_information)
         self.assertEqual(response.status_code, 302)

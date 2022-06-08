@@ -1,7 +1,11 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from cables_shop.settings import DELIVERY_PRICE
-from shop.models import *
+from django.db.models.signals import post_save
+from shop.models import (
+    Cable, CablePhoto, CableType, Order, ShippingAddress,
+    OrderedProduct,
+)
 
 
 class BaseTestCase(TestCase):
