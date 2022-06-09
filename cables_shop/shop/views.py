@@ -1,5 +1,5 @@
 from django.http import HttpRequest, JsonResponse
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView, RedirectView, TemplateView, list, detail
 from django.contrib import messages
@@ -155,11 +155,17 @@ class UserRegistrationView(FormView):
     success_url = reverse_lazy('user_login_page')
 
     def form_valid(self, form):
+        print(self.request.POST)
         form.save()
         # sent success message to user
         user_name = form.cleaned_data.get('email', '')
         messages.success(self.request, f'Аккаунт {user_name} создан успешно')
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Регистрация'
+        return context
 
 
 def user_login(request: HttpRequest):
