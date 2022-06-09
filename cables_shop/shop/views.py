@@ -1,6 +1,7 @@
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
-from django.views.generic import TemplateView, list, detail
+from django.urls import reverse_lazy
+from django.views.generic import FormView, RedirectView, TemplateView, list, detail
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -148,20 +149,17 @@ def update_cart(request: HttpRequest):
     return JsonResponse('Cart has been updated', safe=False)
 
 
-def user_registration(request: HttpRequest):
-    form = UserRegistrationForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
+class UserRegistrationView(FormView):
+    form_class = UserRegistrationForm
+    template_name = 'shop/registration.html'
+    success_url = reverse_lazy('user_login_page')
+
+    def form_valid(self, form):
         form.save()
         # sent success message to user
         user_name = form.cleaned_data.get('email', '')
-        messages.success(request, f'Аккаунт {user_name} создан успешно')
-        return redirect('user_login_page')
-
-    contex = {
-        'title': 'Регистрация',
-        'form': form
-    }
-    return render(request, 'shop/registration.html', contex)
+        messages.success(self.request, f'Аккаунт {user_name} создан успешно')
+        return super().form_valid(form)
 
 
 def user_login(request: HttpRequest):
@@ -187,10 +185,13 @@ def user_login(request: HttpRequest):
     return redirect('home_page')
 
 
-@login_required(login_url='user_login_page')
-def user_logout(request):
-    logout(request)
-    return redirect('home_page')
+class UserLogoutView(LoginRequiredMixin, RedirectView):
+    login_url = 'user_login_page'
+    pattern_name = 'home_page'
+
+    def get(self, *args, **kwargs):
+        logout(self.request)
+        return super(UserLogoutView, self).get(*args, **kwargs)
 
 
 class UserProfileView(LoginRequiredMixin, list.ListView):
@@ -214,19 +215,24 @@ class UserProfileView(LoginRequiredMixin, list.ListView):
         return context
 
 
-@login_required(login_url='user_login_page')
-def order_information(request: HttpRequest, order_pk: int):
-    order = get_object_or_404(Order, pk=order_pk)
+class OrderView(LoginRequiredMixin, detail.DetailView):
+    login_url = 'user_login_page'
+    model = Order
+    context_object_name = 'order'
+    pk_url_kwarg = 'order_pk'
+    template_name = 'shop/order_info.html'
 
-    # If order don't belong to current user or the order still in cart
-    if order.customer != request.user or order.status == Order.OrderStatus.IN_CART:
-        return redirect('user_profile_page')
+    def get(self, *args, **kwargs):
+        order = self.get_object()
+        if order.customer != self.request.user or order.status == Order.OrderStatus.IN_CART:
+            return redirect('user_profile_page')
 
-    contex = {
-        'title': f'Заказ №{order.pk}',
-        'order': order,
-    }
-    return render(request, 'shop/order_info.html', contex)
+        return super(OrderView, self).get(*args, **kwargs)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Заказ №{self.object.pk}'
+        return context
 
 
 class AboutPageView(TemplateView):
