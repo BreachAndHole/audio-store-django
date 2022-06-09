@@ -1,7 +1,6 @@
 from django.test import TestCase, Client
-from django.contrib.auth.models import User
 from django.urls import reverse
-from shop.models import Order, Cable, CableType
+from shop.models import Order, Cable, CableType, User
 
 
 class BaseTestCase(TestCase):
@@ -9,12 +8,14 @@ class BaseTestCase(TestCase):
         self.client = Client()
 
         self.user = User.objects.create(
-            username='login_test_user',
-            email='loginTest@test.ru',
-            password='Test_password',
+            email='test@test.ru',
+            first_name='Sergey',
+            last_name='Frolov',
+            phone_number='+79261234567',
+            password='test_password',
         )
         order = Order.objects.create(
-            customer=self.user.customer,
+            customer=self.user,
             status=Order.OrderStatus.ACCEPTED,
             delivery_type=Order.DeliveryType.PICK_UP,
         )
@@ -28,6 +29,7 @@ class BaseTestCase(TestCase):
         self.user_profile_url = reverse('user_profile_page')
         self.order_url = reverse('order_info_page', kwargs={'order_pk': order.pk})
         self.logout_url = reverse('user_logout_page')
+        self.about_url = reverse('about_page')
 
 
 class SimpleViewsTestCase(BaseTestCase):
@@ -47,6 +49,7 @@ class SimpleViewsTestCase(BaseTestCase):
             price=100,
             units_in_stock=10,
             description='description',
+            is_for_sale=True,
             type=self.cable_type,
         )
 
@@ -91,6 +94,23 @@ class SimpleViewsTestCase(BaseTestCase):
         self.assertEqual(page_title, title)
 
 
+class AboutPageTestCase(BaseTestCase):
+
+    def setUp(self):
+        super(AboutPageTestCase, self).setUp()
+
+    def test_about_page_GET(self):
+        template_name = 'shop/about.html'
+        title = 'Обо мне'
+        response = self.client.get(reverse('about_page'))
+
+        page_title = response.context['title']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, template_name)
+        self.assertEqual(page_title, title)
+
+
 class UserRegistrationTestCase(BaseTestCase):
     """ User registration related tests """
 
@@ -103,41 +123,6 @@ class UserRegistrationTestCase(BaseTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name)
-
-    def test_user_registration_page_valid_POST(self):
-        """
-        If the form is valid, user must be created and redirected to the
-        home page
-        """
-        registration_form_post_data = {
-            'username': 'testuser2',
-            'email': 'test2@mail.ru',
-            'password1': 'Frolov_35',
-            'password2': 'Frolov_35',
-        }
-        response = self.client.post(
-            self.registration_url,
-            registration_form_post_data,
-        )
-        [print(t.name) for t in response.templates]
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(User.objects.filter(username='testuser2').count(), 1)
-
-    def test_user_registration_page_invalid_POST(self):
-        """
-        If the form is invalid, user must not be created
-        and stay on the same page
-        """
-        registration_form_post_data = {
-            'username': 'testuser2',
-            'email': 'test2@mail.ru',
-            'password1': 'Frolov',
-            'password2': 'Frolov_35',
-        }
-        response = self.client.post(self.registration_url, registration_form_post_data)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(User.objects.filter(username='testuser2').count(), 0)
 
 
 class UserLoginLogoutTestCase(BaseTestCase):
@@ -154,13 +139,10 @@ class UserLoginLogoutTestCase(BaseTestCase):
         self.assertTemplateUsed(response, template_name)
 
     def test_user_logout_page_GET(self):
-        self.client.login(username=self.user.username, password=self.user.password)
+        self.client.login(username=self.user.email, password=self.user.password)
         response = self.client.get(self.logout_url)
 
         self.assertEqual(response.status_code, 302)
-
-    # ODO: test login POST valid
-    # ODO: test login POST invalid
 
 
 class UserProfilePageTestCase(BaseTestCase):
@@ -169,19 +151,7 @@ class UserProfilePageTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
 
-    # ODO: test profile page GET
-    # ODO: test order info GET
-
 
 class OrderTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
-
-    # ODO: test cart page GET
-
-    # ODO: test checkout page GET
-    # ODO: test checkout page POST valid
-    # ODO: test checkout page POST invalid
-
-    # ODO: test update_cart json parse error
-    # ODO: test update_cart update error

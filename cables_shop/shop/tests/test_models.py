@@ -1,10 +1,8 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
 from cables_shop.settings import DELIVERY_PRICE
-from django.db.models.signals import post_save
 from shop.models import (
     Cable, CablePhoto, CableType, Order, ShippingAddress,
-    OrderedProduct,
+    OrderedProduct, User, CustomUserManager,
 )
 
 
@@ -55,15 +53,12 @@ class BaseTestCase(TestCase):
             is_title=False,
         )
         self.user = User.objects.create_user(
-            username='test_user',
             email='test@test.ru',
-            password='Test_password',
+            first_name='Sergey',
+            last_name='Frolov',
+            phone_number='+79261234567',
+            password='test_password',
         )
-        self.customer = self.user.customer
-        self.customer.first_name = 'Sergey'
-        self.customer.last_name = 'Frolov'
-        self.customer.phone = '+79998887766'
-        self.customer.save()
 
 
 class CablesTestCase(BaseTestCase):
@@ -99,13 +94,85 @@ class CablesTestCase(BaseTestCase):
         self.assertEqual(str(self.nontitle_cable_photo), 'test ...')
 
 
-class CustomerTestCase(BaseTestCase):
+class UserTestCase(BaseTestCase):
+    """
+    This test case covering custom User model and CustomUserManager functionality
+    """
 
     def setUp(self):
         super().setUp()
 
     def test_customer_str(self):
-        self.assertEqual(str(self.customer), 'Frolov Sergey')
+        self.assertEqual(str(self.user), 'test@test.ru')
+
+    def test_user_manager_no_email_error(self):
+        self.assertRaises(
+            ValueError,
+            User.objects.create_user,
+            '',
+            'test_password',
+            'Sergey',
+            'Frolov',
+            '+79219084376',
+        )
+
+    def test_user_manager_no_password_error(self):
+        self.assertRaises(
+            ValueError,
+            User.objects.create_user,
+            'test@mail.ru',
+            '',
+            'Sergey',
+            'Frolov',
+            '+79219084376',
+        )
+
+    def test_user_manager_no_phone_error(self):
+        self.assertRaises(
+            ValueError,
+            User.objects.create_user,
+            'test@mail.ru',
+            'test_password',
+            'Sergey',
+            'Frolov',
+            '',
+        )
+
+    def test_create_superuser_valid(self):
+        user = User.objects.create_superuser(
+            'test@mail.ru',
+            'test_password',
+            'Sergey',
+            'Frolov',
+            '+79219084376',
+        )
+        self.assertTrue(user.is_staff)
+        self.assertTrue(user.is_active)
+        self.assertTrue(user.is_superuser)
+
+    def test_create_superuser_not_staff_error(self):
+        self.assertRaises(
+            ValueError,
+            User.objects.create_superuser,
+            'test@mail.ru',
+            'test_password',
+            'Sergey',
+            'Frolov',
+            '+79219084376',
+            is_staff=False,
+        )
+
+    def test_create_superuser_not_superuser_error(self):
+        self.assertRaises(
+            ValueError,
+            User.objects.create_superuser,
+            'test@mail.ru',
+            'test_password',
+            'Sergey',
+            'Frolov',
+            '+79219084376',
+            is_superuser=False,
+        )
 
 
 class OrderTestCase(BaseTestCase):
@@ -113,14 +180,14 @@ class OrderTestCase(BaseTestCase):
         super().setUp()
 
         self.shipping_address = ShippingAddress.objects.create(
-            customer=self.customer,
+            customer=self.user,
             address='test address',
             city='test city',
             state='test state',
             zipcode='1234',
         )
         self.order_in_cart = Order.objects.create(
-            customer=self.customer,
+            customer=self.user,
             status=Order.OrderStatus.IN_CART,
             delivery_type=Order.DeliveryType.DELIVERY,
         )
@@ -136,7 +203,7 @@ class OrderTestCase(BaseTestCase):
         )
 
         self.accepted_order_pick_up = Order.objects.create(
-            customer=self.customer,
+            customer=self.user,
             status=Order.OrderStatus.ACCEPTED,
             delivery_type=Order.DeliveryType.PICK_UP,
         )
@@ -149,7 +216,7 @@ class OrderTestCase(BaseTestCase):
     def test_shipping_address_str(self):
         self.assertEqual(
             str(self.shipping_address),
-            'Адрес покупателя Frolov Sergey, 1234'
+            'Адрес покупателя test@test.ru, 1234'
         )
 
     def test_ordered_product_str(self):
@@ -159,10 +226,10 @@ class OrderTestCase(BaseTestCase):
         self.assertEqual(self.product_1_in_cart.total_price, 300)
 
     def test_order_str(self):
-        self.assertEqual(str(self.order_in_cart), '№5: Frolov Sergey, В корзине')
+        self.assertEqual(str(self.order_in_cart), '№5: test@test.ru, В корзине')
 
     def test_order_absolute_url(self):
-        self.assertEqual(self.order_in_cart.get_absolute_url(), '/user/order/3')
+        self.assertEqual(self.order_in_cart.get_absolute_url(), '/order/3')
 
     def test_products_total_price(self):
         self.assertEqual(self.order_in_cart.products_total_price, 900)
@@ -173,32 +240,3 @@ class OrderTestCase(BaseTestCase):
 
     def test_order_total_products(self):
         self.assertEqual(self.order_in_cart.order_total_products, 2)
-
-
-class ReceiversTestCase(BaseTestCase):
-
-    def setUp(self):
-        super().setUp()
-
-    @staticmethod
-    def assert_receiver_is_connected(receiver_string, signal, sender):
-        receivers = signal._live_receivers(sender)
-        receiver_strings = [f'{r.__module__}.{r.__name__}' for r in receivers]
-        if receiver_string not in receiver_strings:
-            raise AssertionError(
-                '{} is not connected to signal.'.format(receiver_string)
-            )
-
-    def test_create_customer_profile(self):
-        self.assert_receiver_is_connected(
-            'shop.models.create_customer_profile',
-            signal=post_save,
-            sender=User,
-        )
-
-    def test_save_customer_profile(self):
-        self.assert_receiver_is_connected(
-            'shop.models.save_customer_profile',
-            signal=post_save,
-            sender=User,
-        )
