@@ -6,27 +6,18 @@
     <div class="col-4 border-end">
       <div class="card bg-dark border-0">
         <div class="card-body text-center">
-          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+          <img src="https://picsum.photos/200/300"
                alt="avatar" class="rounded-circle img-fluid"
                style="width: 150px;">
-          <h5 class="my-3">{{ user.customer.last_name }} {{ user.customer.first_name }}</h5>
-          <h6 class="my-3">{{ user.customer.phone }}</h6>
+          <h5 class="my-3">{{ user.last_name }} {{ user.first_name }}</h5>
+          <h6 class="my-3">{{ user.phone_number }}</h6>
           <div class="d-flex justify-content-center mb-2">
-              <a href="#" class="btn btn-light">Обновить информацию</a>
+              <a href="{% url 'update_user_info_page' %}" class="btn btn-light">Обновить информацию</a>
           </div>
         </div>
       </div>
       <div class="card bg-dark border-0">
         <div class="card-body">
-          <hr>
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">Имя</p>
-            </div>
-            <div class="col-sm-9">
-              <p class="mb-0">{{ user.customer.first_name }} {{ user.customer.last_name }}</p>
-            </div>
-          </div>
           <hr>
           <div class="row">
             <div class="col-sm-3">
@@ -37,46 +28,40 @@
             </div>
           </div>
           <hr>
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">Телефон</p>
+          {% if last_used_address %}
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Город</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="mb-0">{{ last_used_address.city }}</p>
+              </div>
             </div>
-            <div class="col-sm-9">
-              <p class="mb-0">{{ user.customer.phone }}</p>
+            <hr>
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Адрес</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="mb-0">{{ last_used_address.address }}</p>
+              </div>
             </div>
-          </div>
-          <hr>
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">Город</p>
+            <hr>
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Индекс</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="mb-0">{{ last_used_address.zipcode }}</p>
+              </div>
             </div>
-            <div class="col-sm-9">
-              <p class="mb-0">{{ last_used_address.city }}</p>
-            </div>
-          </div>
-          <hr>
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">Адрес</p>
-            </div>
-            <div class="col-sm-9">
-              <p class="mb-0">{{ last_used_address.address }}</p>
-            </div>
-          </div>
-          <hr>
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">Индекс</p>
-            </div>
-            <div class="col-sm-9">
-              <p class="mb-0">{{ last_used_address.zipcode }}</p>
-            </div>
-          </div>
-          <hr>
+            <hr>
+          {% endif %}
         </div>
       </div>
     </div>
     <div class="col-8">
+      {% if orders %}
       <div class="table-responsive ">
         <table class="table">
           <thead>
@@ -100,27 +85,31 @@
           </tr>
           </thead>
           <tbody>
-          {% for order in orders %}
-          <tr class="border-bottom">
-            <td class="border-0 align-middle text-white text-center">{{ order.pk }}
-            </td>
-            <td class="border-0 align-middle text-white text-start">{{ order.order_accepted_date }}
-            </td>
-            <td class="border-0 align-middle text-white text-center">{{ order.order_total_products}}
-            </td>
-            <td class="border-0 align-middle text-white text-center">{{ order.order_total_price }}
-            </td>
-            <td class="border-0 align-middle text-white text-center">{{ order.get_status_display }}
-            </td>
-            <td class="border-0 align-middle text-white text-center">
-              <a href="{{ order.get_absolute_url }}"
-                 class="btn btn-sm btn-outline-light">Подробнее</a>
-            </td>
-          </tr>
-          {% endfor %}
+            {% for order in orders %}
+            <tr class="border-bottom">
+              <td class="border-0 align-middle text-white text-center">{{ order.pk }}
+              </td>
+              <td class="border-0 align-middle text-white text-start">{{ order.order_accepted_date }}
+              </td>
+              <td class="border-0 align-middle text-white text-center">{{ order.order_total_products}}
+              </td>
+              <td class="border-0 align-middle text-white text-center">{{ order.order_total_price }}
+              </td>
+              <td class="border-0 align-middle text-white text-center">{{ order.get_status_display }}
+              </td>
+              <td class="border-0 align-middle text-white text-center">
+                <a href="{{ order.get_absolute_url }}"
+                   class="btn btn-sm btn-outline-light">Подробнее</a>
+              </td>
+            </tr>
+            {% endfor %}
+
           </tbody>
         </table>
       </div>
+      {% else %}
+        <h5>У вас пока нет ни одного оформленного заказа</h5>
+      {% endif %}
     </div>
   </div>
 </div>

@@ -1,9 +1,11 @@
 from django.db import models
 from django.urls import reverse
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.contrib.auth.models import (
+    AbstractBaseUser, PermissionsMixin,
+    BaseUserManager,
+)
 from cables_shop.settings import DELIVERY_PRICE
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class CableType(models.Model):
@@ -43,6 +45,7 @@ class Cable(models.Model):
     length_sm = models.PositiveSmallIntegerField('длина, см.', default=0)
     price = models.PositiveIntegerField('цена, руб.', default=0)
     units_in_stock = models.PositiveSmallIntegerField('количество в наличии')
+    is_for_sale = models.BooleanField('в продаже', default=True)
     description = models.TextField('описание', blank=True, null=True)
     type = models.ForeignKey(CableType, on_delete=models.PROTECT)
 
@@ -89,45 +92,86 @@ class CablePhoto(models.Model):
         return self.photo.url if self.photo else ''
 
 
-class Customer(models.Model):
+class CustomUserManager(BaseUserManager):
     """
-    Django User extension with customer information.
-    OneToOne relation with shipping address model.
+    Overriding default user creation methods to add phone_number field
+    and authenticate by email
     """
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, unique=True,
-        verbose_name='пользователь'
-    )
-    first_name = models.CharField('имя', max_length=15)
-    last_name = models.CharField('фамилия', max_length=15)
-    phone = models.CharField('номер телефона', max_length=15)
+    def _create_user(
+            self, email, password, first_name, last_name, phone_number, **extra_fields
+    ):
+        if not email:
+            raise ValueError('Email is required')
+        if not password:
+            raise ValueError('Password is required')
+        if not phone_number:
+            raise ValueError('Phone number is required')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            first_name=first_name,
+            last_name=last_name,
+            phone_number=phone_number,
+            **extra_fields
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(
+            self, email, password, first_name, last_name, phone_number, **extra_fields
+    ):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("is_superuser", False)
+        return self._create_user(
+            email, password, first_name, last_name, phone_number, **extra_fields
+        )
+
+    def create_superuser(
+            self, email, password, first_name, last_name, phone_number, **extra_fields
+    ):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self._create_user(
+            email, password, first_name, last_name, phone_number, **extra_fields
+        )
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    """ Overriding default user model """
+    email = models.EmailField('email', max_length=70, unique=True)
+    first_name = models.CharField('имя', max_length=50)
+    last_name = models.CharField('фамилия', max_length=50)
+    phone_number = PhoneNumberField('номер телефона', region='RU', unique=True)
+
+    is_staff = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
+
+    object = CustomUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('first_name', 'last_name', 'phone_number')
 
     class Meta:
-        verbose_name = 'клиент'
-        verbose_name_plural = 'клиенты'
+        verbose_name = 'пользователь'
+        verbose_name_plural = 'пользователи'
 
     def __str__(self):
-        return f'{self.last_name} {self.first_name}'
-
-
-@receiver(post_save, sender=User)
-def create_customer_profile(sender, instance, created, **kwargs):
-    if created:
-        Customer.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_customer_profile(sender, instance, **kwargs):
-    instance.customer.save()
+        return f'{self.email}'
 
 
 class ShippingAddress(models.Model):
-    """
-    Customer shipping address model.
-    One to many relation with customer (user).
-    """
     customer = models.ForeignKey(
-        Customer, on_delete=models.CASCADE,
+        User, on_delete=models.CASCADE,
         verbose_name='покупатель'
     )
     address = models.CharField('адрес', max_length=200, null=True)
@@ -144,11 +188,6 @@ class ShippingAddress(models.Model):
 
 
 class Order(models.Model):
-    """
-    Customer order model. When empty or not checked out (some products are
-    still in cart), status is IN_CART
-    """
-
     class OrderStatus(models.TextChoices):
         IN_CART = 'IC', 'В корзине'
         ACCEPTED = 'AC', 'Принят'
@@ -159,7 +198,7 @@ class Order(models.Model):
         DELIVERY = 'DE', 'Доставка'
 
     customer = models.ForeignKey(
-        Customer,
+        User,
         verbose_name='покупатель',
         on_delete=models.CASCADE,
         null=True
@@ -172,10 +211,6 @@ class Order(models.Model):
     )
     order_accepted_date = models.DateField(
         'дата оформления заказа',
-        auto_now_add=True
-    )
-    order_last_update_date = models.DateField(
-        'дата последнего обновления заказа',
         auto_now_add=True
     )
     status = models.CharField(

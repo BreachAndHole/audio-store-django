@@ -1,39 +1,35 @@
-from typing import TypedDict
-
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
-
-from shop.models import Customer
-
-
-class CheckoutFormInitials(TypedDict):
-    first_name: str
-    last_name: str
-    phone: str
-    address: str
-    city: str
-    state: str
-    zipcode: str
+from phonenumber_field import formfields
+from shop.models import User
+from shop import utils
 
 
 class UserRegistrationForm(UserCreationForm):
-    """User registration form"""
+    """ Overrider User registration form """
 
-    # Changing styles
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in ('username', 'email', 'password1', 'password2'):
+
+        # Changing fields style
+        for field in self.Meta.fields:
             self.fields[field].widget.attrs.update(
                 {'type': 'text', 'class': "form-control"}
             )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2', ]
+        fields = (
+            'email',
+            'first_name',
+            'last_name',
+            'phone_number',
+            'password1',
+            'password2',
+        )
 
 
-class CheckoutForm(forms.Form):
+class UserInformationForm(forms.Form):
     """
     Form for checkout page.
     Handling both customer and shipping address models
@@ -62,14 +58,13 @@ class CheckoutForm(forms.Form):
             )
         )
     )
-    phone = forms.CharField(
+    phone_number = formfields.PhoneNumberField(
         label='Номер телефона',
-        max_length=15,
         widget=(
             forms.TextInput(
                 attrs={
                     'class': 'form-control',
-                    'placeholder': '+7 987 654-32-10'
+                    'placeholder': '+7 (980) 765-43-21'
                 }
             )
         )
@@ -124,13 +119,13 @@ class CheckoutForm(forms.Form):
     )
 
     @staticmethod
-    def get_checkout_form_initials(customer: Customer) -> CheckoutFormInitials:
-        last_address = customer.shippingaddress_set.last()
+    def get_user_information_form_initials(customer: User) -> dict:
+        last_address = utils.get_last_used_customer_address(customer)
 
         initials = {
             'first_name': customer.first_name or '',
             'last_name': customer.last_name or '',
-            'phone': customer.phone or '',
+            'phone_number': customer.phone_number or '',
             'address': last_address.address if last_address else '',
             'city': last_address.city if last_address else '',
             'state': last_address.state if last_address else '',

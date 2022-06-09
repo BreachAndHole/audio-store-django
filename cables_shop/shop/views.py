@@ -6,9 +6,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
-from .services.orders import CartUpdateService, CheckoutService
+from .services.orders import CartUpdateService, UserInformationService
 from . import utils
 from .models import CableType, Cable, Order, OrderedProduct
+from .forms import UserInformationForm
 from cables_shop.settings import DELIVERY_PRICE
 
 
@@ -32,6 +33,9 @@ class AllCablesPageView(list.ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Товары'
         return context
+
+    def get_queryset(self):
+        return Cable.objects.filter(is_for_sale=True)
 
 
 class CablePageView(detail.DetailView):
@@ -65,20 +69,27 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
     def get_queryset(self):
         return OrderedProduct.objects.filter(
-            order__customer=self.request.user.customer,
+            order__customer=self.request.user,
             order__status=Order.OrderStatus.IN_CART
         ).order_by('date_added')
 
 
 @login_required(login_url='user_login_page')
 def checkout(request: HttpRequest):
-    checkout_service = CheckoutService(request.user.customer, request.POST)
-    form = checkout_service.checkout_form
+    checkout_service = UserInformationService(request.user, request.POST)
+    form = checkout_service.form
 
     if request.method == 'POST' and form.is_valid():
         try:
             checkout_service.process_checkout()
-        except checkout_service.ProductsQuantityError:
+        except UserInformationService.PhoneNumberAlreadyExistsError:
+            messages.error(
+                request,
+                'Пользователь с таким номером телефона уже зарегистрирован. '
+                'Используйте телефон, указанный при регистрации или введите другой'
+            )
+            return redirect('checkout_page')
+        except UserInformationService.ProductsQuantityError:
             checkout_service.correct_ordered_products()
             messages.error(
                 request,
@@ -119,7 +130,7 @@ def user_registration(request: HttpRequest):
     if request.method == 'POST' and form.is_valid():
         form.save()
         # sent success message to user
-        user_name = form.cleaned_data.get('username', '')
+        user_name = form.cleaned_data.get('email', '')
         messages.success(request, f'Аккаунт {user_name} создан успешно')
         return redirect('user_login_page')
 
@@ -137,19 +148,19 @@ def user_login(request: HttpRequest):
     if request.method != 'POST':
         return render(request, 'shop/login.html', contex)
 
-    username = request.POST.get('username_field', None)
+    email = request.POST.get('email_field', None)
     password = request.POST.get('password_field', None)
-    user = authenticate(request, username=username, password=password)
+    user = authenticate(request, username=email, password=password)
     if user is None:
         messages.info(
             request,
-            'Имя пользователя или пароль введены неверно'
+            'Электронная почта или пароль введены неверно'
         )
         return render(request, 'shop/login.html', contex)
 
     login(request, user)
     # create empty cart if user has no cart
-    utils.create_empty_cart(request.user.customer)
+    utils.create_empty_cart(request.user)
     return redirect('home_page')
 
 
@@ -166,28 +177,27 @@ class UserProfileView(LoginRequiredMixin, list.ListView):
     template_name = 'shop/user_profile.html'
 
     def get_queryset(self):
-        customer_orders = Order.objects.filter(
-            customer=self.request.user.customer
+        checked_out_customer_orders = Order.objects.filter(
+            customer=self.request.user
         ).exclude(status=Order.OrderStatus.IN_CART).order_by('-pk')
-        return customer_orders
+        return checked_out_customer_orders
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Личный кабинет'
         context['last_used_address'] = utils.get_last_used_customer_address(
-            self.request.user.customer
+            self.request.user
         )
         return context
 
 
 @login_required(login_url='user_login_page')
 def order_information(request: HttpRequest, order_pk: int):
-    customer = request.user.customer
     order = get_object_or_404(Order, pk=order_pk)
 
     # If order don't belong to current user or the order still in cart
-    if order.customer != customer or order.status == Order.OrderStatus.IN_CART:
-        return redirect('home_page')
+    if order.customer != request.user or order.status == Order.OrderStatus.IN_CART:
+        return redirect('user_profile_page')
 
     contex = {
         'title': f'Заказ №{order.pk}',
@@ -203,3 +213,26 @@ class AboutPageView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Обо мне'
         return context
+
+
+def update_user_info(request: HttpRequest):
+    update_info_service = UserInformationService(request.user, request.POST)
+    form = update_info_service.form
+
+    if request.method == 'POST' and form.is_valid():
+        try:
+            update_info_service.process_information_update()
+        except UserInformationService.PhoneNumberAlreadyExistsError:
+            messages.error(
+                request,
+                'Пользователь с таким номером телефона уже зарегистрирован.'
+            )
+            return redirect('update_user_info_page')
+
+        return redirect('user_profile_page')
+
+    contex = {
+        'title': f'Обновление информации',
+        'form': form
+    }
+    return render(request, 'shop/update_user_info.html', contex)

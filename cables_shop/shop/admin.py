@@ -27,10 +27,10 @@ class CablePhotoAdmin(admin.ModelAdmin):
 
 
 # Orders related
-@admin.register(Customer)
+@admin.register(User)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'first_name', 'last_name', 'phone')
-    list_display_links = ('user',)
+    list_display = ('id', 'last_name', 'first_name', 'email', 'phone_number')
+    list_display_links = ('last_name',)
     ordering = ('-id',)
 
 

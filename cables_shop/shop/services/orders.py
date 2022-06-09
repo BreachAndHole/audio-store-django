@@ -1,10 +1,13 @@
 import json
 from enum import Enum
 from typing import NamedTuple, TypedDict
+from django.db import IntegrityError
 from django.http import HttpRequest, QueryDict
 from django.core.exceptions import ObjectDoesNotExist
-from shop.forms import CheckoutForm
-from shop.models import *
+from shop.forms import UserInformationForm
+from shop.models import Order, OrderedProduct, ShippingAddress, Cable, User
+
+from shop import utils
 
 
 class CartUpdateAction(Enum):
@@ -31,7 +34,7 @@ class CartUpdateService:
     def process_cart_update(self) -> None:
         parsed_response = self.__parse_json_update_data()
         order, _ = Order.objects.get_or_create(
-            customer=self.request.user.customer,
+            customer=self.request.user,
             status=Order.OrderStatus.IN_CART,
         )
         ordered_product = self.__get_product_to_update(
@@ -42,7 +45,7 @@ class CartUpdateService:
             ordered_product,
             parsed_response.action
         )
-        self.__save_or_delete_product_in_cart(ordered_product)
+        utils.save_or_delete_ordered_product(ordered_product)
 
     def __parse_json_update_data(self) -> CartUpdateParsedData:
         """
@@ -70,11 +73,7 @@ class CartUpdateService:
 
         return parsed_data
 
-    def __get_product_to_update(
-            self,
-            order: Order,
-            product_id: int
-    ) -> OrderedProduct:
+    def __get_product_to_update(self, order: Order, product_id: int) -> OrderedProduct:
         """Getting or creating new ordered product for further updating"""
         try:
             cable = Cable.objects.get(pk=product_id)
@@ -107,18 +106,14 @@ class CartUpdateService:
             case _:
                 raise self.CartUpdateError(f'Undefined {action = }')
 
-    @staticmethod
-    def __save_or_delete_product_in_cart(
-            ordered_product: OrderedProduct
-    ) -> None:
-        if ordered_product.quantity <= 0:
-            ordered_product.delete()
-        else:
-            ordered_product.save()
+
+class DeliveryTypeConverter(TypedDict):
+    delivery: Order.DeliveryType
+    selfPickUp: Order.DeliveryType
 
 
-class CheckoutService:
-    delivery_types_converter = {
+class UserInformationService:
+    delivery_type_converter: DeliveryTypeConverter = {
         'delivery': Order.DeliveryType.DELIVERY,
         'selfPickUp': Order.DeliveryType.PICK_UP
     }
@@ -135,22 +130,23 @@ class CheckoutService:
     class ProductsQuantityError(Exception):
         """ Ordered quantity is greater than available """
 
-    def __init__(
-            self, customer: Customer,
-            post_request_data: QueryDict
-    ) -> None:
+    class PhoneNumberAlreadyExistsError(Exception):
+        """ Phone number already exists """
+
+    def __init__(self, customer: User, post_request_data: QueryDict) -> None:
         self.customer = customer
         self.order = Order.objects.get(
             customer=self.customer,
             status=Order.OrderStatus.IN_CART
         )
         self.ordered_products = self.order.orderedproduct_set.all()
-        self.checkout_form = CheckoutForm(
+        self.form = UserInformationForm(
             post_request_data or None,
-            initial=CheckoutForm.get_checkout_form_initials(self.customer)
+            initial=UserInformationForm.get_user_information_form_initials(
+                self.customer
+            )
         )
-
-        self.delivery_type = self.delivery_types_converter.get(
+        self.delivery_type = self.delivery_type_converter.get(
             post_request_data.get('radioDeliveryType')
         )
 
@@ -164,22 +160,35 @@ class CheckoutService:
         self.__update_products_in_stock()
 
         if self.delivery_type != Order.DeliveryType.PICK_UP:
-            shipping_address = self.__get_shipping_address_for_this_order()
+            shipping_address = self.__get_shipping_address_from_form()
             self.order.shipping_address = shipping_address
 
         self.order.status = Order.OrderStatus.ACCEPTED
         self.order.delivery_type = self.delivery_type
         self.order.save()
 
-    def __update_customer_information(self) -> None:
-        checkout_form_data = self.checkout_form.cleaned_data
-        self.customer.first_name = checkout_form_data.get('first_name', '')
-        self.customer.last_name = checkout_form_data.get('last_name', '')
-        self.customer.phone = checkout_form_data.get('phone', '')
-        self.customer.save()
+    def process_information_update(self) -> None:
+        self.__update_customer_information()
+        shipping_address = self.__get_shipping_address_from_form()
+        shipping_address.save()
 
-    def __get_shipping_address_for_this_order(self) -> ShippingAddress:
-        checkout_form_data = self.checkout_form.cleaned_data
+    def __update_customer_information(self) -> None:
+        checkout_form_data = self.form.cleaned_data
+        self.customer.first_name = checkout_form_data.get('first_name')
+        self.customer.last_name = checkout_form_data.get('last_name')
+
+        # If user wants to change his phone number
+        form_phone_number = checkout_form_data.get('phone_number')
+        try:
+            self.customer.phone_number = form_phone_number
+            self.customer.save()
+        except IntegrityError:
+            raise self.PhoneNumberAlreadyExistsError(
+                f'Phone number {form_phone_number} already attached to another user'
+            )
+
+    def __get_shipping_address_from_form(self) -> ShippingAddress:
+        checkout_form_data = self.form.cleaned_data
         try:
             shipping_address, _ = ShippingAddress.objects.get_or_create(
                 customer=self.customer,

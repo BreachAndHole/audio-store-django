@@ -1,0 +1,75 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<div class="container d-flex justify-content-center">
+
+  <div class="col-md-7">
+    <form method="POST" action="">
+      <hr class="my-4">
+      <h4 class="mb-3">Обновление информации</h4>
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-sm-6">
+          {{ form.first_name.label }}
+          {{ form.first_name }}
+          <div class="invalid-feedback">
+            Имя обязательно для ввода.
+          </div>
+        </div>
+        <div class="col-sm-6">
+          {{ form.last_name.label }}
+          {{ form.last_name }}
+          <div class="invalid-feedback">
+            Фамилия обязательна для ввода.
+          </div>
+        </div>
+        <div class="col-12">
+          {{ form.phone_number.label }}
+          {{ form.phone_number }}
+          <div class="invalid-feedback">
+            Пожалуйста введите верный телефонный номер
+          </div>
+        </div>
+
+        <div class="col-12 address-information-block">
+          {{ form.address.label }}
+          {{ form.address }}
+          <div class="invalid-feedback">
+            Необходимо ввести адрес
+          </div>
+        </div>
+        <div class="col-md-5 address-information-block">
+          {{ form.city.label }}
+          {{ form.city }}
+          <div class="invalid-feedback">
+            Необходимо ввести город
+          </div>
+        </div>
+
+        <div class="col-md-4 address-information-block">
+          {{ form.state.label }}
+          {{ form.state }}
+        </div>
+
+        <div class="col-md-3 address-information-block">
+          {{ form.zipcode.label }}
+          {{ form.zipcode }}
+          <div class="invalid-feedback">
+            Необходимо ввести почтовый индекс
+          </div>
+        </div>
+      </div>
+      <hr class="my-4">
+      {% for message in messages %}
+      <p class="h6 text-start text-white">{{ message }}</p>
+      <hr class="my-4">
+      {% endfor %}
+      <button class="btn btn-light btn-lg w-100" type="submit">
+        Обновить данные
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock content %}
+

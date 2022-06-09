@@ -15,4 +15,5 @@ urlpatterns = [
     path('updateCart/', views.update_cart, name='update_cart_page'),
     path('user/order/<int:order_pk>', views.order_information, name='order_info_page'),
     path('about/', views.AboutPageView.as_view(), name='about_page'),
+    path('user/updateInfo', views.update_user_info, name='update_user_info_page'),
 ]
