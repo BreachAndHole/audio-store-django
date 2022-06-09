@@ -1,13 +1,15 @@
 import json
 from enum import Enum
-from typing import NamedTuple, TypedDict
+from typing import NamedTuple, Optional, TypedDict
 from django.db import IntegrityError
 from django.http import HttpRequest, QueryDict
 from django.core.exceptions import ObjectDoesNotExist
-from shop.forms import UserInformationForm
-from shop.models import Order, OrderedProduct, ShippingAddress, Cable, User
+from .forms import UserInformationForm
+from .models import Order, OrderedProduct, ShippingAddress, Cable, User
 
-from shop import utils
+from . import utils
+
+from .errors import *
 
 
 class CartUpdateAction(Enum):
@@ -22,12 +24,6 @@ class CartUpdateParsedData(NamedTuple):
 
 
 class CartUpdateService:
-    class JSONResponseParsingError(Exception):
-        """ Error during parsing JSON response with update cart data """
-
-    class CartUpdateError(Exception):
-        """ Error during updating cart """
-
     def __init__(self, request: HttpRequest) -> None:
         self.request = request
 
@@ -54,7 +50,7 @@ class CartUpdateService:
         try:
             received_data = json.loads(self.request.body)
         except json.JSONDecodeError:
-            raise self.JSONResponseParsingError(
+            raise JSONResponseParsingError(
                 'Error during json response decoding'
             )
 
@@ -64,12 +60,12 @@ class CartUpdateService:
                 action=received_data.get('action')
             )
         except KeyError:
-            raise self.JSONResponseParsingError(
+            raise JSONResponseParsingError(
                 'productId or action is not in response'
             )
 
         if parsed_data.product_id < 0:
-            raise self.JSONResponseParsingError('Invalid product id')
+            raise JSONResponseParsingError('Invalid product id')
 
         return parsed_data
 
@@ -118,22 +114,7 @@ class UserInformationService:
         'selfPickUp': Order.DeliveryType.PICK_UP
     }
 
-    class NotAuthenticatedError(Exception):
-        """ User tried to update cart without authentication """
-
-    class UserIsAnonymousError(Exception):
-        """ User is anonymous """
-
-    class CreateShippingAddressError(Exception):
-        """ Error during creating shipping address for the order"""
-
-    class ProductsQuantityError(Exception):
-        """ Ordered quantity is greater than available """
-
-    class PhoneNumberAlreadyExistsError(Exception):
-        """ Phone number already exists """
-
-    def __init__(self, customer: User, post_request_data: QueryDict) -> None:
+    def __init__(self, customer: User, post_request_data: Optional[QueryDict]) -> None:
         self.customer = customer
         self.order = Order.objects.get(
             customer=self.customer,
@@ -154,7 +135,7 @@ class UserInformationService:
         self.__update_customer_information()
 
         if not self.__order_is_valid():
-            raise self.ProductsQuantityError(
+            raise ProductsQuantityError(
                 'Ordered quantity is greater than available'
             )
         self.__update_products_in_stock()
@@ -183,7 +164,7 @@ class UserInformationService:
             self.customer.phone_number = form_phone_number
             self.customer.save()
         except IntegrityError:
-            raise self.PhoneNumberAlreadyExistsError(
+            raise PhoneNumberAlreadyExistsError(
                 f'Phone number {form_phone_number} already attached to another user'
             )
 
@@ -198,7 +179,7 @@ class UserInformationService:
                 zipcode=checkout_form_data.get('zipcode'),
             )
         except KeyError:
-            raise self.CreateShippingAddressError(
+            raise CreateShippingAddressError(
                 'Error during shipping address creation'
             )
         return shipping_address
