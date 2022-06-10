@@ -1,23 +1,29 @@
+from django.contrib import auth
 from django.test import TestCase, Client
 from django.urls import reverse
-from shop.models import Order, Cable, CableType, User
+from shop.models import Order, Cable, CableType, ShippingAddress, User
 
 
 class BaseTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
-        self.user = User.objects.create(
-            email='test@test.ru',
-            first_name='Sergey',
-            last_name='Frolov',
-            phone_number='+79261234567',
-            password='test_password',
+        self.user = User.objects.create_user(
+            'test@test.ru',
+            'Sergey',
+            'Frolov',
+            '+79261234567',
+            'test_password',
         )
-        order = Order.objects.create(
+        self.order = Order.objects.create(
             customer=self.user,
             status=Order.OrderStatus.ACCEPTED,
             delivery_type=Order.DeliveryType.PICK_UP,
+        )
+        Order.objects.create(
+            customer=self.user,
+            status=Order.OrderStatus.IN_CART,
+            delivery_type=Order.DeliveryType.DELIVERY,
         )
 
         # URLs
@@ -27,9 +33,10 @@ class BaseTestCase(TestCase):
         self.registration_url = reverse('user_registration_page')
         self.login_url = reverse('user_login_page')
         self.user_profile_url = reverse('user_profile_page')
-        self.order_url = reverse('order_info_page', kwargs={'order_pk': order.pk})
+        self.order_url = reverse('order_info_page', kwargs={'order_pk': self.order.pk})
         self.logout_url = reverse('user_logout_page')
         self.about_url = reverse('about_page')
+        self.profile_url = reverse('user_profile_page')
 
 
 class SimpleViewsTestCase(BaseTestCase):
@@ -124,6 +131,65 @@ class UserRegistrationTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name)
 
+    def test_user_registration_valid_POST(self):
+        """
+        If the form is valid, user must be created and redirected to the login page
+        """
+        form_post_data = {
+            'email': 'lemur@mail.ru',
+            'last_name': 'Сергей',
+            'first_name': 'Фролов',
+            'phone_number': '+79119234723',
+            'password1': 'Sergey_11',
+            'password2': 'Sergey_11'
+        }
+        response = self.client.post(self.registration_url, form_post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.filter(email='lemur@mail.ru').count(), 1)
+        self.assertTemplateUsed(response, 'shop/login.html')
+
+    def test_user_registration_invalid_email_POST(self):
+        form_post_data = {
+            'email': 'lemur@mailru',
+            'last_name': 'Сергей',
+            'first_name': 'Фролов',
+            'phone_number': '+79119234723',
+            'password1': 'Sergey_11',
+            'password2': 'Sergey_11'
+        }
+        response = self.client.post(self.registration_url, form_post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.filter(email='lemur@mail.ru').count(), 0)
+        self.assertTemplateUsed(response, 'shop/registration.html')
+
+    def test_user_registration_invalid_phone_POST(self):
+        form_post_data = {
+            'email': 'lemur@mail.ru',
+            'last_name': 'Сергей',
+            'first_name': 'Фролов',
+            'phone_number': '+791f9234723',
+            'password1': 'Sergey_11',
+            'password2': 'Sergey_11'
+        }
+        response = self.client.post(self.registration_url, form_post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.filter(email='lemur@mail.ru').count(), 0)
+        self.assertTemplateUsed(response, 'shop/registration.html')
+
+    def test_user_registration_invalid_password_POST(self):
+        form_post_data = {
+            'email': 'lemur@mail.ru',
+            'last_name': 'Сергей',
+            'first_name': 'Фролов',
+            'phone_number': '+79119234723',
+            'password1': 'Sergey_1',
+            'password2': 'Sergey_11'
+        }
+        response = self.client.post(self.registration_url, form_post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.filter(email='lemur@mail.ru').count(), 0)
+        self.assertTemplateUsed(response, 'shop/registration.html')
+
 
 class UserLoginLogoutTestCase(BaseTestCase):
     """ User login related tests """
@@ -131,7 +197,7 @@ class UserLoginLogoutTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
 
-    def test_user_login_page_GET(self):
+    def test_user_login_page_can_access(self):
         template_name = 'shop/login.html'
         response = self.client.get(self.login_url)
 
@@ -139,9 +205,10 @@ class UserLoginLogoutTestCase(BaseTestCase):
         self.assertTemplateUsed(response, template_name)
 
     def test_user_logout_page_GET(self):
-        self.client.login(username=self.user.email, password=self.user.password)
-        response = self.client.get(self.logout_url)
+        self.client.force_login(self.user)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
 
+        response = self.client.get(self.logout_url)
         self.assertEqual(response.status_code, 302)
 
 
@@ -151,7 +218,87 @@ class UserProfilePageTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
 
+    def test_user_profile_page_can_access(self):
+        self.client.force_login(self.user)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
 
-class OrderTestCase(BaseTestCase):
+        response = self.client.get(self.profile_url)
+        self.assertTemplateUsed(response, 'shop/user_profile.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_orders_display_correctly(self):
+        """ IN_CART orders shouldn't be displayed in user profile"""
+        self.client.force_login(self.user)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+
+        response = self.client.get(self.profile_url)
+        orders_on_page = response.context['orders']
+
+        self.assertEqual(Order.objects.filter(customer=self.user).count(), 2)
+        self.assertEqual(orders_on_page.count(), 1)
+
+    def test_no_shipping_address_is_none_display_correctly(self):
+        self.client.force_login(self.user)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+
+        response = self.client.get(self.profile_url)
+        shipping_address = response.context['last_used_address']
+
+        self.assertIsNone(shipping_address)
+
+    def test_no_shipping_address_exists_display_correctly(self):
+        shipping_address = ShippingAddress.objects.create(
+            customer=self.user,
+            address='test address',
+            city='test city',
+            state='test state',
+            zipcode='1244',
+        )
+
+        self.client.force_login(self.user)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+
+        response = self.client.get(self.profile_url)
+        displayed_shipping_address = response.context['last_used_address']
+
+        self.assertEqual(displayed_shipping_address, shipping_address)
+
+
+class OrderPageTestCase(BaseTestCase):
+    """ Order related tests """
+
     def setUp(self):
         super().setUp()
+
+    def test_accepted_delivery_order(self):
+        self.client.force_login(self.user)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+
+        response = self.client.get(self.order_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'shop/order_info.html')
+        self.assertEqual(response.context['order'], self.order)
+
+    def test_not_this_user_order_redirect(self):
+        """
+        If user tries to access order page of another user,
+        he should be redirected to his profile page
+        """
+        user2 = User.objects.create_user(
+            'test2@mail.ru',
+            'Sergey',
+            'Frolov',
+            '+79261234367',
+            'test_password2',
+        )
+        self.client.force_login(user2)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+
+        # Test if user got redirected
+        response = self.client.get(self.order_url)
+        self.assertEqual(response.status_code, 302)
+
+        # Test if user got redirected to profile page
+        response = self.client.get(self.order_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'shop/user_profile.html')

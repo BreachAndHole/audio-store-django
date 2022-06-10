@@ -155,12 +155,16 @@ class UserRegistrationView(FormView):
     success_url = reverse_lazy('user_login_page')
 
     def form_valid(self, form):
-        print(self.request.POST)
         form.save()
         # sent success message to user
         user_name = form.cleaned_data.get('email', '')
-        messages.success(self.request, f'Аккаунт {user_name} создан успешно')
+        messages.success(self.request, f'Аккаунт {user_name} создан успешно.')
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # sent error message to user
+        messages.error(self.request, 'Ошибка при регистрации. Повторите попытку.')
+        return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -174,7 +178,7 @@ def user_login(request: HttpRequest):
     }
     if request.method != 'POST':
         return render(request, 'shop/login.html', contex)
-
+    print(request.POST)
     email = request.POST.get('email_field', None)
     password = request.POST.get('password_field', None)
     user = authenticate(request, username=email, password=password)
