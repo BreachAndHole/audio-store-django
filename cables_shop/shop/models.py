@@ -47,7 +47,7 @@ class Cable(models.Model):
     units_in_stock = models.PositiveSmallIntegerField('количество в наличии')
     is_for_sale = models.BooleanField('в продаже', default=True)
     description = models.TextField('описание', blank=True, null=True)
-    type = models.ForeignKey(CableType, on_delete=models.PROTECT)
+    type = models.ForeignKey(CableType, verbose_name='тип кабеля', on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = 'кабель'
