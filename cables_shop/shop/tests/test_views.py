@@ -1,7 +1,7 @@
 from django.contrib import auth
 from django.test import TestCase, Client
 from django.urls import reverse
-from shop.models import Order, Cable, CableType, ShippingAddress, User
+from shop.models import Order, Cable, CableType, OrderedProduct, ShippingAddress, User
 
 
 class BaseTestCase(TestCase):
@@ -15,33 +15,16 @@ class BaseTestCase(TestCase):
             '+79261234567',
             'test_password',
         )
-        self.order = Order.objects.create(
+        self.accepted_order = Order.objects.create(
             customer=self.user,
             status=Order.OrderStatus.ACCEPTED,
             delivery_type=Order.DeliveryType.PICK_UP,
         )
-        Order.objects.create(
+        self.order_in_cart = Order.objects.create(
             customer=self.user,
             status=Order.OrderStatus.IN_CART,
             delivery_type=Order.DeliveryType.DELIVERY,
         )
-
-        # URLs
-        self.index_url = reverse('home_page')
-        self.all_cables_url = reverse('all_cables_page')
-        self.cart_url = reverse('cart_page')
-        self.registration_url = reverse('user_registration_page')
-        self.login_url = reverse('user_login_page')
-        self.user_profile_url = reverse('user_profile_page')
-        self.order_url = reverse('order_info_page', kwargs={'order_pk': self.order.pk})
-        self.logout_url = reverse('user_logout_page')
-        self.about_url = reverse('about_page')
-        self.profile_url = reverse('user_profile_page')
-
-
-class SimpleViewsTestCase(BaseTestCase):
-    def setUp(self):
-        super().setUp()
 
         self.cable_type = CableType.objects.create(
             name='test type',
@@ -59,8 +42,31 @@ class SimpleViewsTestCase(BaseTestCase):
             is_for_sale=True,
             type=self.cable_type,
         )
+        self.ordered_product_1 = OrderedProduct.objects.create(
+            order=self.order_in_cart,
+            product=self.cable,
+            quantity=3,
+        )
 
+        # URLs
+        self.login_url = reverse('user_login_page')
+        self.logout_url = reverse('user_logout_page')
+        self.profile_url = reverse('user_profile_page')
+        self.accepted_order_url = reverse(
+            'order_info_page',
+            kwargs={'order_pk': self.accepted_order.pk}
+        )
+
+
+class SimpleViewsTestCase(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.index_url = reverse('home_page')
+        7
+        self.all_cables_url = reverse('all_cables_page')
         self.cable_url = reverse('cable_page', kwargs={'cable_slug': self.cable.slug})
+        self.about_url = reverse('about_page')
 
     def test_home_page_GET(self):
         template_name = 'shop/index.html'
@@ -100,22 +106,12 @@ class SimpleViewsTestCase(BaseTestCase):
         self.assertEqual(cable, self.cable)
         self.assertEqual(page_title, title)
 
-
-class AboutPageTestCase(BaseTestCase):
-
-    def setUp(self):
-        super(AboutPageTestCase, self).setUp()
-
     def test_about_page_GET(self):
         template_name = 'shop/about.html'
-        title = 'Обо мне'
         response = self.client.get(reverse('about_page'))
-
-        page_title = response.context['title']
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name)
-        self.assertEqual(page_title, title)
 
 
 class UserRegistrationTestCase(BaseTestCase):
@@ -123,6 +119,7 @@ class UserRegistrationTestCase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
+        self.registration_url = reverse('user_registration_page')
 
     def test_user_registration_page_GET(self):
         template_name = 'shop/registration.html'
@@ -217,6 +214,7 @@ class UserProfilePageTestCase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
+        self.user_profile_url = reverse('user_profile_page')
 
     def test_user_profile_page_can_access(self):
         self.client.force_login(self.user)
@@ -237,7 +235,7 @@ class UserProfilePageTestCase(BaseTestCase):
         self.assertEqual(Order.objects.filter(customer=self.user).count(), 2)
         self.assertEqual(orders_on_page.count(), 1)
 
-    def test_no_shipping_address_is_none_display_correctly(self):
+    def test_no_shipping_address_display_correctly(self):
         self.client.force_login(self.user)
         self.assertTrue(auth.get_user(self.client).is_authenticated)
 
@@ -246,7 +244,7 @@ class UserProfilePageTestCase(BaseTestCase):
 
         self.assertIsNone(shipping_address)
 
-    def test_no_shipping_address_exists_display_correctly(self):
+    def test_existed_shipping_address_display_correctly(self):
         shipping_address = ShippingAddress.objects.create(
             customer=self.user,
             address='test address',
@@ -274,10 +272,10 @@ class OrderPageTestCase(BaseTestCase):
         self.client.force_login(self.user)
         self.assertTrue(auth.get_user(self.client).is_authenticated)
 
-        response = self.client.get(self.order_url)
+        response = self.client.get(self.accepted_order_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'shop/order_info.html')
-        self.assertEqual(response.context['order'], self.order)
+        self.assertEqual(response.context['order'], self.accepted_order)
 
     def test_not_this_user_order_redirect(self):
         """
@@ -295,10 +293,82 @@ class OrderPageTestCase(BaseTestCase):
         self.assertTrue(auth.get_user(self.client).is_authenticated)
 
         # Test if user got redirected
-        response = self.client.get(self.order_url)
+        response = self.client.get(self.accepted_order_url)
         self.assertEqual(response.status_code, 302)
 
         # Test if user got redirected to profile page
-        response = self.client.get(self.order_url, follow=True)
+        response = self.client.get(self.accepted_order_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'shop/user_profile.html')
+
+
+class CartPageTestCase(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.cart_url = reverse('cart_page')
+        self.client.force_login(self.user)
+
+    def test_cart_page_can_access(self):
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+        response = self.client.get(self.cart_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'shop/cart.html')
+
+    def test_ordered_items_display_correctly(self):
+        OrderedProduct.objects.create(
+            order=self.accepted_order,
+            product=self.cable,
+            quantity=2,
+        )
+
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+        response = self.client.get(self.cart_url)
+
+        ordered_products = response.context['ordered_products']
+        self.assertListEqual(
+            list(ordered_products),
+            list(self.order_in_cart.orderedproduct_set.all())
+        )
+
+    def test_order_information_display_correctly(self):
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+        response = self.client.get(self.cart_url)
+
+        products_total_price = response.context['products_total_price']
+        self.assertEqual(products_total_price, 100*3)
+
+    def test_empty_cart_redirect(self):
+        self.order_in_cart.orderedproduct_set.all().delete()
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+
+        response = self.client.get(self.cart_url)
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get(self.cart_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'shop/all_cables.html')
+
+
+class CheckoutPageTestCase(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.checkout_url = reverse('checkout_page')
+        self.client.force_login(self.user)
+
+    def test_checkout_page_can_access(self):
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+        response = self.client.get(self.checkout_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'shop/checkout.html')
+
+    def test_checkout_page_redirect_if_cart_empty(self):
+        self.order_in_cart.orderedproduct_set.all().delete()
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+
+        response = self.client.get(self.checkout_url)
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get(self.checkout_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'shop/all_cables.html')

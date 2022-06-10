@@ -104,6 +104,7 @@ def checkout(request: HttpRequest):
 
     form = checkout_service.form
     if request.method == 'POST' and form.is_valid():
+        print(request.POST)
         try:
             checkout_service.process_checkout()
         except PhoneNumberAlreadyExistsError:
@@ -178,7 +179,7 @@ def user_login(request: HttpRequest):
     }
     if request.method != 'POST':
         return render(request, 'shop/login.html', contex)
-    print(request.POST)
+
     email = request.POST.get('email_field', None)
     password = request.POST.get('password_field', None)
     user = authenticate(request, username=email, password=password)
