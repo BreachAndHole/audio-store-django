@@ -13,9 +13,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #D8DEE9;
+    background-color: #282a36;
     transition: .4s;
     border-radius: 34px;
+    border: 1px solid #FFFFFF;
 }
 
 .switch input {
@@ -32,10 +33,11 @@
     background-color: #282a36;
     transition: .4s;
     border-radius: 25px;
+    border: 1px solid #FFFFFF;
 }
 
 input:checked+.slider {
-    background-color: #BF616A;
+    background-color: #D8DEE9;
 }
 
 input:checked+.slider:before {
