@@ -15,7 +15,6 @@ class CableType(models.Model):
     """
     name = models.CharField('название (ед.ч)', max_length=30, unique=True)
     name_plural = models.CharField('название (мн.ч)', max_length=50)
-    slug = models.SlugField('URL')
     description = models.TextField('описание', blank=True, null=True)
     photo = models.ImageField(
         'фото',

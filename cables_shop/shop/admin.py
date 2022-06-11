@@ -5,9 +5,8 @@ from .models import *
 # Products related
 @admin.register(CableType)
 class CableTypeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'name_plural', 'description', 'slug')
+    list_display = ('id', 'name', 'name_plural', 'description')
     list_display_links = ('name',)
-    prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(Cable)
