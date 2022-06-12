@@ -6,8 +6,7 @@
     <div class="col-lg-12 mt-3">
       <div class="table-responsive">
         <table class="table">
-          <thead>
-          <tr>
+          <tr class="border-bottom">
             <th scope="col" class="border-0 text-white text-center">
               <div class="p-2 text-uppercase">№</div>
             </th>
@@ -24,10 +23,8 @@
               <div class="py-2 text-uppercase">Сумма</div>
             </th>
           </tr>
-          </thead>
-          <tbody>
           {% for product in order.orderedproduct_set.all %}
-          <tr class="border-top">
+          <tr class="border-bottom">
             <td class="border-0 align-middle text-white text-center">{{ forloop.counter }}</td>
             <td scope="row" class="border-0 text-start">
               <div class="p-2  align-middle ">
@@ -57,7 +54,6 @@
             <td class="border-0 align-middle text-white text-center">500 ₽</td>
           </tr>
           {% endif%}
-          </tbody>
         </table>
       </div>
       <div class="row">

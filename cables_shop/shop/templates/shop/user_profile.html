@@ -61,7 +61,6 @@
       {% if orders %}
       <div class="table-responsive ">
         <table class="table">
-          <thead>
           <tr class="border-bottom">
             <th scope="col" class="border-0 text-white">
               <div class="p-2 text-uppercase text-center">№</div>
@@ -75,13 +74,10 @@
             <th scope="col" class="border-0 text-white">
               <div class="py-2 text-uppercase text-center">Сумма</div>
             </th>
-
             <th scope="col" class="border-0 text-white">
               <div class="py-2 text-uppercase text-center">Статус</div>
             </th>
           </tr>
-          </thead>
-          <tbody>
             {% for order in orders %}
             <tr class="border-bottom">
               <td class="border-0 align-middle text-white text-center">{{ order.pk }}
@@ -100,12 +96,10 @@
               </td>
             </tr>
             {% endfor %}
-
-          </tbody>
         </table>
       </div>
       {% else %}
-        <h5 class="text-center">У вас пока нет ни одного оформленного заказа</h5>
+        <h5 class="text-center mt-4">У вас пока нет ни одного оформленного заказа</h5>
       {% endif %}
     </div>
   </div>

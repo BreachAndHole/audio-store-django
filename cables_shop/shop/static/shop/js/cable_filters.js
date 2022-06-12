@@ -12,7 +12,6 @@ for (var i = 0; i < cableTypeCheckboxes.length; i++) {
                 var cardType = productCards[j].dataset.type
 
                 if (cardType == cableTypeId) {
-                    // productCards[j].style.display = 'block'
                     productCards[j].classList.remove('hide-product')
 
                 }
@@ -22,7 +21,6 @@ for (var i = 0; i < cableTypeCheckboxes.length; i++) {
                 var cardType = productCards[j].dataset.type
 
                 if (cardType == cableTypeId) {
-                    // productCards[j].style.display = 'none'
                     productCards[j].classList.add('hide-product')
                 }
             }

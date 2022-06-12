@@ -1,97 +1,89 @@
 {% extends 'shop/base.html' %}
 {% load static %}
 {% block content %}
-<div class="container marketing">
-    <hr class="featurette-divider">
-    <div class="row featurette">
-        <div class="col-md-7 order-md-2">
-            <h2 class="featurette-heading fw-normal lh-1">Обо мне</h2>
-            <p class="lead">Дорогой друг, приветствую тебя в моём магазине. Меня зовут
-                Сергей. С детства я был увлечен музыкой.
-                Сколько я себя помню, я обожал слушать хард-рок, блюз и смежные
-                жанры.</p>
-            <p class="lead">В определённный момент жизни я увлёкся коллекционированием
-                виниловых пластинок и именно так попал в мир Hi-Fi и Hi-End звука.</p>
-            <p class="lead">Поскольку за плечами я имею радиотехническое образование, я
-                постоянно экспериментировал со звучанием и хотел настроить его под себя.
-                Именно так я и начал изготавливать свои первые аудио-кабели.
-                Вскоре я понял, что этим звучанием можно поделиться и с другими
-                любителями качественной музыки.</p>
-            <p class="lead">На данный момент количество довольных покупателей уже
-                превышает сотню человек,
-                а варианты различных кабелей исчитываются десятками. Надеюсь, в этом
-                магазине и вы найдёте именно то, что поможет вам насладиться любимой
-                музыкой, как никогда ранее.</p>
+<div class="container mb-5">
+  <div class="row border-top py-3">
+    <div class="col-md-7 order-md-2">
+      <h2 class="featurette-heading fw-normal lh-1">Обо мне</h2>
+      <p class="lead">Дорогой друг, приветствую тебя в моём магазине. Меня зовут
+        Сергей. С детства я был увлечен музыкой.
+        Сколько я себя помню, я обожал слушать хард-рок, блюз и смежные
+        жанры.</p>
+      <p class="lead">В определённный момент жизни я увлёкся коллекционированием
+        виниловых пластинок и именно так попал в мир Hi-Fi и Hi-End звука.</p>
+      <p class="lead">Поскольку я имею радиотехническое образование, я
+        постоянно экспериментировал со звучанием и всегда стремился настроить его под себя.
+        Именно так я и начал изготавливать свои первые аудио-кабели.
+        Вскоре я понял, что этим звучанием можно поделиться и с другими
+        любителями качественной музыки.</p>
+      <p class="lead">На данный момент количество довольных покупателей уже
+        превышает сотню человек,
+        а варианты различных кабелей исчитываются десятками. Надеюсь, в этом
+        магазине и вы найдёте именно то, что поможет вам насладиться любимой
+        музыкой, как никогда ранее.</p>
 
-        </div>
-        <div class="col-md-5 order-md-1">
-            <img src="{% static 'shop/images/about.jpg' %}" alt=""
-            class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"/>
-        </div>
     </div>
-
-    <hr class="featurette-divider" id="materials">
-
-    <div class="row featurette">
-        <div class="col-md-7">
-            <h2 class="featurette-heading fw-normal lh-1">Используемые материалы</h2>
-            <p class="lead">В своей продукции я использую исключительно качественные
-                материалы проверенных производителей.</p>
-            <p class="lead">При изготовлении представленных в ассортименте кабелей
-                используются
-                такие бренды как Canare, Audiocras, Belsis, R-Connectors и другие.
-                Пайка осуществляется на серебросодержащем припое, за счёт чего звук
-                становится заметно детальней и богаче.</p>
-            <p class="lead">Независимо от ценовой категории, каждый кабель изготовлен с
-                предельным вниманием к деталям,
-                после чего обязательно проверяется на реальной аудиосистеме.</p>
-        </div>
-        <div class="col-md-5">
-            <img src="{% static 'shop/images/materials.jpg' %}" alt=""
-            class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"/>
-        </div>
+    <div class="col-md-5 order-md-1">
+      <img src="{% static 'shop/images/about.jpg' %}" alt=""
+           class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"/>
     </div>
+  </div>
 
-    <hr class="featurette-divider" id="deliveryInfo">
 
-    <div class="row featurette">
-        <div class="col-md-7 order-md-2">
-            <h2 class="featurette-heading fw-normal lh-1">Доставка</h2>
-            <p class="lead">При оформлении заказа на сайте вы можете выбрать
-                доставку.</p>
-            <p class="lead">Доставка осуществляется через СДЭК.
-                При отсутствии пунктов выдачи СДЭК в вашем населённом пункте, доставка
-                будет осуществлена Почтой России.</p>
-            <p class="lead">При выборе доставки в качестве способа получения,
-                оплата осуществляется посредством наложного платежа. Доставка, как
-                правило, стоит 500 рублей.</p>
-        </div>
-        <div class="col-md-5 order-md-1">
-            <img src="{% static 'shop/images/delivery.jpg' %}" alt=""
-            class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"/>
-        </div>
+  <div class="row row border-top py-3">
+    <div class="col-md-7">
+      <h2 class="featurette-heading fw-normal lh-1">Используемые материалы</h2>
+      <p class="lead">В своей продукции я использую исключительно качественные
+        материалы проверенных производителей.</p>
+      <p class="lead">При изготовлении представленных в ассортименте кабелей
+        используются
+        такие бренды как Canare, Audiocras, Belsis, R-Connectors и другие.
+        Пайка осуществляется на серебросодержащем припое, за счёт чего звук
+        становится заметно детальней и богаче.</p>
+      <p class="lead">Независимо от ценовой категории, каждый кабель изготовлен с
+        предельным вниманием к деталям,
+        после чего обязательно проверяется на реальной аудиосистеме.</p>
     </div>
-
-    <hr class="featurette-divider" id="pickUpInfo">
-
-    <div class="row featurette">
-        <div class="col-md-7">
-            <h2 class="featurette-heading fw-normal lh-1">Самовывоз</h2>
-            <p class="lead">Поскольку магазин находится в Санкт-Петербурге, для жителей
-                города доступен самовывоз. Услуга самовывоза бесплатная</p>
-            <p class="lead">При самовывозе доступна оплата наличными, а так же
-                банковским переводом</p>
-            <p class="lead">Забрать заказ можно по будним дням с 10:00 до 18:00 по
-                адресу Коломяжский проспект 28к3, а после 19:00 по адресу Московский
-                проспект 220</p>
-        </div>
-        <div class="col-md-5">
-            <img src="{% static 'shop/images/pickup.jpeg' %}" alt=""
-            class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"/>
-        </div>
+    <div class="col-md-5">
+      <img src="{% static 'shop/images/materials.jpg' %}" alt=""
+           class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"/>
     </div>
+  </div>
 
-    <hr class="featurette-divider mb-5">
+  <div class="row row border-top py-3">
+    <div class="col-md-7 order-md-2">
+      <h2 class="featurette-heading fw-normal lh-1">Доставка</h2>
+      <p class="lead">При оформлении заказа на сайте вы можете выбрать
+        доставку.</p>
+      <p class="lead">Доставка осуществляется через СДЭК.
+        При отсутствии пунктов выдачи СДЭК в вашем населённом пункте, доставка
+        будет осуществлена Почтой России.</p>
+      <p class="lead">При выборе доставки в качестве способа получения,
+        оплата осуществляется посредством наложного платежа. Доставка, как
+        правило, стоит 500 рублей.</p>
+    </div>
+    <div class="col-md-5 order-md-1">
+      <img src="{% static 'shop/images/delivery.jpg' %}" alt=""
+           class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"/>
+    </div>
+  </div>
+
+  <div class="row row border-top pt-3">
+    <div class="col-md-7">
+      <h2 class="featurette-heading fw-normal lh-1">Самовывоз</h2>
+      <p class="lead">Поскольку магазин находится в Санкт-Петербурге, для жителей
+        города доступна услуга самовывоза.</p>
+      <p class="lead">При самовывозе оплата может быть осуществлена как наличными, так и
+        банковским переводом. Услуга самовывоза является бесплатной.</p>
+      <p class="lead">Забрать заказ можно по будним дням с 10:00 до 18:00 по
+        адресу Коломяжский проспект 28к3, а также после 19:00 по адресу Московский проспект 220</p>
+    </div>
+    <div class="col-md-5">
+      <img src="{% static 'shop/images/pickup.jpeg' %}" alt=""
+           class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto"/>
+    </div>
+  </div>
+
 
 </div>
 {% endblock content %}

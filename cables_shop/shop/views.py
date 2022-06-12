@@ -22,7 +22,7 @@ class IndexPageView(list.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Главная страница'
+        context['title'] = 'Hi-Fi store'
         return context
 
 
@@ -34,7 +34,7 @@ class AllCablesPageView(list.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Товары'
+        context['title'] = 'Hi-Fi store - товары'
         return context
 
     def get_queryset(self):
@@ -51,7 +51,7 @@ class CablePageView(detail.DetailView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Страница товара - {context.get("cable").name}'
+        context['title'] = f'Hi-Fi store - {context.get("cable").name}'
         return context
 
 
@@ -77,7 +77,7 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Корзина'
+        context['title'] = 'Hi-Fi store - Корзина'
 
         # Adding cart total price to context
         products = context['ordered_products']
@@ -130,7 +130,7 @@ def checkout(request: HttpRequest):
         return redirect('home_page')
 
     context = {
-        'title': 'Оформление заказа',
+        'title': 'Hi-Fi store - Оформление заказа',
         'form': form,
         'ordered_products': checkout_service.ordered_products,
         'delivery_price': DELIVERY_PRICE,
@@ -143,7 +143,7 @@ def checkout(request: HttpRequest):
 def update_cart(request: HttpRequest):
     """
     This view is working with JSON-response sent by cart.js on every
-    cart items related button click
+    cart items related button click (add, remove, delete)
     """
     try:
         CartUpdateService(request).process_cart_update()
@@ -174,13 +174,13 @@ class UserRegistrationView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Регистрация'
+        context['title'] = 'Hi-Fi store - Регистрация'
         return context
 
 
 def user_login(request: HttpRequest):
     contex = {
-        'title': 'Войти в аккаунт',
+        'title': 'Hi-Fi store - Вход',
     }
     if request.method != 'POST':
         return render(request, 'shop/login.html', contex)
@@ -224,7 +224,7 @@ class UserProfileView(LoginRequiredMixin, list.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Личный кабинет'
+        context['title'] = 'Hi-Fi store - Личный кабинет'
         context['last_used_address'] = utils.get_last_used_customer_address(
             self.request.user
         )
@@ -247,7 +247,7 @@ class OrderView(LoginRequiredMixin, detail.DetailView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Заказ №{self.object.pk}'
+        context['title'] = f'Hi-Fi store - Заказ №{self.object.pk}'
         return context
 
 
@@ -256,7 +256,7 @@ class AboutPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Обо мне'
+        context['title'] = 'Hi-Fi store - Информация'
         return context
 
 
@@ -277,7 +277,7 @@ def update_user_info(request: HttpRequest):
         return redirect('user_profile_page')
 
     contex = {
-        'title': f'Обновление информации',
+        'title': 'Hi-Fi store - Обновление контактных данных',
         'form': form
     }
     return render(request, 'shop/update_user_info.html', contex)

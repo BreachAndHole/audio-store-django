@@ -15,10 +15,9 @@
         <li class="list-group-item d-flex justify-content-between lh-sm bg-dark border border-light">
           <div>
             <h6 class="my-0 text-white">{{ product.product.name }}</h6>
-            <small class="text-white">{{ product.quantity }}
-              шт.</small>
+            <small class="text-white">{{ product.quantity }} шт.</small>
           </div>
-          <span class="text-white">{{ product.total_price }} ₽</span>
+          <span class="text-white text-end w-25">{{ product.total_price }} ₽</span>
         </li>
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between lh-sm bg-dark border border-light delivery-price-block">
@@ -26,7 +25,7 @@
             <h6 class="my-0 text-white">Доставка ТК</h6>
             <small class="text-white">1 шт.</small>
           </div>
-          <span class="text-white">500 ₽</span>
+          <span class="text-white text-end">500 ₽</span>
         </li>
         <li class="list-group-item d-flex justify-content-between bg-dark border border-light">
           <span class="text-white">Итого</span>
