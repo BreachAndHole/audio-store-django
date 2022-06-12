@@ -1,6 +1,6 @@
 {% extends 'shop/base.html' %}
 {% load shop_tags %}
-
+{% load static %}
 {% block content %}
 
 <!-- Cariusel block -->
@@ -15,21 +15,21 @@
   </div>
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="https://picsum.photos/1920/1080" class="d-block w-100" alt="...">
+      <img src="{% static 'shop/images/index_1.jpg' %}" class="d-block w-100" alt="...">
       <div class="carousel-caption d-none d-md-block">
         <h1>Исключительное качество</h1>
-        <p>Кабели для настоящих ценителей звука высокого качества</p>
+        <p>Для настоящих ценителей звука высокого качества</p>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="https://picsum.photos/1920/1080" class="d-block w-100" alt="...">
+      <img src="{% static 'shop/images/index_2.jpg' %}" class="d-block w-100" alt="...">
       <div class="carousel-caption d-none d-md-block">
         <h1>Для неравнодушных к музыке</h1>
-        <p>Кабели как для музыкантов, так и для людей, их слушающих</p>
+        <p>Как для музыкантов, так и для людей, их слушающих</p>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="https://picsum.photos/1920/1080" class="d-block w-100" alt="...">
+      <img src="{% static 'shop/images/index_3.jpg' %}" class="d-block w-100" alt="...">
       <div class="carousel-caption d-none d-md-block">
         <h1>Сделано с любовью</h1>
         <p>Изготовлено с любовью к музыке и вниманием к деталям</p>

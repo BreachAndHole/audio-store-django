@@ -104,7 +104,6 @@ def checkout(request: HttpRequest):
 
     form = checkout_service.form
     if request.method == 'POST' and form.is_valid():
-        print(request.POST)
         try:
             checkout_service.process_checkout()
         except PhoneNumberAlreadyExistsError:
