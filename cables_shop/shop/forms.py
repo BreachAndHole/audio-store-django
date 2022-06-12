@@ -16,6 +16,13 @@ class UserRegistrationForm(UserCreationForm):
             self.fields[field].widget.attrs.update(
                 {'type': 'text', 'class': "form-control"}
             )
+        # Adding placeholders
+        self.fields['email'].widget.attrs.update({'placeholder': 'Ivan@mail.com'})
+        self.fields['first_name'].widget.attrs.update({'placeholder': 'Иван'})
+        self.fields['last_name'].widget.attrs.update({'placeholder': 'Иванов'})
+        self.fields['phone_number'].widget.attrs.update({'placeholder': '+7 (911) 987-65-43'})
+        self.fields['password1'].widget.attrs.update({'placeholder': 'Password'})
+        self.fields['password2'].widget.attrs.update({'placeholder': 'Password'})
 
     class Meta:
         model = User
@@ -31,8 +38,7 @@ class UserRegistrationForm(UserCreationForm):
 
 class UserInformationForm(forms.Form):
     """
-    Form for checkout page.
-    Handling both customer and shipping address models
+    Form for processing User information. used on checkout page as well as in profile
     """
     first_name = forms.CharField(
         label='Имя',
