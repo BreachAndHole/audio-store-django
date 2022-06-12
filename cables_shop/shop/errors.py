@@ -15,7 +15,11 @@ class UserIsAnonymousError(Exception):
 
 
 class CreateShippingAddressError(Exception):
-    """ Error during creating shipping address for the order"""
+    """ Error during creating shipping address for the order """
+
+
+class ShippingAddressNotProvidedError(Exception):
+    """ Delivery selected but no shipping address was entered """
 
 
 class ProductsQuantityError(Exception):

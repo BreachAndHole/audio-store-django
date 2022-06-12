@@ -113,6 +113,12 @@ def checkout(request: HttpRequest):
                 'Используйте телефон, указанный при регистрации или введите другой.'
             )
             return redirect('checkout_page')
+        except ShippingAddressNotProvidedError:
+            messages.error(
+                request,
+                'При выборе доставки необходимо указать хотя бы адрес и город.'
+            )
+            return redirect('checkout_page')
         except ProductsQuantityError:
             checkout_service.correct_ordered_products()
             messages.error(

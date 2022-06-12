@@ -138,11 +138,16 @@ class UserInformationService:
             raise ProductsQuantityError(
                 'Ordered quantity is greater than available'
             )
-        self.__update_products_in_stock()
 
         if self.delivery_type != Order.DeliveryType.PICK_UP:
             shipping_address = self.__get_shipping_address_from_form()
+
+            # If delivery selected and address of city not entered
+            if any([not shipping_address.address, not shipping_address.city]):
+                raise ShippingAddressNotProvidedError
             self.order.shipping_address = shipping_address
+
+        self.__update_products_in_stock()
 
         self.order.status = Order.OrderStatus.ACCEPTED
         self.order.delivery_type = self.delivery_type

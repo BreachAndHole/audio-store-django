@@ -72,6 +72,7 @@ class UserInformationForm(forms.Form):
     address = forms.CharField(
         label='Адрес',
         max_length=200,
+        required=False,
         widget=(
             forms.TextInput(
                 attrs={
@@ -84,6 +85,7 @@ class UserInformationForm(forms.Form):
     city = forms.CharField(
         label='Город',
         max_length=50,
+        required=False,
         widget=(
             forms.TextInput(
                 attrs={
@@ -96,6 +98,7 @@ class UserInformationForm(forms.Form):
     state = forms.CharField(
         label='Область',
         max_length=70,
+        required=False,
         widget=(
             forms.TextInput(
                 attrs={
@@ -108,6 +111,7 @@ class UserInformationForm(forms.Form):
     zipcode = forms.CharField(
         label='Почтовый индекс',
         max_length=10,
+        required=False,
         widget=(
             forms.TextInput(
                 attrs={
