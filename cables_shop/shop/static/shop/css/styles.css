@@ -1,0 +1,31 @@
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #282a36;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #E5E9F0;
+}
+
+/* Filtering fade animations */
+.hide-product {
+    opacity: 1;
+    animation-name: hide-element;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes hide-element {
+    to {
+        opacity: 0;
+        max-height: 0;
+        max-width: 0;
+        padding: 0;
+        margin: 0;
+        border: 0;
+    }
+}
