@@ -10,10 +10,11 @@ class CartItemsTotalData(TypedDict):
 def get_cart_items_total(request: HttpRequest) -> CartItemsTotalData:
     if not request.user.is_authenticated:
         return {'cart_items_total': 0}
-    order, _ = Order.objects.get_or_create(
-        customer=request.user,
-        status=Order.OrderStatus.IN_CART,
-    )
-    ordered_items = OrderedProduct.objects.filter(order=order)
-    items_total = sum(item.quantity for item in ordered_items)
+
+    ordered_products = OrderedProduct.objects.select_related('order').filter(
+        order__customer=request.user,
+        order__status=Order.OrderStatus.IN_CART
+    ).values('quantity')
+
+    items_total = sum(item['quantity'] for item in ordered_products)
     return {'cart_items_total': items_total}
