@@ -11,7 +11,7 @@ from .services import CartUpdateService, UserInformationService
 from .errors import *
 from . import utils
 from .models import CableType, Cable, Order, OrderedProduct
-from cables_shop.settings import DELIVERY_PRICE
+from shop import config
 
 
 class IndexPageView(list.ListView):
@@ -22,7 +22,7 @@ class IndexPageView(list.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Hi-Fi store'
+        context['title'] = config.INDEX_PAGE_TITLE
         return context
 
 
@@ -34,7 +34,7 @@ class AllCablesPageView(list.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Hi-Fi store - товары'
+        context['title'] = config.ALL_CABLES_PAGE_TITLE
         return context
 
     def get_queryset(self):
@@ -77,7 +77,7 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Hi-Fi store - Корзина'
+        context['title'] = config.CART_PAGE_TITLE
 
         # Adding cart total price to context
         products = context['ordered_products']
@@ -130,10 +130,10 @@ def checkout(request: HttpRequest):
         return redirect('home_page')
 
     context = {
-        'title': 'Hi-Fi store - Оформление заказа',
+        'title': config.CHECKOUT_PAGE_TITLE,
         'form': form,
         'ordered_products': checkout_service.ordered_products,
-        'delivery_price': DELIVERY_PRICE,
+        'delivery_price': config.DELIVERY_PRICE,
         'order_total_price': checkout_service.order.order_total_price,
         'cart_total_price': checkout_service.order.products_total_price,
     }
@@ -174,13 +174,13 @@ class UserRegistrationView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Hi-Fi store - Регистрация'
+        context['title'] = config.REGISTRATION_PAGE_TITLE
         return context
 
 
 def user_login(request: HttpRequest):
     contex = {
-        'title': 'Hi-Fi store - Вход',
+        'title': config.LOGIN_PAGE_TITLE,
     }
     if request.method != 'POST':
         return render(request, 'shop/login.html', contex)
@@ -224,7 +224,7 @@ class UserProfileView(LoginRequiredMixin, list.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Hi-Fi store - Личный кабинет'
+        context['title'] = config.USER_PROFILE_PAGE_TITLE
         context['last_used_address'] = utils.get_last_used_customer_address(
             self.request.user
         )
@@ -256,7 +256,7 @@ class AboutPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Hi-Fi store - Информация'
+        context['title'] = config.ABOUT_PAGE_TITLE
         return context
 
 
@@ -277,7 +277,7 @@ def update_user_info(request: HttpRequest):
         return redirect('user_profile_page')
 
     contex = {
-        'title': 'Hi-Fi store - Обновление контактных данных',
+        'title': config.UPDATE_USER_INFO_PAGE_TITLE,
         'form': form
     }
     return render(request, 'shop/update_user_info.html', contex)

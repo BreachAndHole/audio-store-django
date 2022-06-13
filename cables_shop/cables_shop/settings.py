@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG')
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -65,11 +65,11 @@ WSGI_APPLICATION = 'cables_shop.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('DATABASE_NAME'),
-        'USER': os.getenv('DATABASE_USER'),
+        'NAME': 'audio_store_django',
+        'USER': 'sergey',
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
         'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT'),
+        'PORT': 5432,
     }
 }
 
@@ -96,7 +96,7 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = os.getenv('USE_TZ')
+USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
@@ -116,6 +116,3 @@ CACHES = {
         'LOCATION': os.path.join(BASE_DIR, 'shop_cache')
     }
 }
-
-# shop settings
-DELIVERY_PRICE = 500

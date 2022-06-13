@@ -4,7 +4,7 @@ from django.contrib.auth.models import (
     AbstractBaseUser, PermissionsMixin,
     BaseUserManager,
 )
-from cables_shop.settings import DELIVERY_PRICE
+from shop import config
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -247,7 +247,7 @@ class Order(models.Model):
     @property
     def order_total_price(self) -> int:
         if self.delivery_type == Order.DeliveryType.DELIVERY:
-            return self.products_total_price + DELIVERY_PRICE
+            return self.products_total_price + config.DELIVERY_PRICE
         return self.products_total_price
 
     @property
