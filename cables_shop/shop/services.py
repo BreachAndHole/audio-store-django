@@ -116,13 +116,18 @@ class UserInformationService:
 
     def __init__(self, customer: User, post_request_data: Optional[QueryDict]) -> None:
         self.customer = customer
-        self.order = Order.objects.get(
+        self.order, _ = Order.objects.get_or_create(
             customer=self.customer,
             status=Order.OrderStatus.IN_CART
         )
         self.ordered_products = OrderedProduct.objects.filter(
             order=self.order
+        ).select_related('product').only(
+            'quantity',
+            'product__name',
+            'product__price'
         )
+
         self.form = UserInformationForm(
             post_request_data or None,
             initial=UserInformationForm.get_user_information_form_initials(

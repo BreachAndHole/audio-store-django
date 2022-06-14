@@ -25,7 +25,7 @@
             </div>
           </div>
           <hr>
-          {% if last_used_address %}
+          {% if last_used_address.address %}
             <div class="row">
               <div class="col-sm-3">
                 <p class="mb-0">Город</p>
@@ -69,9 +69,6 @@
               <div class="py-2 text-uppercase text-start">Дата</div>
             </th>
             <th scope="col" class="border-0 text-white">
-              <div class="py-2 text-uppercase text-center">Товаров</div>
-            </th>
-            <th scope="col" class="border-0 text-white">
               <div class="py-2 text-uppercase text-center">Сумма</div>
             </th>
             <th scope="col" class="border-0 text-white">
@@ -83,8 +80,6 @@
               <td class="border-0 align-middle text-white text-center">{{ order.pk }}
               </td>
               <td class="border-0 align-middle text-white text-start">{{ order.order_accepted_date }}
-              </td>
-              <td class="border-0 align-middle text-white text-center">{{ order.order_total_products}}
               </td>
               <td class="border-0 align-middle text-white text-center">{{ order.order_total_price }} ₽
               </td>

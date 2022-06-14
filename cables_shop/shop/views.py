@@ -136,8 +136,6 @@ def checkout(request: HttpRequest):
         'form': form,
         'ordered_products': checkout_service.ordered_products,
         'delivery_price': config.DELIVERY_PRICE,
-        'order_total_price': checkout_service.order.order_total_price,
-        'cart_total_price': checkout_service.order.products_total_price,
     }
     return render(request, 'shop/checkout.html', context)
 
@@ -218,12 +216,6 @@ class UserProfileView(LoginRequiredMixin, list.ListView):
     context_object_name = 'orders'
     template_name = 'shop/user_profile.html'
 
-    def get_queryset(self):
-        checked_out_customer_orders = Order.objects.filter(
-            customer=self.request.user
-        ).exclude(status=Order.OrderStatus.IN_CART).order_by('-pk')
-        return checked_out_customer_orders
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = config.USER_PROFILE_PAGE_TITLE
@@ -231,6 +223,12 @@ class UserProfileView(LoginRequiredMixin, list.ListView):
             self.request.user
         )
         return context
+
+    def get_queryset(self):
+        checked_out_customer_orders = Order.objects.filter(
+            customer=self.request.user
+        ).exclude(status=Order.OrderStatus.IN_CART).order_by('-pk')
+        return checked_out_customer_orders
 
 
 class OrderView(LoginRequiredMixin, detail.DetailView):
@@ -241,8 +239,13 @@ class OrderView(LoginRequiredMixin, detail.DetailView):
     template_name = 'shop/order_info.html'
 
     def get(self, *args, **kwargs):
+        """
+        If user tries to access other user order
+        or the order is not checked out he must be redirected
+        """
         order = self.get_object()
-        if order.customer != self.request.user or order.status == Order.OrderStatus.IN_CART:
+        is_in_cart = order.status == Order.OrderStatus.IN_CART
+        if order.customer != self.request.user or is_in_cart:
             return redirect('user_profile_page')
 
         return super(OrderView, self).get(*args, **kwargs)
@@ -250,6 +253,10 @@ class OrderView(LoginRequiredMixin, detail.DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = f'Hi-Fi store - Заказ №{self.object.pk}'
+        context['delivery_price'] = config.DELIVERY_PRICE
+
+        order = self.get_object()
+        context['ordered_products'] = order.orderedproduct_set.select_related('product')
         return context
 
 

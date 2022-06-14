@@ -2,13 +2,13 @@
 
 {% block content %}
 {% load static %}
+{% load shop_tags %}
 <div class="container mt-4">
   <div class="row g-5">
     <div class="col-md-5 col-lg-4 order-md-last ">
       <h4 class="d-flex justify-content-between align-items-center mb-3">
         <a href="{% url 'cart_page' %}"
-           class="btn btn btn-bg-dark text-white"><span class="h4">Корзина</span></a>
-        <span class="badge bg-white text-dark rounded-pill">{{ cart_items_total }}</span>
+           class="btn btn-bg-dark text-white"><span class="h4">Корзина</span></a>
       </h4>
       <ul class="list-group mb-3">
         {% for product in ordered_products %}
@@ -17,7 +17,7 @@
             <h6 class="my-0 text-white">{{ product.product.name }}</h6>
             <small class="text-white">{{ product.quantity }} шт.</small>
           </div>
-          <span class="text-white text-end w-25">{{ product.total_price }} ₽</span>
+          <span class="text-white text-end w-25">{% product_total_price product.quantity product.product.price %} ₽</span>
         </li>
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between lh-sm bg-dark border border-light delivery-price-block">
@@ -29,8 +29,9 @@
         </li>
         <li class="list-group-item d-flex justify-content-between bg-dark border border-light">
           <span class="text-white">Итого</span>
-          <strong class="text-white" id="cartTotalPriceBlock">{{ order_total_price }} ₽</strong>
-          <input type="hidden" id="cartTotalPrice" value="{{ cart_total_price }}">
+          {% cart_price_total ordered_products as price_total %}
+          <strong class="text-white" id="cartTotalPriceBlock">{{ price_total|add:delivery_price }} ₽</strong>
+          <input type="hidden" id="cartTotalPrice" value="{{ price_total }}">
           <input type="hidden" id="deliveryPrice" value="{{ delivery_price }}">
         </li>
       </ul>

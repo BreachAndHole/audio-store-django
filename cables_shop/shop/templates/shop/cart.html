@@ -52,7 +52,7 @@
                       data-product_id="{{ product.product.id }}" data-action="add_to_cart">+
               </button>
             </td>
-            <td class="border-0 align-middle text-white text-center">{{ product.total_price }} ₽</td>
+            <td class="border-0 align-middle text-white text-center">{% product_total_price product.quantity product.product.price %} ₽</td>
             <td class="border-0 align-middle text-white text-center">
               <button class="mx-2 btn btn-outline-light btn-update-cart"
                       data-product_id="{{ product.product.id }}" data-action="delete_from_cart">X

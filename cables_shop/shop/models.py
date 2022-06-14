@@ -248,23 +248,26 @@ class Order(models.Model):
 
     @property
     def products_total_price(self) -> int:
-        """Returns total price for all products in cart"""
-        ordered_products = self.orderedproduct_set.all()
-        products_price = sum(
-            [product.total_price for product in ordered_products]
+        """ Returns total price for all products in cart """
+        ordered_products = self.orderedproduct_set.select_related('product').values(
+            'quantity',
+            'product__price'
         )
-        return products_price
+
+        prices = []
+        for product in ordered_products:
+            prices.append(product['quantity'] * product['product__price'])
+        return sum(prices)
 
     @property
     def order_total_price(self) -> int:
+        """
+        Returns total price for all products in cart
+         with delivery price if chosen
+         """
         if self.delivery_type == Order.DeliveryType.DELIVERY:
             return self.products_total_price + config.DELIVERY_PRICE
         return self.products_total_price
-    #
-    # @property
-    # def order_total_products(self) -> int:
-    #     """Returns total amount of unique products in cart"""
-    #     return len(self.orderedproduct_set.all())
 
 
 class OrderedProduct(models.Model):

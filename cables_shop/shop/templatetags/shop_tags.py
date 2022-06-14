@@ -12,6 +12,11 @@ def get_all_cable_types():
 
 
 @register.simple_tag
+def product_total_price(quantity: int, price: int) -> int:
+    return quantity * price
+
+
+@register.simple_tag
 def cart_items_total(user) -> int:
     """ Calculate ordered items total count"""
     if not user.is_authenticated:
@@ -27,4 +32,4 @@ def cart_items_total(user) -> int:
 @register.simple_tag
 def cart_price_total(products: QuerySet[OrderedProduct]) -> int:
     """ Calculate total price for an order without delivery"""
-    return sum([product.quantity * product.product.price for product in products])
+    return sum([product.quantity*product.product.price for product in products])
