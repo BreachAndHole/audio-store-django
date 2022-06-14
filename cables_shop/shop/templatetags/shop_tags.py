@@ -1,6 +1,7 @@
 from django import template
 from django.db.models.query import QuerySet
-from shop.models import CableType, OrderedProduct, Order
+
+from shop.models import CableType, Order, OrderedProduct
 
 
 register = template.Library()

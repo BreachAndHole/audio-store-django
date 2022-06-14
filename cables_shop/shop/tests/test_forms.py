@@ -1,6 +1,7 @@
 from django.test import TestCase
+
 from shop.forms import UserInformationForm
-from shop.models import User, ShippingAddress
+from shop.models import ShippingAddress, User
 
 
 class UserInformationFormTest(TestCase):

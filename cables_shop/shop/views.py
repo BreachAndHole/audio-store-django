@@ -1,17 +1,20 @@
-from django.http import HttpRequest, JsonResponse
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.views.generic import FormView, RedirectView, TemplateView, list, detail
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm
-from .services import CartUpdateService, UserInformationService
-from .exceptions import *
-from . import utils
-from .models import CablePhoto, CableType, Cable, Order, OrderedProduct
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpRequest, JsonResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.views.generic import (FormView, RedirectView, TemplateView, detail,
+                                  list)
+
 from shop import config
+
+from . import utils
+from .exceptions import *
+from .forms import UserRegistrationForm
+from .models import Cable, CablePhoto, CableType, Order, OrderedProduct
+from .services import CartUpdateService, UserInformationService
 
 
 class IndexPageView(list.ListView):

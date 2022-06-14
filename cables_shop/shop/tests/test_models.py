@@ -1,9 +1,8 @@
 from django.test import TestCase
+
 from shop import config
-from shop.models import (
-    Cable, CablePhoto, CableType, Order, ShippingAddress,
-    OrderedProduct, User
-)
+from shop.models import (Cable, CablePhoto, CableType, Order, OrderedProduct,
+                         ShippingAddress, User)
 
 
 class BaseTestCase(TestCase):

@@ -1,5 +1,6 @@
 from typing import Optional
-from .models import ShippingAddress, User, Order, OrderedProduct
+
+from .models import Order, OrderedProduct, ShippingAddress, User
 
 
 def get_last_used_customer_address(customer: User) -> Optional[ShippingAddress]:

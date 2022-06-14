@@ -1,11 +1,10 @@
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
 from django.db import models
 from django.urls import reverse
-from django.contrib.auth.models import (
-    AbstractBaseUser, PermissionsMixin,
-    BaseUserManager,
-)
-from shop import config
 from phonenumber_field.modelfields import PhoneNumberField
+
+from shop import config
 
 
 class CableType(models.Model):

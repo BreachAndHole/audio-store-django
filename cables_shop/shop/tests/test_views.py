@@ -1,11 +1,10 @@
 from django.contrib import auth
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.urls import reverse
-from shop.models import (
-    CablePhoto, Order, Cable, CableType, OrderedProduct,
-    ShippingAddress, User,
-)
+
 from shop import config
+from shop.models import (Cable, CablePhoto, CableType, Order, OrderedProduct,
+                         ShippingAddress, User)
 
 
 class BaseTestCase(TestCase):

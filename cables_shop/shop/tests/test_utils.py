@@ -1,6 +1,8 @@
 from django.test import TestCase
-from shop.models import Order, ShippingAddress, User, OrderedProduct, Cable, CableType
+
 from shop import utils
+from shop.models import (Cable, CableType, Order, OrderedProduct,
+                         ShippingAddress, User)
 
 
 class UtilsTestCase(TestCase):

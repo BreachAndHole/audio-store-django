@@ -1,15 +1,15 @@
 import json
 from enum import Enum
 from typing import NamedTuple, Optional, TypedDict
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.http import HttpRequest, QueryDict
-from django.core.exceptions import ObjectDoesNotExist
-from .forms import UserInformationForm
-from .models import Order, OrderedProduct, ShippingAddress, Cable, User
 
 from . import utils
-
 from .exceptions import *
+from .forms import UserInformationForm
+from .models import Cable, Order, OrderedProduct, ShippingAddress, User
 
 
 class CartUpdateAction(Enum):

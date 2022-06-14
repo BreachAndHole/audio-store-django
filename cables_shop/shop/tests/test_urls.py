@@ -1,7 +1,8 @@
 from django.test import TestCase
-from django.urls import reverse, resolve
-from shop.models import Order, Cable, CableType, User
+from django.urls import resolve, reverse
+
 from shop import views
+from shop.models import Cable, CableType, Order, User
 
 
 class URLsTestCase(TestCase):
