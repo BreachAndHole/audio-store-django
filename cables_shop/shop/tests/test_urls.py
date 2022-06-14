@@ -134,12 +134,12 @@ class URLsTestCase(TestCase):
         self.assertEqual(resolve(url).func, views.checkout)
         self.assertEqual(response.status_code, 200)
 
-    def test_update_cart_page_access(self):
+    def test_update_cart_page_redirect(self):
         url = reverse('update_cart_page')
         response = self.client.get(url)
 
         self.assertEqual(resolve(url).func, views.update_cart)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     def test_order_info_page_redirect(self):
         """

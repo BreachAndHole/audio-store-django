@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
 from .services import CartUpdateService, UserInformationService
-from .errors import *
+from .exceptions import *
 from . import utils
 from .models import CablePhoto, CableType, Cable, Order, OrderedProduct
 from shop import config
@@ -140,6 +140,7 @@ def checkout(request: HttpRequest):
     return render(request, 'shop/checkout.html', context)
 
 
+@login_required(login_url='user_login_page')
 def update_cart(request: HttpRequest):
     """
     This view is working with JSON-response sent by cart.js on every
@@ -166,11 +167,6 @@ class UserRegistrationView(FormView):
         user_name = form.cleaned_data.get('email', '')
         messages.success(self.request, f'Аккаунт {user_name} создан успешно.')
         return super().form_valid(form)
-
-    def form_invalid(self, form):
-        # sent error message to user
-        messages.error(self.request, 'Ошибка при регистрации. Повторите попытку.')
-        return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

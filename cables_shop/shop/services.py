@@ -9,7 +9,7 @@ from .models import Order, OrderedProduct, ShippingAddress, Cable, User
 
 from . import utils
 
-from .errors import *
+from .exceptions import *
 
 
 class CartUpdateAction(Enum):

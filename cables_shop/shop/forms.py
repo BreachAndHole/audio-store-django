@@ -35,6 +35,31 @@ class UserRegistrationForm(UserCreationForm):
             'password2',
         )
 
+        error_messages = {
+            'email': {
+                'required': 'Необходимо ввести Email',
+                'invalid': 'Email введён неверно',
+                'unique': 'Пользователь с таким Email уже зарегистрирован'
+            },
+            'phone_number': {
+                'required': 'Необходимо ввести номер телефона',
+                'invalid': 'Неверный формат номера телефона',
+                'unique': 'Пользователь с таким номером телефона уже зарегистрирован'
+            },
+        }
+
+    def clean_first_name(self, *args, **kwargs):
+        first_name = self.cleaned_data.get('first_name')
+        if not first_name:
+            raise forms.ValidationError('Необходимо ввести имя')
+        return first_name.title()
+
+    def clean_last_name(self, *args, **kwargs):
+        last_name = self.cleaned_data.get('last_name')
+        if not last_name:
+            raise forms.ValidationError('Необходимо ввести фамилию')
+        return last_name.title()
+
 
 class UserInformationForm(forms.Form):
     """
