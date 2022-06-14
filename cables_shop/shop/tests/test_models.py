@@ -1,8 +1,8 @@
 from django.test import TestCase
-from cables_shop.settings import DELIVERY_PRICE
+from shop import config
 from shop.models import (
     Cable, CablePhoto, CableType, Order, ShippingAddress,
-    OrderedProduct, User, CustomUserManager,
+    OrderedProduct, User
 )
 
 
@@ -12,14 +12,12 @@ class BaseTestCase(TestCase):
         self.cable_type_with_photo = CableType.objects.create(
             name='test type',
             name_plural='test type cables',
-            slug='test-type',
             description='description',
             photo='cable_type_photo.jpg',
         )
         self.cable_type_without_photo = CableType.objects.create(
             name='test type 2',
             name_plural='test type cables 2',
-            slug='test-type-2',
             description='description 2',
         )
 
@@ -220,7 +218,7 @@ class OrderTestCase(BaseTestCase):
         )
 
     def test_ordered_product_str(self):
-        self.assertEqual(str(self.product_1_in_cart), '#11, test cable, 100 см.')
+        self.assertEqual(str(self.product_1_in_cart), '#9, test cable, 100 см.')
 
     def test_get_product_total_price(self):
         self.assertEqual(self.product_1_in_cart.total_price, 300)
@@ -235,8 +233,8 @@ class OrderTestCase(BaseTestCase):
         self.assertEqual(self.order_in_cart.products_total_price, 900)
 
     def test_order_total_price(self):
-        self.assertEqual(self.order_in_cart.order_total_price, 900 + DELIVERY_PRICE)
+        self.assertEqual(
+            self.order_in_cart.order_total_price,
+            900 + config.DELIVERY_PRICE
+        )
         self.assertEqual(self.accepted_order_pick_up.order_total_price, 500)
-
-    def test_order_total_products(self):
-        self.assertEqual(self.order_in_cart.order_total_products, 2)

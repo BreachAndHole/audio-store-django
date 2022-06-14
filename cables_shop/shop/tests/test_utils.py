@@ -17,7 +17,6 @@ class UtilsTestCase(TestCase):
             name='test_cable_type',
             name_plural='test_cable_types',
             description='test_description',
-            slug='test_cable_type',
             photo='test_cable_type_photo.jpg',
         )
         self.cable = Cable.objects.create(

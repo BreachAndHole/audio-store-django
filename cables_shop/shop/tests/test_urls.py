@@ -43,7 +43,6 @@ class URLsTestCase(TestCase):
         cable_type = CableType.objects.create(
             name='test type',
             name_plural='test type cables',
-            slug='test-type',
             description='description',
         )
         cable = Cable.objects.create(

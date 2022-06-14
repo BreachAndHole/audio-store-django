@@ -1,7 +1,11 @@
 from django.contrib import auth
 from django.test import TestCase, Client
 from django.urls import reverse
-from shop.models import Order, Cable, CableType, OrderedProduct, ShippingAddress, User
+from shop.models import (
+    CablePhoto, Order, Cable, CableType, OrderedProduct,
+    ShippingAddress, User,
+)
+from shop import config
 
 
 class BaseTestCase(TestCase):
@@ -29,7 +33,6 @@ class BaseTestCase(TestCase):
         self.cable_type = CableType.objects.create(
             name='test type',
             name_plural='test type cables',
-            slug='test-type',
             description='description',
         )
         self.cable = Cable.objects.create(
@@ -42,6 +45,12 @@ class BaseTestCase(TestCase):
             is_for_sale=True,
             type=self.cable_type,
         )
+        self.cable_photo = CablePhoto.objects.create(
+            cable=self.cable,
+            photo='test_cable_photo.jpg',
+            is_title=True,
+        )
+
         self.ordered_product_1 = OrderedProduct.objects.create(
             order=self.order_in_cart,
             product=self.cable,
@@ -63,14 +72,13 @@ class SimpleViewsTestCase(BaseTestCase):
         super().setUp()
 
         self.index_url = reverse('home_page')
-        7
+
         self.all_cables_url = reverse('all_cables_page')
         self.cable_url = reverse('cable_page', kwargs={'cable_slug': self.cable.slug})
         self.about_url = reverse('about_page')
 
     def test_home_page_GET(self):
         template_name = 'shop/index.html'
-        title = 'Главная страница'
         response = self.client.get(self.index_url)
 
         cable_types = response.context['cable_types']
@@ -78,24 +86,23 @@ class SimpleViewsTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name)
         self.assertEqual(cable_types.count(), 1)
-        self.assertEqual(page_title, title)
+        self.assertEqual(page_title, config.INDEX_PAGE_TITLE)
 
     def test_all_cables_page_GET(self):
         template_name = 'shop/all_cables.html'
-        title = 'Товары'
 
         response = self.client.get(self.all_cables_url)
-        cables = response.context['cables']
+        photos = response.context['photos']
         page_title = response.context['title']
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name)
-        self.assertEqual(cables.count(), 1)
-        self.assertEqual(page_title, title)
+        self.assertEqual(photos.count(), 1)
+        self.assertEqual(page_title, config.ALL_CABLES_PAGE_TITLE)
 
     def test_cable_page_GET(self):
         template_name = 'shop/cable.html'
-        title = f'Страница товара - {self.cable.name}'
+        title = f'Hi-Fi store - {self.cable.name}'
         response = self.client.get(self.cable_url)
 
         cable = response.context['cable']
@@ -125,6 +132,8 @@ class UserRegistrationTestCase(BaseTestCase):
         template_name = 'shop/registration.html'
         response = self.client.get(self.registration_url)
 
+        page_title = response.context['title']
+        self.assertEqual(page_title, config.REGISTRATION_PAGE_TITLE)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name)
 
@@ -198,6 +207,8 @@ class UserLoginLogoutTestCase(BaseTestCase):
         template_name = 'shop/login.html'
         response = self.client.get(self.login_url)
 
+        page_title = response.context['title']
+        self.assertEqual(page_title, config.LOGIN_PAGE_TITLE)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name)
 
@@ -221,6 +232,8 @@ class UserProfilePageTestCase(BaseTestCase):
         self.assertTrue(auth.get_user(self.client).is_authenticated)
 
         response = self.client.get(self.profile_url)
+        page_title = response.context['title']
+        self.assertEqual(page_title, config.USER_PROFILE_PAGE_TITLE)
         self.assertTemplateUsed(response, 'shop/user_profile.html')
         self.assertEqual(response.status_code, 200)
 
@@ -311,6 +324,9 @@ class CartPageTestCase(BaseTestCase):
     def test_cart_page_can_access(self):
         self.assertTrue(auth.get_user(self.client).is_authenticated)
         response = self.client.get(self.cart_url)
+
+        page_title = response.context['title']
+        self.assertEqual(page_title, config.CART_PAGE_TITLE)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'shop/cart.html')
 
@@ -329,13 +345,6 @@ class CartPageTestCase(BaseTestCase):
             list(ordered_products),
             list(self.order_in_cart.orderedproduct_set.all())
         )
-
-    def test_order_information_display_correctly(self):
-        self.assertTrue(auth.get_user(self.client).is_authenticated)
-        response = self.client.get(self.cart_url)
-
-        products_total_price = response.context['products_total_price']
-        self.assertEqual(products_total_price, 100*3)
 
     def test_empty_cart_redirect(self):
         self.order_in_cart.orderedproduct_set.all().delete()
@@ -359,6 +368,8 @@ class CheckoutPageTestCase(BaseTestCase):
         self.assertTrue(auth.get_user(self.client).is_authenticated)
         response = self.client.get(self.checkout_url)
 
+        page_title = response.context['title']
+        self.assertEqual(page_title, config.CHECKOUT_PAGE_TITLE)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'shop/checkout.html')
 
