@@ -10,7 +10,7 @@ from .forms import UserRegistrationForm
 from .services import CartUpdateService, UserInformationService
 from .errors import *
 from . import utils
-from .models import CableType, Cable, Order, OrderedProduct
+from .models import CablePhoto, CableType, Cable, Order, OrderedProduct
 from shop import config
 
 
@@ -27,9 +27,12 @@ class IndexPageView(list.ListView):
 
 
 class AllCablesPageView(list.ListView):
-    """ All cables for sale is displayed on this page """
-    model = Cable
-    context_object_name = 'cables'
+    """
+    All cables for sale is displayed on this page.
+    Cables are queried via related title photos
+    """
+    model = CablePhoto
+    context_object_name = 'photos'
     template_name = 'shop/all_cables.html'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -39,7 +42,11 @@ class AllCablesPageView(list.ListView):
 
     def get_queryset(self):
         # Showing on the page only cables marked as for sale
-        return Cable.objects.filter(is_for_sale=True)
+        title_photos = CablePhoto.objects.filter(
+            is_title=True,
+            cable__is_for_sale=True,
+        ).select_related('cable').select_related('cable__type')
+        return title_photos
 
 
 class CablePageView(detail.DetailView):
@@ -67,10 +74,10 @@ class CartPageView(LoginRequiredMixin, list.ListView):
 
     def get(self, *args, **kwargs):
         """ Redirect user if he tries to access empty cart """
-        ordered_products = Order.objects.get(
-            customer=self.request.user,
-            status=Order.OrderStatus.IN_CART
-        ).orderedproduct_set.all()
+        ordered_products = OrderedProduct.objects.filter(
+            order__customer=self.request.user,
+            order__status=Order.OrderStatus.IN_CART
+        )
         if not ordered_products:
             return redirect('all_cables_page')
         return super(CartPageView, self).get(*args, **kwargs)
@@ -78,11 +85,6 @@ class CartPageView(LoginRequiredMixin, list.ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = config.CART_PAGE_TITLE
-
-        # Adding cart total price to context
-        products = context['ordered_products']
-        products_total_price = sum(product.total_price for product in products)
-        context['products_total_price'] = products_total_price
         return context
 
     def get_queryset(self):
@@ -90,7 +92,7 @@ class CartPageView(LoginRequiredMixin, list.ListView):
         ordered_products = OrderedProduct.objects.filter(
             order__customer=self.request.user,
             order__status=Order.OrderStatus.IN_CART
-        ).order_by('date_added')
+        ).order_by('date_added').select_related('product')
         return ordered_products
 
 

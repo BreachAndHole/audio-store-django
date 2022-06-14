@@ -19,29 +19,29 @@
     </div>
   </div>
   <div class="row g-3 mt-3 border-top">
-    {% for cable in cables %}
+    {% for photo in photos %}
     <div class="col-12 col-md-6 col-lg-4 cable-card"
-         data-type="{{ cable.type.pk }}">
+         data-type="{{ photo.cable.type.pk }}">
       <div class="card bg-dark text-white border-white h-100">
-        <img src="{{ cable.title_photo_url }}" alt="Photo for {{ cable.name }}"
+        <img src="{{ photo.photo_url }}" alt="Photo for {{ photo.cable.name }}"
              class="card-img-top">
         <div class="card-body d-flex flex-column text-white">
-          <h3 class="card-title">{{ cable.name }}</h3>
-          <div class="mb-3 h6">Длина: {{ cable.length_sm }} см.</div>
-          <p class="card-text">{{ cable.description }}</p>
+          <h3 class="card-title">{{ photo.cable.name }}</h3>
+          <div class="mb-3 h6">Длина: {{ photo.cable.length_sm }} см.</div>
+          <p class="card-text">{{ photo.cable.description }}</p>
           <div class="d-flex justify-content-between align-items-center mt-auto">
             <div>
-              <a href="{{ cable.get_absolute_url }}"
+              <a href="{{ photo.cable.get_absolute_url }}"
                  class="btn btn-outline-light">Подробнее</a>
-              {% if cable.units_in_stock %}
+              {% if photo.cable.units_in_stock %}
               <button class="btn-update-cart btn btn-sm btn-outline-light ms-2"
-                      data-product_id="{{ cable.id }}"
+                      data-product_id="{{ photo.cable.id }}"
                       data-action="add_to_cart">В корзину
               </button>
               {% endif %}
 
             </div>
-            <div class="my-auto h5">{{ cable.price }} ₽</div>
+            <div class="my-auto h5">{{ photo.cable.price }} ₽</div>
           </div>
         </div>
       </div>

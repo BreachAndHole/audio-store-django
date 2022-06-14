@@ -120,7 +120,9 @@ class UserInformationService:
             customer=self.customer,
             status=Order.OrderStatus.IN_CART
         )
-        self.ordered_products = self.order.orderedproduct_set.all()
+        self.ordered_products = OrderedProduct.objects.filter(
+            order=self.order
+        )
         self.form = UserInformationForm(
             post_request_data or None,
             initial=UserInformationForm.get_user_information_form_initials(

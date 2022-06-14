@@ -3,6 +3,7 @@
 
 <head>
   {% load static %}
+  {% load shop_tags %}
   <meta charset="UTF-8">
   <title>{{ title }}</title>
   <script type="text/javascript">
@@ -41,8 +42,8 @@
         <li><a href="{% url 'about_page' %}" class="nav-link text-white">Информация</a></li>
       </ul>
       <div class="text-end">
+        {% cart_items_total user as cart_total%}
         {% if user.is_authenticated %}
-        {% with cart_total=cart_items_total %}
         {% if cart_total and request.path != '/cart/checkout/' %}
         <button class="badge bg-white text-dark rounded-pill border-0 mx-2"
                 id="CartItemsTotalIndicator"
@@ -51,7 +52,6 @@
         </button>
         <a href="{% url 'cart_page' %}" class="btn btn-bg-dark text-white">Корзина</a>
         {% endif %}
-        {% endwith %}
 
         <a href="{% url 'user_logout_page' %}"
            class="btn btn-bg-dark btn-outline-light">Выйти</a>

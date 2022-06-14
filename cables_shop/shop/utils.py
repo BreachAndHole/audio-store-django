@@ -4,10 +4,7 @@ from .models import ShippingAddress, User, Order, OrderedProduct
 
 def get_last_used_customer_address(customer: User) -> Optional[ShippingAddress]:
     """ Returns last used customer address if exists, otherwise None """
-    user_addresses = ShippingAddress.objects.filter(customer=customer)
-    if user_addresses.count():
-        return user_addresses.last()
-    return None
+    return ShippingAddress.objects.filter(customer=customer).last()
 
 
 def create_empty_cart(customer: User) -> None:

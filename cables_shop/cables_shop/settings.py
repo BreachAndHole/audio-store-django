@@ -14,7 +14,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -25,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'phonenumber_field',
+    'debug_toolbar',
     'shop.apps.ShopConfig',
 ]
 
@@ -36,6 +39,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 AUTH_USER_MODEL = 'shop.User'
@@ -53,7 +57,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'shop.context_processors.get_cart_items_total',
             ],
         },
     },
@@ -116,3 +119,7 @@ CACHES = {
         'LOCATION': os.path.join(BASE_DIR, 'shop_cache')
     }
 }
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]

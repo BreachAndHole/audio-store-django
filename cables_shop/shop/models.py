@@ -46,7 +46,11 @@ class Cable(models.Model):
     units_in_stock = models.PositiveSmallIntegerField('количество в наличии')
     is_for_sale = models.BooleanField('в продаже', default=True)
     description = models.TextField('описание', blank=True, null=True)
-    type = models.ForeignKey(CableType, verbose_name='тип кабеля', on_delete=models.PROTECT)
+    type = models.ForeignKey(
+        CableType,
+        verbose_name='тип кабеля',
+        on_delete=models.PROTECT,
+    )
 
     class Meta:
         verbose_name = 'кабель'
@@ -63,7 +67,10 @@ class Cable(models.Model):
     def title_photo_url(self) -> str:
         """Get photo URL or empty string"""
         try:
-            return self.cablephoto_set.get(is_title=True).photo_url
+            return CablePhoto.objects.get(
+                cable=self,
+                is_title=True
+            ).photo_url
         except CablePhoto.DoesNotExist:
             return ''
 
@@ -74,7 +81,10 @@ class CablePhoto(models.Model):
     Title photo is the one displayed on cable card on all cables page
     """
     photo = models.ImageField('фото', upload_to='photos/cable_photos/%Y/%m')
-    cable = models.ForeignKey(Cable, verbose_name='кабель', on_delete=models.CASCADE)
+    cable = models.ForeignKey(
+        Cable, verbose_name='кабель',
+        on_delete=models.CASCADE,
+    )
     is_title = models.BooleanField('является титульным')
 
     class Meta:
@@ -96,6 +106,7 @@ class CustomUserManager(BaseUserManager):
     Overriding default user creation methods to add phone_number field
     and authenticate by email
     """
+
     def _create_user(
             self, email, password, first_name, last_name, phone_number, **extra_fields
     ):
@@ -171,7 +182,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(
         User, on_delete=models.CASCADE,
-        verbose_name='покупатель'
+        verbose_name='покупатель',
     )
     address = models.CharField('адрес', max_length=200, null=True)
     city = models.CharField('город', max_length=50, null=True)
@@ -249,16 +260,24 @@ class Order(models.Model):
         if self.delivery_type == Order.DeliveryType.DELIVERY:
             return self.products_total_price + config.DELIVERY_PRICE
         return self.products_total_price
-
-    @property
-    def order_total_products(self) -> int:
-        """Returns total amount of unique products in cart"""
-        return len(self.orderedproduct_set.all())
+    #
+    # @property
+    # def order_total_products(self) -> int:
+    #     """Returns total amount of unique products in cart"""
+    #     return len(self.orderedproduct_set.all())
 
 
 class OrderedProduct(models.Model):
-    order = models.ForeignKey(Order, verbose_name='заказ', on_delete=models.CASCADE)
-    product = models.ForeignKey(Cable, verbose_name='товар', on_delete=models.CASCADE)
+    order = models.ForeignKey(
+        Order,
+        verbose_name='заказ',
+        on_delete=models.CASCADE
+    )
+    product = models.ForeignKey(
+        Cable,
+        verbose_name='товар',
+        on_delete=models.CASCADE
+    )
     quantity = models.SmallIntegerField('заказанное количество', default=0)
     date_added = models.DateTimeField('время добавления', auto_now_add=True)
 
