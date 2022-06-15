@@ -5,7 +5,14 @@
 [![Bootstrap 5.2](https://img.shields.io/badge/Bootstrap-5.2-blue)](https://getbootstrap.com/)
 ![Coverage 89%](https://img.shields.io/badge/Covearge-89%25-blue)
 ___
-## Краткое описание
+## Оглавление
+
+1. [Описание проекта](#описание-проекта)
+2. [Использовованный стэк](#использованный-стэк)
+3. [Запуск на локальной машине](#запуск-проекта-на-локальной-машине)
+4. [Внешний вид](#внешний-вид)
+___
+## Описание проекта
 
 В данном проекте реализован интернет магазин аудио-кабелей высокого качества,
 изготавливаемых и продаваемых мной на протяжении последнего года.
@@ -32,7 +39,7 @@ ___
 Все необходимые зависимости описаны в файле `requirements.py`
 
 ___
-## Стандартный запуск проекта на 127.0.0.1
+## Запуск проекта на локальной машине
  - Склонировать репозиторий
 ```
 $ git clone https://github.com/BreachAndHole/audio-store-django.git
@@ -64,3 +71,33 @@ $ pip install -r requirements.txt
 ```
 $ python3.10 cables_shop/manage.py runserver
 ```
+___
+## Внешний вид
+
+ - Главная страница сайта
+
+![index.png](./screenshots/index.png)
+
+ - Страница регистрации пользователя
+
+![registration.png](./screenshots/registration.png)
+
+ - Личный кабинет пользователя
+
+![profile.png](./screenshots/profile.png)
+
+ - Информация о заказе
+
+![order.png](./screenshots/order.png)
+
+ - Страница представленных товаров
+
+![cables.png](./screenshots/cables.png)
+
+ - Страница товара
+
+![cable.png](./screenshots/cable.png)
+
+ - Страница оформления заказа
+
+![checkout.png](./screenshots/checkout.png)
