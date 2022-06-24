@@ -3,8 +3,8 @@
 [![Python 3.10](https://img.shields.io/badge/Python-3.10-blue)](https://www.python.org/)
 [![Django 4.0](https://img.shields.io/badge/django-4.0-blue)](https://www.djangoproject.com/)
 [![Bootstrap 5.2](https://img.shields.io/badge/Bootstrap-5.2-blue)](https://getbootstrap.com/)
-![Coverage 89%](https://img.shields.io/badge/Covearge-89%25-blue)
-![Status](https://img.shields.io/badge/Status-Live-green)
+![Coverage 89%](https://img.shields.io/badge/Coverage-89%25-brightgreen)
+[[Status](https://img.shields.io/badge/Status-Live-brightgreen)](http://193.3.23.151:8000)
 
 ## Оглавление
 
